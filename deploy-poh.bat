@@ -22,8 +22,20 @@ REM Step 3 – Commit and push changes
 echo.
 echo [3/4] Adding, committing, and pushing changes to GitHub...
 git add -A
-git commit -m "Auto-deploy update" --allow-empty
-git push origin main || goto :error
+
+REM Check if there are changes
+git diff-index --quiet HEAD -- || (
+    for /f "tokens=1-4 delims=/ " %%a in ("%date%") do (
+        set today=%%a-%%b-%%c
+    )
+    for /f "tokens=1-2 delims=: " %%a in ("%time%") do (
+        set now=%%a-%%b
+    )
+    git commit -m "Auto-deploy update %today% %now%"
+    git push origin main || goto :error
+) && (
+    echo No changes to commit. Skipping push.
+)
 
 REM Step 4 – Trigger GitHub Actions deploy
 echo.
