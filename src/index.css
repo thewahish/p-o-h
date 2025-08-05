@@ -2,7 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Custom styles */
 body {
   @apply bg-gradient-to-b from-gray-900 to-black text-white;
 }
