@@ -13,10 +13,13 @@ If you are developing a production application, we recommend using TypeScript wi
 
 
 
-Path of Heroes – Consolidated Master README v3.0
-Last Updated: August 4, 2025
-Status: In Development (Prototype Stage)
+Path of Heroes – Consolidated Master README v4.0
+Last Updated: August 5, 2025
+
+Status: In Development (Core Gameplay Loop - Rebalancing Phase)
+
 GitHub Repository: https://github.com/thewahish/p-o-h
+
 Developer: Obai Sukar
 
 📘 Project Purpose & Master Record
@@ -44,15 +47,15 @@ Main Menu: The player starts here. They can access the Soul Forge to spend curre
 
 Character Selection: The player chooses one of the three available heroes.
 
-The Dungeon: The run begins on Floor 1. Each floor is a randomly generated 7x7 grid.
+The Dungeon: The run begins on Floor 1. Each floor is a procedurally generated grid with impassable walls, creating a unique maze-like layout.
 
-Exploration: The player moves one tile at a time on the grid, revealing adjacent rooms.
+Exploration: The player moves one tile at a time on the grid, revealing adjacent rooms and navigating the floor's layout.
 
-Events: Moving into a room triggers an event (Battle, Shop, Campfire, etc.). The room is consumed after the event is completed.
+Events: Moving into a room triggers an event (Battle, Shop, Campfire, etc.). The room is marked as 'completed' after the event.
 
 Progression: After defeating the Floor Boss, the player advances to the next, more challenging floor.
 
-Defeat: If the player's HP drops to zero, the run ends. They lose a portion of their run-specific currency but retain all Hero Souls.
+Defeat: If the player's HP drops to zero, the run ends. They lose 90% of their collected Gold but retain all Hero Souls.
 
 Meta-Progression: The player is returned to the Main Menu, where they can use their collected Hero Souls at the Soul Forge to unlock permanent upgrades, making their next run easier.
 
@@ -84,67 +87,71 @@ Enemies: Introduction of Champion enemy variants with powerful, unique abilities
 Final Demo Boss: The Crypt Lord
 
 🗺️ Exploration & The Grid System
-Floor progression is handled via exploration of a 7x7 grid.
+Floor progression is handled via strategic exploration of a procedurally generated grid.
 
-Generation: Each floor generates a new grid. The player starts at the bottom-center, and the boss room is at the top-center. A main path is generated, but side-rooms and branches offer risk-reward opportunities.
+Generation: Each floor generates a new grid larger than 7x7. The player starts at a designated entrance, and the boss room is at a designated exit. The generation algorithm creates impassable walls and maze-like paths, ensuring the player cannot simply walk in a straight line to the boss. Branches and dead-ends will hide risk-reward opportunities.
 
-Movement: The player can move to any adjacent, revealed room. Moving into a room consumes it and triggers its event.
+Movement: The player can move to any adjacent, revealed, and accessible room. Moving into a room triggers its event.
 
 Room Types & Icons:
 
-Battle $⚔️$: A standard combat encounter.
+Battle ⚔️: A standard combat encounter.
 
-Elite Battle $💀$: A combat encounter with a powerful "Elite" enemy that gives better rewards.
+Elite Battle 💀: A combat encounter with powerful "Elite" enemies that give better rewards.
 
-Shop $🏪$: Spend gold on items and equipment.
+Shop 🏪: Spend gold on items and equipment.
 
-Campfire $🔥$: A safe room to either heal or upgrade a stat.
+Campfire 🔥: A safe room to either heal or upgrade a stat for the run.
 
-Shrine $⛩️$: Receive a powerful, passive blessing (Relic).
+Shrine ⛩️: Be offered a choice between three powerful, passive blessings (Relics).
 
-Mystery $❓$: A random event with a variety of outcomes.
+Mystery ❓: A random event with a variety of outcomes.
 
-Boss $👹$: A fight against the area's boss to proceed to the next floor.
+Boss 👹: A fight against the area's boss to proceed to the next floor.
 
 ⚔️ Combat System
 Combat is the core challenge of the game and is designed to be strategic and turn-based.
 
 System: Turn-based combat where turn order is determined by the Speed (SPD) stat of each combatant.
 
+Damage Formula: Damage = (Attacker_ATK * Attacker_ATK) / (Attacker_ATK + Defender_DEF). This formula uses defense as mitigation and ensures every hit deals at least some damage.
+
 Core Stats:
+
+HP (Health Points): A character's life force. Reaching 0 means defeat.
 
 ATK (Attack): Determines physical damage.
 
-POW (Power): Determines magical damage and the potency of effects (like DoTs, heals).
-
-DEF (Defense): Reduces incoming damage.
+DEF (Defense): Mitigates incoming physical damage.
 
 SPD (Speed): Determines turn order.
 
+CRIT (Critical Chance): The percentage chance to land a critical hit for 1.5x damage.
+
+(Planned) POW (Power): Will determine magical damage and the potency of effects (like DoTs, heals).
+
 Actions: On their turn, a character can Attack, use a Skill, use an Item, or Defend.
 
-Resource Regeneration: The player regenerates a small amount of their primary resource (Vigor, Mana, Energy) at the start of each of their turns.
+Resource Regeneration: The player regenerates a small amount of their primary resource (Vigor, Mana, Energy) at the start of each of their turns in combat.
 
-Status Effects: The core strategic layer.
+Status Effects:
 
-Vulnerable: Target takes increased damage (e.g., +50%).
+Weaken: Target deals reduced damage.
 
-Weak: Target deals reduced damage (e.g., -50%).
+Poison: Target takes damage at the start of its turn.
 
-Additional effects like Poison, Burn, Stun, and Shield will be added.
+(Planned): Vulnerable (takes increased damage), Stun, Burn, Shield, etc.
 
 🧙 Playable Characters
-Each character offers a distinct playstyle. All data will be stored in a central constants file.
-
 Warrior (Taha / طه)
 
 Role: Tank / Melee
 
 Resource: Vigor
 
-Mechanics: Focuses on high HP and DEF. Uses skills that scale with ATK and DEF.
+Mechanics: High HP and DEF. Skills scale with ATK and DEF.
 
-Starting Skill: Shield Slam - A high-impact defensive or utility skill.
+Starting Skill: Shield Bash - Deals minor damage and applies the Weaken debuff to an enemy.
 
 Sorceress (Mais / ميس)
 
@@ -152,9 +159,9 @@ Role: Ranged Mage
 
 Resource: Mana
 
-Mechanics: Focuses on high POW for devastating spells. Low defenses.
+Mechanics: High ATK (used for spell damage). Low defenses.
 
-Starting Skill: Fireball - A powerful, high-damage spell.
+Starting Skill: Fireball - Deals damage to all enemies.
 
 Rogue (Ibrahim / إبراهيم)
 
@@ -162,103 +169,80 @@ Role: Assassin / DoT Specialist
 
 Resource: Energy
 
-Mechanics: Focuses on high SPD and applying Damage-over-Time effects that scale with POW.
+Mechanics: High SPD and CRIT. Focuses on applying Damage-over-Time effects.
 
-Starting Skill: Poison Strike - Applies a potent Poison effect.
+Starting Skill: Venom Strike - Deals high initial damage and applies a potent Poison effect.
 
-📈 Progression & Leveling (In-Run)
+📈 Progression (In-Run)
 Experience (XP): Players gain XP from defeating enemies.
 
-Leveling Up: Upon reaching an XP threshold, the hero levels up. This provides a core stat increase based on their class's statGainsPerLevel and fully restores HP and resources.
+Leveling Up: Upon reaching an XP threshold, the hero levels up, gaining core stats based on their class's growthRates and fully restoring HP and resources.
 
-Rewards: After winning a battle, players are taken to a reward screen where they can choose one of three random upgrades, such as a temporary stat increase, a new piece of equipment, or a new skill.
+Battle Outcome: After a battle, players are taken to a dedicated Outcome Screen.
+
+Victory: Displays Gold and XP earned. A future feature will be to choose one of three random reward cards (e.g., new item, temporary stat boost).
+
+Defeat: Displays the 90% Gold penalty and provides an option to return to the Main Menu.
 
 ✨ Meta-Progression: The Soul Forge
-To ensure every run feels meaningful, the game features a robust meta-progression system.
-
-Permanent Currency: Players earn Hero Souls during each run, based on performance (floors cleared, elites defeated). A portion of these souls is retained even upon death.
-
-The Soul Forge: From the main menu, players spend Hero Souls on permanent, global upgrades that affect all future runs.
-
-Example Upgrades:
-
-Increase a hero's starting HP or Gold.
-
-Unlock new characters (Sorceress, Rogue).
-
-Improve the quality of rewards found after combat.
-
-Unlock new skills or items to be found during runs.
-
-Start every run with a free potion.
+(This system is planned for a future development phase and remains unchanged.)
 
 🎒 Inventory, Loot & Potions
-Equipment Slots: Characters have 8 equipment slots: Head, Shoulders, Chest, Legs, Feet, Hands, Weapon, and an Accessory.
-
-Loot Drops: Enemies have a chance to drop equipment. The quality of loot is determined by rarity colors (Common, Uncommon, Rare, Epic, Legendary).
-
-Potions: Players can find or buy run-specific consumable potions (e.g., Health Potion, Mana Potion). These are lost upon death. Using a potion in combat costs a turn.
-
-Management: Inventory can be managed at the Campfire or outside of combat. During combat, inventory can be viewed, but equipment cannot be changed.
+(This system is planned for a future development phase and remains unchanged.)
 
 ⛺ Event Scene Breakdown
-Each non-combat room offers a strategic choice.
+Shop 🏪: Spend gold on a selection of equipment, relics, and potions.
 
-Shop $🏪$: Spend gold on a selection of equipment, relics, and potions.
-
-Campfire $🔥$: Choose one of two options:
+Campfire 🔥: Choose one of two options:
 
 Rest: Heal for a significant percentage of Max HP.
 
 Sharpen: Gain a small, permanent stat boost for the remainder of the run (e.g., +2 ATK).
 
-Shrine $⛩️$: Be offered a choice of one of three powerful, passive blessings (Relics) that provide run-altering effects.
+Shrine ⛩️: Be offered a choice of one of three powerful, passive blessings (Relics) that provide run-altering effects.
 
-Mystery $❓$: A random event with a variety of outcomes, from finding treasure to being ambushed.
+Mystery ❓: A random event with a variety of outcomes, from finding treasure to being ambushed.
 
 ⚙️ Technical Architecture
 Frontend: React 18
 
 Build Tool: Vite
 
-Styling: TailwindCSS (locked to v3.4.17 for consistency). Custom global styles in index.css.
+Styling: TailwindCSS (v3.4.17).
 
-Icons: lucide-react
+State Management: A global singleton object (src/core/state.js) with a subscription model (subscribe/_notify) to update the UI efficiently without polling.
 
-State Management: Initial state via React Hooks (useState, useContext). Will consider a dedicated library (e.g., Zustand) as complexity grows.
+Debugging: A persistent, global debugger (persistent-debugger.jsx + logger.js) that initializes before React to catch startup errors and provide detailed runtime logging.
+
+File Naming Convention: All components and modules in src use kebab-case (e.g., battle-screen.jsx, game-state.js) to prevent case-sensitivity issues.
 
 File Structure:
 
 p-o-h/
-├── src/
-│   ├── components/  # Reusable components (e.g., BattleScreen.jsx, MainMenu.jsx)
-│   ├── constants/   # Game data (e.g., characters.js, items.js, localization.js)
-│   ├── utils/       # Helper functions (e.g., damageCalculator.js)
-│   ├── App.jsx      # Main game logic and state management
-│   └── main.jsx     # Application entry point
-├── deploy-poh.bat   # Deployment script
-└── package.json
-🐛 Known Issues & Development Roadmap
-Known Issues:
+└── src/
+    ├── components/     # React components (battle-screen.jsx, etc.)
+    ├── constants/      # Static game data (characters.js, enemies.js, etc.)
+    ├── core/           # Core singletons (state.js, logger.js)
+    ├── systems/        # Game logic modules (combat.js, dungeon.js)
+    ├── App.jsx         # Main component, router
+    └── main.jsx        # Application entry point
+🚧 Development Roadmap
+Recently Completed (Pending Implementation):
 
-Placeholder combat functionality (win/lose buttons).
+Full Rebalancing Pass (New Damage Formula, Buffed Enemies, Floor Scaling).
 
-Shop, Shrine, and other event screens are placeholders.
+Implementation of Battle Outcome Screens (Victory/Defeat).
 
-No XP or leveling system implemented.
+Implementation of the Death Penalty (90% Gold Loss).
 
-No inventory or equipment system implemented.
+HUD update to include Player Level and XP Bar.
 
-Development Roadmap:
+Next Major Features:
 
-Combat System Implementation: Build the <BattleScreen> component with the full turn-based logic, stats, and effects.
+Advanced Dungeon Generation: Overhaul the dungeon.js system to create larger, non-linear, maze-like floors with impassable walls.
 
-Character & Data: Move all static game data (characters, enemies, items) into src/constants/.
+Floor Progression: Implement the logic for advancing to the next floor after defeating a boss.
 
-Inventory & Equipment: Develop the UI and logic for the 8-slot inventory system.
+Inventory System: Build the UI and logic for equipping and managing items.
 
-Meta-Progression: Create the Soul Forge UI and logic for purchasing permanent upgrades.
-
-Event Components: Build out the functional components for the Shop, Campfire, and Shrine events.
-
-Bilingual Support: Implement the language toggle and localization system.
+Full Event Implementation: Create the functional UIs for the Shop, Campfire, and Shrine choices.
