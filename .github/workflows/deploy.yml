@@ -3,27 +3,34 @@ name: Deploy Path of Heroes to GitHub Pages
 on:
   push:
     branches:
-      - main  # Deploy when pushing to main
+      - main  # Runs only when you push to main
+  workflow_dispatch: # Allows manual trigger from GitHub Actions tab
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
+      # Step 1 - Checkout Repo
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      # Step 2 - Set up Node.js
+      - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
+          cache: npm
 
+      # Step 3 - Install dependencies
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
+      # Step 4 - Build project
       - name: Build project
         run: npm run build
 
+      # Step 5 - Deploy to GitHub Pages
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
