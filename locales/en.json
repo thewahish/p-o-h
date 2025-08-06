@@ -1,0 +1,278 @@
+{
+  "game": {
+    "title": "Path of Heroes",
+    "subtitle": "Choose Your Hero"
+  },
+  "language": {
+    "select": "Select Language",
+    "english": "English",
+    "arabic": "العربية",
+    "confirm": "Continue"
+  },
+  "menu": {
+    "play": "Play Game",
+    "options": "Options", 
+    "credits": "Credits",
+    "soulForge": "Soul Forge",
+    "loading": "Loading Path of Heroes..."
+  },
+  "character": {
+    "select": "Choose Your Hero",
+    "roster": "Choose Your Champion",
+    "description": "Description:",
+    "role": "Role:",
+    "specialization": "Specialization:",
+    "stats": "Base Stats (Level 1):",
+    "startJourney": "Start Your Journey",
+    "details": "Details"
+  },
+  "characters": {
+    "warrior": {
+      "name": "Taha",
+      "nameArabic": "طه",
+      "role": "Tank/Warrior",
+      "description": "A formidable warrior, Taha leads with unyielding defense and immense vitality. He excels in direct combat, soaking up damage while delivering powerful strikes.",
+      "traits": {
+        "highDefense": "High Defense",
+        "areaStrikes": "Area Strikes", 
+        "resolute": "Resolute"
+      }
+    },
+    "sorceress": {
+      "name": "Mais",
+      "nameArabic": "ميس",
+      "role": "Ranged Mage",
+      "description": "Mais commands elemental forces, unleashing devastating area-of-effect spells and freezing foes in their tracks. Though fragile, her magic can turn the tide of any battle.",
+      "traits": {
+        "elementalMagic": "Elemental Magic",
+        "ancientKnowledge": "Ancient Knowledge",
+        "spellMastery": "Spell Mastery"
+      }
+    },
+    "rogue": {
+      "name": "Ibrahim", 
+      "nameArabic": "إبراهيم",
+      "role": "Assassin/DoT Specialist",
+      "description": "Swift and deadly, Ibrahim strikes from the shadows with unparalleled speed and precision. His critical hits can dispatch even the toughest enemies before they know what hit them.",
+      "traits": {
+        "berserkerRage": "Berserker Rage",
+        "rawStrength": "Raw Strength",
+        "intimidating": "Intimidating"
+      }
+    }
+  },
+  "stats": {
+    "hp": "HP",
+    "hpShort": "HP",
+    "xp": "XP",
+    "xpShort": "XP",
+    "resource": "Resource",
+    "atk": "ATK",
+    "attack": "ATK", 
+    "def": "DEF",
+    "defense": "DEF",
+    "spd": "SPD",
+    "speed": "SPD",
+    "crit": "CRIT",
+    "level": "Lvl",
+    "floor": "Floor",
+    "gold": "Gold"
+  },
+  "resources": {
+    "vigor": "Vigor",
+    "mana": "Mana", 
+    "energy": "Energy"
+  },
+  "combat": {
+    "battle": "Battle",
+    "attack": "Attack",
+    "skill": "Skill", 
+    "defend": "Defend",
+    "potions": "Potions",
+    "flee": "Flee",
+    "noSkill": "No Skill",
+    "log": "Combat Log",
+    "playerTurn": "{player}'s Turn",
+    "enemyTurn": "Enemy Turn",
+    "victory": "Victory!",
+    "defeat": "You Have Fallen...",
+    "continue": "Continue",
+    "returnToMenu": "Return to Menu",
+    "goldAcquired": "Gold Acquired:",
+    "experienceGained": "Experience Gained:",
+    "goldLost": "Gold Lost:",
+    "remaining": "remaining",
+    "journeyEnds": "Your journey ends here... for now.",
+    "victorious": "You have emerged victorious!",
+    "insufficientResource": "Not enough {resource}!",
+    "messages": {
+      "battleBegins": "A battle begins! Enemies: {enemies}",
+      "yourTurn": "It's your turn!",
+      "youAttack": "You attack {target} for {damage} damage!",
+      "youUseSkill": "You use {skill}!",
+      "skillHits": "{skill} hits {target} for {damage} damage!",
+      "targetAfflicted": "{target} is afflicted with {effect}.",
+      "defensiveStance": "You take a defensive stance.",
+      "successfulEscape": "You successfully escaped from battle!",
+      "failedEscape": "You couldn't escape!",
+      "enemyAttacks": "{enemy} attacks you for {damage} damage!",
+      "defenseReduced": "Your defensive stance reduces the damage!",
+      "unitDefeated": "{unit} is defeated!",
+      "youDefeated": "You have been defeated...",
+      "allEnemiesDefeated": "Victory! You defeated all enemies.",
+      "poisonDamage": "{unit} takes {damage} damage from poison.",
+      "statusWoreOff": "{unit}'s {effect} effect wore off.",
+      "criticalHit": "Critical hit!"
+    }
+  },
+  "skills": {
+    "shieldBash": {
+      "name": "Shield Bash",
+      "description": "Deals damage and weakens enemy attack"
+    },
+    "fireball": {
+      "name": "Fireball", 
+      "description": "Deals damage to all enemies"
+    },
+    "venomStrike": {
+      "name": "Venom Strike",
+      "description": "High damage with poison effect"
+    }
+  },
+  "enemies": {
+    "goblin": "Goblin",
+    "slime": "Slime", 
+    "orcBrute": "Orc Brute",
+    "skeleton": "Skeleton",
+    "ghoul": "Ghoul",
+    "wraith": "Wraith",
+    "imp": "Demonic Imp",
+    "cultist": "Cultist",
+    "orcWarlord": "Orc Warlord",
+    "graveGolem": "Grave Golem",
+    "cryptLord": "The Crypt Lord"
+  },
+  "rooms": {
+    "battle": "Battle Room",
+    "elite": "Elite Battle", 
+    "shop": "Shop",
+    "shrine": "Shrine",
+    "treasure": "Treasure Room",
+    "boss": "Boss Room",
+    "campfire": "Campfire"
+  },
+  "shop": {
+    "welcome": "Welcome to my shop!",
+    "purchase": "Purchase",
+    "leave": "Leave Shop",
+    "cannotAfford": "You cannot afford this item",
+    "soldOut": "Sold Out"
+  },
+  "shrine": {
+    "blessing": "Choose a Blessing",
+    "strength": "Blessing of Strength",
+    "fortitude": "Blessing of Fortitude", 
+    "swiftness": "Blessing of Swiftness",
+    "fortune": "Blessing of Fortune",
+    "received": "You receive the {blessing}! +{bonus} {stat}"
+  },
+  "treasure": {
+    "found": "You found {amount} gold!"
+  },
+  "souls": {
+    "forge": "Soul Forge",
+    "heroSouls": "Hero Souls",
+    "permanentUpgrades": "Permanent upgrades for all heroes",
+    "earned": "Hero Souls Earned:",
+    "kept": "Souls are kept for permanent upgrades!",
+    "closeForge": "Close Forge",
+    "earnDescription": "Earn Hero Souls by defeating enemies and completing floors",
+    "purchase": "Purchase",
+    "owned": "OWNED",
+    "purchased": "PURCHASED", 
+    "needSouls": "Need {cost} Souls",
+    "purchaseCost": "Purchase ({cost} Souls)"
+  },
+  "upgrades": {
+    "vitality": {
+      "name": "Vitality",
+      "description": "+20% Maximum Health for all heroes"
+    },
+    "fortune": {
+      "name": "Fortune", 
+      "description": "+50% Starting Gold for all runs"
+    },
+    "wisdom": {
+      "name": "Wisdom",
+      "description": "+25% Experience gain for all heroes"
+    }
+  },
+  "status": {
+    "poison": "Poison",
+    "weaken": "Weakened", 
+    "defend": "Defending",
+    "poisonDamage": "{target} takes {damage} damage from poison",
+    "weakenApplied": "{target}'s attack has been weakened!",
+    "statusResisted": "{target} resisted the effect!",
+    "statusWoreOff": "{character}'s {effect} wore off"
+  },
+  "shop": {
+    "title": "Merchant's Shop",
+    "onePurchaseOnly": "You may only make one purchase.",
+    "thankYou": "Thank you for your purchase!",
+    "leave": "Leave",
+    "notEnoughGold": "Not enough gold!"
+  },
+  "items": {
+    "sword": "Sword",
+    "staff": "Staff",
+    "hp_potion": "Health Potion"
+  },
+  "rarities": {
+    "common": "Common",
+    "uncommon": "Uncommon", 
+    "rare": "Rare",
+    "epic": "Epic",
+    "mythic": "Mythic",
+    "legendary": "Legendary"
+  },
+  "prefixes": {
+    "sturdy": "Sturdy",
+    "sharp": "Sharp"
+  },
+  "rewards": {
+    "goldFound": "Treasure Found!",
+    "goldFoundAmount": "You found {amount} gold!",
+    "blessingReceived": "Divine Blessing!",
+    "blessingDetails": "✨ You receive the {blessing}! +{bonus} {stat}",
+    "itemFound": "Item Found!",
+    "reward": "Reward!",
+    "continue": "Continue"
+  },
+  "blessings": {
+    "strength": "Blessing of Strength",
+    "fortitude": "Blessing of Fortitude",
+    "swiftness": "Blessing of Swiftness",
+    "fortune": "Blessing of Fortune"
+  },
+  "exploration": {
+    "controls": "Use WASD or Arrow Keys to navigate the maze. Click adjacent rooms to move."
+  },
+  "debug": {
+    "title": "Debugger",
+    "gameState": "Game State",
+    "consoleLog": "Console Log", 
+    "copyLogs": "Copy All Logs",
+    "initialized": "Debugger initialized",
+    "toggleOn": "Debugger panel opened",
+    "toggleOff": "Debugger panel closed",
+    "logsCopied": "All logs copied to clipboard!",
+    "errorLoading": "Error loading screen:",
+    "screenLoaded": "Screen loaded:",
+    "gameInitialized": "Game initialized",
+    "languageChanged": "Language changed to:",
+    "errorCopyingLogs": "Failed to copy logs:",
+    "errorInitializing": "Error initializing system:",
+    "systemInitialized": "System initialized:"
+  }
+}

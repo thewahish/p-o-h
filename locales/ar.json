@@ -1,0 +1,278 @@
+{
+  "game": {
+    "title": "طريق الأبطال",
+    "subtitle": "اختر بطلك"
+  },
+  "language": {
+    "select": "اختر اللغة",
+    "english": "English",
+    "arabic": "العربية",
+    "confirm": "متابعة"
+  },
+  "menu": {
+    "play": "ابدأ اللعبة",
+    "options": "الخيارات",
+    "credits": "الاعتمادات",
+    "soulForge": "مصنع الأرواح",
+    "loading": "جاري تحميل طريق الأبطال..."
+  },
+  "character": {
+    "select": "اختر بطلك",
+    "roster": "اختر بطلك",
+    "description": "الوصف:",
+    "role": "الدور:",
+    "specialization": "التخصص:",
+    "stats": "الإحصائيات الأساسية (المستوى 1):",
+    "startJourney": "ابدأ رحلتك",
+    "details": "التفاصيل"
+  },
+  "characters": {
+    "warrior": {
+      "name": "طه",
+      "nameArabic": "طه",
+      "role": "دبابة/محارب",
+      "description": "محارب هائل، يقود طه بدفاع لا يتزعزع وحيوية هائلة. إنه يتفوق في القتال المباشر، ويمتص الضرر بينما يوجه ضربات قوية.",
+      "traits": {
+        "highDefense": "دفاع عالٍ",
+        "areaStrikes": "ضربات منطقة",
+        "resolute": "عزيمة"
+      }
+    },
+    "sorceress": {
+      "name": "ميس",
+      "nameArabic": "ميس", 
+      "role": "ساحرة بعيدة المدى",
+      "description": "ميس تتحكم بالقوى العنصرية، تطلق تعويذات منطقة واسعة مدمرة وتجمد الأعداء في مساراتهم. على الرغم من ضعفها، يمكن لسحرها تغيير مجرى أي معركة.",
+      "traits": {
+        "elementalMagic": "سحر عنصري",
+        "ancientKnowledge": "معرفة قديمة",
+        "spellMastery": "إتقان التعويذات"
+      }
+    },
+    "rogue": {
+      "name": "إبراهيم",
+      "nameArabic": "إبراهيم",
+      "role": "قاتل/متخصص في الضرر المستمر",
+      "description": "سريع وقاتل، يضرب إبراهيم من الظلال بسرعة ودقة لا مثيل لهما. يمكن لضرباته الحاسمة القضاء على أصعب الأعداء قبل أن يدركوا ما أصابهم.",
+      "traits": {
+        "berserkerRage": "غضب البرسيركر",
+        "rawStrength": "قوة خام", 
+        "intimidating": "مهيب"
+      }
+    }
+  },
+  "stats": {
+    "hp": "نقاط الحياة",
+    "hpShort": "نح",
+    "xp": "نقاط الخبرة",
+    "xpShort": "نخ",
+    "resource": "المورد",
+    "atk": "الهجوم",
+    "attack": "الهجوم",
+    "def": "الدفاع", 
+    "defense": "الدفاع",
+    "spd": "السرعة",
+    "speed": "السرعة",
+    "crit": "الضرر الحرج",
+    "level": "المستوى",
+    "floor": "الطابق",
+    "gold": "الذهب"
+  },
+  "resources": {
+    "vigor": "نشاط",
+    "mana": "مانا",
+    "energy": "طاقة"
+  },
+  "combat": {
+    "battle": "معركة",
+    "attack": "هجوم",
+    "skill": "مهارة",
+    "defend": "دفاع",
+    "potions": "جرعات",
+    "flee": "هروب",
+    "noSkill": "لا توجد مهارة",
+    "log": "سجل المعركة",
+    "playerTurn": "دور {player}",
+    "enemyTurn": "دور العدو",
+    "victory": "انتصار!",
+    "defeat": "لقد سقطت...",
+    "continue": "متابعة",
+    "returnToMenu": "العودة للقائمة الرئيسية",
+    "goldAcquired": "الذهب المكتسب:",
+    "experienceGained": "الخبرة المكتسبة:",
+    "goldLost": "الذهب المفقود:",
+    "remaining": "متبقي",
+    "journeyEnds": "رحلتك تنتهي هنا... في الوقت الحالي.",
+    "victorious": "لقد حققت النصر!",
+    "insufficientResource": "لا يوجد {resource} كافٍ!",
+    "messages": {
+      "battleBegins": "تبدأ المعركة! الأعداء: {enemies}",
+      "yourTurn": "حان دورك!",
+      "youAttack": "تهاجم {target} وتسبب {damage} ضرر!",
+      "youUseSkill": "تستخدم {skill}!",
+      "skillHits": "{skill} تصيب {target} وتسبب {damage} ضرر!",
+      "targetAfflicted": "{target} مصاب بتأثير {effect}.",
+      "defensiveStance": "تتخذ وقفة دفاعية.",
+      "successfulEscape": "لقد نجحت في الهروب من المعركة!",
+      "failedEscape": "لم تستطع الهروب!",
+      "enemyAttacks": "{enemy} يهاجمك ويسبب {damage} ضرر!",
+      "defenseReduced": "وقفتك الدفاعية تقلل الضرر!",
+      "unitDefeated": "{unit} مهزوم!",
+      "youDefeated": "لقد تم هزيمتك...",
+      "allEnemiesDefeated": "انتصار! لقد هزمت جميع الأعداء.",
+      "poisonDamage": "{unit} يتلقى {damage} ضرر مر السم.",
+      "statusWoreOff": "تأثير {effect} على {unit} قد زال.",
+      "criticalHit": "ضربة حاسمة!"
+    }
+  },
+  "skills": {
+    "shieldBash": {
+      "name": "ضربة الدرع",
+      "description": "يلحق الضرر ويضعف هجوم العدو"
+    },
+    "fireball": {
+      "name": "كرة نارية",
+      "description": "يلحق الضرر بجميع الأعداء"
+    },
+    "venomStrike": {
+      "name": "ضربة سامة", 
+      "description": "ضرر عالي مع تأثير السم"
+    }
+  },
+  "enemies": {
+    "goblin": "عفريت",
+    "slime": "وحل",
+    "orcBrute": "أورك وحشي",
+    "skeleton": "هيكل عظمي",
+    "ghoul": "غول",
+    "wraith": "شبح",
+    "imp": "عفريت شيطاني", 
+    "cultist": "عبدة الشر",
+    "orcWarlord": "أمير حرب الأورك",
+    "graveGolem": "غوليم القبر",
+    "cryptLord": "سيد الخبايا"
+  },
+  "rooms": {
+    "battle": "غرفة المعركة",
+    "elite": "معركة النخبة",
+    "shop": "متجر",
+    "shrine": "مقام",
+    "treasure": "غرفة الكنز",
+    "boss": "غرفة الزعيم",
+    "campfire": "نار المخيم"
+  },
+  "shop": {
+    "welcome": "مرحباً بك في متجري!",
+    "purchase": "شراء",
+    "leave": "غادر المتجر",
+    "cannotAfford": "لا تستطيع تحمل تكلفة هذا العنصر",
+    "soldOut": "نفد المخزون"
+  },
+  "shrine": {
+    "blessing": "اختر بركة",
+    "strength": "بركة القوة",
+    "fortitude": "بركة الصمود",
+    "swiftness": "بركة السرعة",
+    "fortune": "بركة الحظ",
+    "received": "✨ تحصل على {blessing}! +{bonus} {stat}"
+  },
+  "treasure": {
+    "found": "وجدت {amount} ذهب!"
+  },
+  "souls": {
+    "forge": "مصنع الأرواح",
+    "heroSouls": "أرواح الأبطال",
+    "permanentUpgrades": "ترقيات دائمة لجميع الأبطال",
+    "earned": "أرواح الأبطال المكتسبة:",
+    "kept": "الأرواح محفوظة للترقيات الدائمة!",
+    "closeForge": "إغلاق المصنع",
+    "earnDescription": "اكسب أرواح الأبطال بهزيمة الأعداء وإكمال الطوابق",
+    "purchase": "شراء",
+    "owned": "مملوك",
+    "purchased": "تم الشراء",
+    "needSouls": "تحتاج {cost} أرواح",
+    "purchaseCost": "شراء ({cost} أرواح)"
+  },
+  "upgrades": {
+    "vitality": {
+      "name": "الحيوية",
+      "description": "+20% نقاط الحياة القصوى لجميع الأبطال"
+    },
+    "fortune": {
+      "name": "الحظ",
+      "description": "+50% الذهب الابتدائي لجميع المحاولات"
+    },
+    "wisdom": {
+      "name": "الحكمة", 
+      "description": "+25% كسب الخبرة لجميع الأبطال"
+    }
+  },
+  "status": {
+    "poison": "السم",
+    "weaken": "ضعف",
+    "defend": "دفاع",
+    "poisonDamage": "{target} يتلقى {damage} ضرر من السم",
+    "weakenApplied": "تم إضعاف هجوم {target}!",
+    "statusResisted": "{target} قاوم التأثير!",
+    "statusWoreOff": "تأثير {effect} على {character} قد زال"
+  },
+  "shop": {
+    "title": "متجر التاجر",
+    "onePurchaseOnly": "يمكنك إجراء عملية شراء واحدة فقط.",
+    "thankYou": "شكرًا لك على الشراء!",
+    "leave": "غادر",
+    "notEnoughGold": "لا يوجد ذهب كافٍ!"
+  },
+  "items": {
+    "sword": "سيف",
+    "staff": "عصا",
+    "hp_potion": "جرعة صحة"
+  },
+  "rarities": {
+    "common": "شائع",
+    "uncommon": "غير شائع", 
+    "rare": "نادر",
+    "epic": "ملحمي",
+    "mythic": "أسطوري",
+    "legendary": "خارق"
+  },
+  "prefixes": {
+    "sturdy": "متين",
+    "sharp": "حاد"
+  },
+  "rewards": {
+    "goldFound": "تم العثور على كنز!",
+    "goldFoundAmount": "عثرت على {amount} ذهب!",
+    "blessingReceived": "بركة إلهية!",
+    "blessingDetails": "✨ تلقيت {blessing}! +{bonus} {stat}",
+    "itemFound": "تم العثور على عنصر!",
+    "reward": "مكافأة!",
+    "continue": "متابعة"
+  },
+  "blessings": {
+    "strength": "بركة القوة",
+    "fortitude": "بركة الصمود",
+    "swiftness": "بركة السرعة",
+    "fortune": "بركة الحظ"
+  },
+  "exploration": {
+    "controls": "استخدم WASD أو أسهم لوحة المفاتيح للتنقل في المتاهة. انقر على الغرف المجاورة للانتقال."
+  },
+  "debug": {
+    "title": "المصحح",
+    "gameState": "حالة اللعبة",
+    "consoleLog": "سجل وحدة التحكم",
+    "copyLogs": "نسخ جميع السجلات",
+    "initialized": "تم تهيئة المصحح",
+    "toggleOn": "لوحة المصحح مفتوحة",
+    "toggleOff": "لوحة المصحح مغلقة",
+    "logsCopied": "تم نسخ جميع السجلات إلى الحافظة!",
+    "errorLoading": "خطأ في تحميل الشاشة:",
+    "screenLoaded": "تم تحميل الشاشة:",
+    "gameInitialized": "تم تهيئة اللعبة",
+    "languageChanged": "تم تغيير اللغة إلى:",
+    "errorCopyingLogs": "فشل نسخ السجلات:",
+    "errorInitializing": "خطأ في تهيئة النظام:",
+    "systemInitialized": "تم تهيئة النظام:"
+  }
+}
