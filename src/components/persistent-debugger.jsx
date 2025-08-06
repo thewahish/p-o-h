@@ -1,37 +1,34 @@
-// filename: src/components/PersistentDebugger.jsx
+// filename: src/components/persistent-debugger.jsx
 
 import React, { useState, useEffect } from 'react';
 import Logger from '../core/logger';
 
 const sourceColors = {
-    'SYSTEM': 'text-gray-400',
-    'STATE': 'text-purple-400',
-    'UI': 'text-cyan-400',
-    'INPUT': 'text-blue-400',
-    'COMBAT': 'text-red-400',
-    'LOGGER': 'text-yellow-400',
+    'SYSTEM': 'text-gray-400', 'STATE': 'text-purple-400', 'UI': 'text-cyan-400',
+    'INPUT': 'text-blue-400', 'COMBAT': 'text-red-400', 'LOGGER': 'text-yellow-400',
     'ERROR': 'text-red-500 font-bold',
 };
 
 export default function PersistentDebugger() {
     const [logs, setLogs] = useState([]);
-    const [isVisible, setIsVisible] = useState(true);
+    // --- FIX: Default state is now false (hidden) ---
+    const [isVisible, setIsVisible] = useState(false);
 
     useEffect(() => {
-        // Subscribe to the logger. The returned function is the cleanup.
         const unsubscribe = Logger.subscribe(newLogs => {
             setLogs(newLogs);
         });
         return unsubscribe;
-    }, []); // Empty array ensures this runs only once
+    }, []);
 
     if (!isVisible) {
         return (
             <button
                 onClick={() => setIsVisible(true)}
-                className="fixed bottom-4 right-4 bg-amber-600 text-white font-bold py-2 px-4 rounded-lg shadow-lg z-[9999]"
+                className="fixed top-4 right-4 bg-gray-800 hover:bg-gray-700 text-white w-8 h-8 rounded-full shadow-lg z-[9999] flex items-center justify-center text-lg"
+                title="Show Debugger"
             >
-                Show Debugger
+                🐛
             </button>
         );
     }

@@ -1,22 +1,7 @@
-# React + Vite
-
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
-
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
-
-
-
-Path of Heroes – Consolidated Master README v4.0
+Path of Heroes – Consolidated Master README v6.2
 Last Updated: August 5, 2025
 
-Status: In Development (Core Gameplay Loop - Rebalancing Phase)
+Status: In Development (Core Combat Loop Stable)
 
 GitHub Repository: https://github.com/thewahish/p-o-h
 
@@ -36,28 +21,28 @@ Inspiration: Slay the Spire, Hades, Diablo.
 
 Platform: Mobile-first web game (PWA-ready), built with React & Vite.
 
-Orientation: Strictly portrait orientation.
+Orientation: Strictly portrait orientation, enforced via CSS.
 
 Languages: Fully bilingual (English/Arabic) with a persistent global toggle and full RTL support.
 
 🔄 Core Gameplay Loop
-The player's journey is designed to be a continuous cycle of challenge, growth, and replayability.
+The player's journey is a continuous cycle of challenge, growth, and replayability.
 
-Main Menu: The player starts here. They can access the Soul Forge to spend currency from previous runs.
+Main Menu: The player starts here, choosing to begin a new run or visit the Soul Forge.
 
-Character Selection: The player chooses one of the three available heroes.
+Character Selection: The player chooses one of the three available heroes, each with a unique playstyle.
 
-The Dungeon: The run begins on Floor 1. Each floor is a procedurally generated grid with impassable walls, creating a unique maze-like layout.
+The Dungeon: The run begins on Floor 1. Each floor is a procedurally generated grid.
 
-Exploration: The player moves one tile at a time on the grid, revealing adjacent rooms and navigating the floor's layout.
+Exploration: The player moves one tile at a time, revealing adjacent rooms and navigating the floor's layout.
 
 Events: Moving into a room triggers an event (Battle, Shop, Campfire, etc.). The room is marked as 'completed' after the event.
 
 Progression: After defeating the Floor Boss, the player advances to the next, more challenging floor.
 
-Defeat: If the player's HP drops to zero, the run ends. They lose 90% of their collected Gold but retain all Hero Souls.
+Defeat: If the player's HP drops to zero, the run ends. They are taken to a Defeat Screen and lose 90% of their collected Gold but retain all Hero Souls.
 
-Meta-Progression: The player is returned to the Main Menu, where they can use their collected Hero Souls at the Soul Forge to unlock permanent upgrades, making their next run easier.
+Meta-Progression: The player is returned to the Main Menu, where they can use their collected Hero Souls at the Soul Forge to unlock permanent upgrades for all future runs.
 
 📜 The Kickstarter Demo: "The First Chapter"
 The primary development objective is a polished 30-floor demo to serve as a proof-of-concept for a Kickstarter campaign.
@@ -66,15 +51,15 @@ Act 1: The Outer Ruins (Floors 1-10)
 
 Focus: Introduction to core mechanics.
 
-Enemies: Standard enemy types (Goblins, Slimes).
+Enemies: Goblins, Slimes, Orc Brutes.
 
 Boss: Orc Warlord
 
 Act 2: The Royal Crypts (Floors 11-20)
 
-Focus: Increased difficulty and strategic challenges.
+Focus: Increased difficulty, introduction of enemy affixes.
 
-Enemies: Introduction of Elite enemy variants with special modifiers.
+Enemies: Undead skeletons, Ghouls, Wraiths. Elite variants are common.
 
 Boss: Grave Golem
 
@@ -82,65 +67,73 @@ Act 3: The Sanctum (Floors 21-30)
 
 Focus: Final test of skill and build synergy.
 
-Enemies: Introduction of Champion enemy variants with powerful, unique abilities.
+Enemies: Demonic imps, Cultists. Champion variants with powerful abilities appear.
 
 Final Demo Boss: The Crypt Lord
 
 🗺️ Exploration & The Grid System
 Floor progression is handled via strategic exploration of a procedurally generated grid.
 
-Generation: Each floor generates a new grid larger than 7x7. The player starts at a designated entrance, and the boss room is at a designated exit. The generation algorithm creates impassable walls and maze-like paths, ensuring the player cannot simply walk in a straight line to the boss. Branches and dead-ends will hide risk-reward opportunities.
+Generation: Each floor generates a new grid larger than 7x7 (e.g., 9x9 or 11x11). The player starts at a designated entrance, and the boss room is at a designated exit. The generation algorithm creates impassable walls and maze-like paths, ensuring the player cannot simply walk in a straight line to the boss. Branches and dead-ends will hide risk-reward opportunities.
 
-Movement: The player can move to any adjacent, revealed, and accessible room. Moving into a room triggers its event.
+Room Types & Icons: A room's icon indicates the event within.
 
-Room Types & Icons:
+Battle ⚔️: A combat encounter with one or more enemies, scaled to the current floor.
 
-Battle ⚔️: A standard combat encounter.
+Elite Battle 💀: A difficult combat encounter with powerful "Elite" enemies that drop a guaranteed Relic upon victory.
 
-Elite Battle 💀: A combat encounter with powerful "Elite" enemies that give better rewards.
+Shop 🏪: Spend gold on items, potions, and relics. One purchase per visit.
 
-Shop 🏪: Spend gold on items and equipment.
-
-Campfire 🔥: A safe room to either heal or upgrade a stat for the run.
+Campfire 🔥: A safe room to either heal OR upgrade a skill.
 
 Shrine ⛩️: Be offered a choice between three powerful, passive blessings (Relics).
 
-Mystery ❓: A random event with a variety of outcomes.
+Mystery ❓: A random narrative or choice-based event.
 
 Boss 👹: A fight against the area's boss to proceed to the next floor.
 
 ⚔️ Combat System
-Combat is the core challenge of the game and is designed to be strategic and turn-based.
+Combat is the core challenge of the game, designed to be strategic and turn-based.
 
-System: Turn-based combat where turn order is determined by the Speed (SPD) stat of each combatant.
+System: Turn-based combat where turn order is determined by the Speed (SPD) stat of each combatant. Encounters can feature single or multiple enemies.
 
-Damage Formula: Damage = (Attacker_ATK * Attacker_ATK) / (Attacker_ATK + Defender_DEF). This formula uses defense as mitigation and ensures every hit deals at least some damage.
+Targeting: The player can tap/click on an enemy to set it as their "Focus Target." All single-target actions (Attack, Skills) will be directed at the focused enemy. When a target is defeated, the system automatically selects the next living enemy.
+
+Damage Formula: Damage = (Attacker_ATK² / (Attacker_ATK + Defender_DEF))
 
 Core Stats:
 
 HP (Health Points): A character's life force. Reaching 0 means defeat.
 
-ATK (Attack): Determines physical damage.
+ATK (Attack): Primary stat for physical damage calculation.
 
-DEF (Defense): Mitigates incoming physical damage.
+DEF (Defense): Primary stat for damage mitigation.
 
-SPD (Speed): Determines turn order.
+SPD (Speed): Determines turn order in combat.
 
 CRIT (Critical Chance): The percentage chance to land a critical hit for 1.5x damage.
 
-(Planned) POW (Power): Will determine magical damage and the potency of effects (like DoTs, heals).
+(Planned) POW (Power): Will scale magical damage and the potency of status effects.
 
-Actions: On their turn, a character can Attack, use a Skill, use an Item, or Defend.
+Resource Regeneration (Planned): The player will regenerate a small, fixed amount of their primary resource at the start of each of their turns.
 
-Resource Regeneration: The player regenerates a small amount of their primary resource (Vigor, Mana, Energy) at the start of each of their turns in combat.
+🧬 The Affix System (Universal Mechanic)
+To ensure maximum replayability, all dynamic elements in the game will be built on a universal Affix system. An affix is a modifier that grants special properties.
 
-Status Effects:
+Enemies: Monsters on later floors or in Elite encounters will spawn with random affixes.
+| Affix | Name Example | Effect |
+| :--- | :--- | :--- |
+| Vicious | Vicious Goblin | +25% ATK |
+| Swift | Swift Slime | +50% SPD |
+| Armored | Armored Orc | +50% DEF |
+| Regenerating| Goblin of Regeneration| Heals 5% of Max HP each turn. |
+| Thorns | Slime of Thorns | Deals 3 damage to attackers when hit. |
 
-Weaken: Target deals reduced damage.
-
-Poison: Target takes damage at the start of its turn.
-
-(Planned): Vulnerable (takes increased damage), Stun, Burn, Shield, etc.
+Gear (Planned): Equipment will be generated with random prefixes and suffixes that grant bonuses.
+| Prefix | Suffix | Name Example | Effects |
+| :--- | :--- | :--- | :--- |
+| Sturdy | of the Bear | Sturdy Helm of the Bear | +DEF, +HP |
+| Sharp | of Haste | Sharp Dagger of Haste | +ATK, +SPD |
 
 🧙 Playable Characters
 Warrior (Taha / طه)
@@ -149,7 +142,7 @@ Role: Tank / Melee
 
 Resource: Vigor
 
-Mechanics: High HP and DEF. Skills scale with ATK and DEF.
+Flavor: A stoic guardian of a forgotten citadel, Taha's strength comes from his unyielding resolve and mastery of shield and blade.
 
 Starting Skill: Shield Bash - Deals minor damage and applies the Weaken debuff to an enemy.
 
@@ -159,7 +152,7 @@ Role: Ranged Mage
 
 Resource: Mana
 
-Mechanics: High ATK (used for spell damage). Low defenses.
+Flavor: A scholar who delved too deep into forbidden texts, Mais wields raw elemental power at the cost of her own physical resilience.
 
 Starting Skill: Fireball - Deals damage to all enemies.
 
@@ -169,39 +162,67 @@ Role: Assassin / DoT Specialist
 
 Resource: Energy
 
-Mechanics: High SPD and CRIT. Focuses on applying Damage-over-Time effects.
+Flavor: A former royal spy betrayed by his own, Ibrahim now walks the shadows, using potent alchemical poisons and lightning-fast strikes to dispatch his foes.
 
 Starting Skill: Venom Strike - Deals high initial damage and applies a potent Poison effect.
 
-📈 Progression (In-Run)
-Experience (XP): Players gain XP from defeating enemies.
+📈 Progression & Rewards (In-Run)
+Leveling Up: Upon reaching an XP threshold, the hero levels up, gaining core stats based on their growthRates and fully restoring HP and resources.
 
-Leveling Up: Upon reaching an XP threshold, the hero levels up, gaining core stats based on their class's growthRates and fully restoring HP and resources.
+Battle Outcome Screen: After a battle, a dedicated screen appears.
 
-Battle Outcome: After a battle, players are taken to a dedicated Outcome Screen.
+Victory: Displays Gold and XP earned. (Planned) Will also present a choice of 3 random "reward cards" (e.g., a new item, a new skill, a stat boost).
 
-Victory: Displays Gold and XP earned. A future feature will be to choose one of three random reward cards (e.g., new item, temporary stat boost).
+Defeat: Displays the 90% Gold penalty and returns the player to the Main Menu.
 
-Defeat: Displays the 90% Gold penalty and provides an option to return to the Main Menu.
+✨ Meta-Progression: The Soul Forge (IMPLEMENTED)
+This system ensures every run feels meaningful, even in defeat.
 
-✨ Meta-Progression: The Soul Forge
-(This system is planned for a future development phase and remains unchanged.)
+**Hero Souls Currency**: Players earn 1 Hero Soul per enemy defeated. Souls are retained upon death and persist between game sessions via localStorage.
 
-🎒 Inventory, Loot & Potions
-(This system is planned for a future development phase and remains unchanged.)
+**The Soul Forge**: Accessible from the main menu, players spend Hero Souls on permanent, global upgrades that affect all future runs.
+
+**Current Upgrade System**:
+- 🛡️ **Vitality** (20 souls): +20% Max HP for all heroes
+- 💰 **Fortune** (15 souls): +50% Starting Gold
+- 📈 **Wisdom** (25 souls): +25% XP Gain
+
+**Technical Implementation**: 
+- Persistent storage via localStorage (`pathOfHeroes_souls`)
+- Automatic save/load on app initialization
+- Soul collection on death with UI feedback
+- State management integration with GameState system
+
+**Planned Expansions**:
+- Character-specific upgrade paths
+- More complex upgrade trees
+- Soul earning from floor completion and special achievements
+
+🎒 Inventory, Loot & Potions (Planned)
+Equipment Slots: Characters have 8 equipment slots: Head, Shoulders, Chest, Legs, Feet, Hands, Weapon, and an Accessory.
+
+Loot Drops: Enemies have a chance to drop equipment with random rarities and affixes.
+
+Potions: Players can find or buy run-specific consumable potions. Using a potion in combat costs the player's turn.
 
 ⛺ Event Scene Breakdown
-Shop 🏪: Spend gold on a selection of equipment, relics, and potions.
+Shop 🏪: Offers a random selection of 3-4 items. The player can make one purchase, after which the shop closes.
 
-Campfire 🔥: Choose one of two options:
+Campfire 🔥: Offers a choice between two options (only one can be chosen):
 
-Rest: Heal for a significant percentage of Max HP.
+Rest: Heal for 30% of Max HP.
 
-Sharpen: Gain a small, permanent stat boost for the remainder of the run (e.g., +2 ATK).
+Sharpen: Permanently increase a random stat (ATK, DEF, or SPD) for the run.
 
-Shrine ⛩️: Be offered a choice of one of three powerful, passive blessings (Relics) that provide run-altering effects.
+Shrine ⛩️: Offers a choice of one of three powerful, passive abilities called Relics.
 
-Mystery ❓: A random event with a variety of outcomes, from finding treasure to being ambushed.
+Example Relics: Iron Helm (Gain 5 Shield at start of combat), Adrenaline Vial (+5 SPD below 50% HP), Tome of Knowledge (+15% XP gain).
+
+Mystery ❓: A random narrative event with a choice.
+| Event | Choice A | Choice B |
+| :--- | :--- | :--- |
+| A crumbling chest | Open it (Find gold, or trigger a trap) | Leave it |
+| A wounded adventurer | Give a potion (Gain a relic) | Rob them (Gain gold, lose a stat) |
 
 ⚙️ Technical Architecture
 Frontend: React 18
@@ -210,39 +231,119 @@ Build Tool: Vite
 
 Styling: TailwindCSS (v3.4.17).
 
-State Management: A global singleton object (src/core/state.js) with a subscription model (subscribe/_notify) to update the UI efficiently without polling.
+State Management: A global singleton object (src/core/state.js) with a subscription model.
 
-Debugging: A persistent, global debugger (persistent-debugger.jsx + logger.js) that initializes before React to catch startup errors and provide detailed runtime logging.
+Debugging: A persistent, global debugger (persistent-debugger.jsx + logger.js) and a system of in-game developer hotkeys for testing.
+| Key | Action | Use Case |
+| :--- | :--- | :--- |
+| 1 | Heal Player to Full | "Survive a tough fight to see the enemy's full pattern." |
+| 2 | Add 100 Gold | "Test the shop without having to grind for gold." |
+| 3 | Gain one Level | "See how the player feels at Level 5 vs. Level 1." |
+| 5 | Instantly Win Battle | "Bypass a standard fight to get to the next room quickly." |
+| 0 | Toggle Invincibility | A "God Mode" that prevents damage and one-shots enemies. |
 
-File Naming Convention: All components and modules in src use kebab-case (e.g., battle-screen.jsx, game-state.js) to prevent case-sensitivity issues.
+File Naming Convention: All components and modules in src use kebab-case (e.g., battle-screen.jsx).
 
 File Structure:
 
 p-o-h/
 └── src/
-    ├── components/     # React components (battle-screen.jsx, etc.)
-    ├── constants/      # Static game data (characters.js, enemies.js, etc.)
-    ├── core/           # Core singletons (state.js, logger.js)
-    ├── systems/        # Game logic modules (combat.js, dungeon.js)
-    ├── App.jsx         # Main component, router
-    └── main.jsx        # Application entry point
-🚧 Development Roadmap
-Recently Completed (Pending Implementation):
+    ├── components/
+    │   ├── battle-screen.jsx
+    │   ├── debug-panel.jsx
+    │   ├── outcome-screen.jsx
+    │   ├── persistent-debugger.jsx
+    │   └── shop-screen.jsx
+    │
+    ├── constants/
+    │   ├── characters.js
+    │   ├── config.js
+    │   ├── enemies.js
+    │   └── localization.js
+    │
+    ├── core/
+    │   ├── logger.js
+    │   └── state.js
+    │
+    ├── systems/
+    │   ├── combat.js
+    │   ├── dungeon.js
+    │   └── inventory.js
+    │
+    ├── App.jsx
+    ├── main.jsx
+    └── index.css
+Development Protocol & AI Assistant Guidelines:
 
-Full Rebalancing Pass (New Damage Formula, Buffed Enemies, Floor Scaling).
+Master README Review: The AI assistant will always reference the latest version of this document.
 
-Implementation of Battle Outcome Screens (Victory/Defeat).
+User-Provided Code as Baseline: The Developer (you) will provide the full code of relevant file(s) when reporting a bug or requesting a change.
 
-Implementation of the Death Penalty (90% Gold Loss).
+Full Impact Analysis: The AI will analyze the full scope of any change across all affected files.
 
-HUD update to include Player Level and XP Bar.
+Complete File Mandate: The AI will provide only full and complete files as a response.
 
-Next Major Features:
+Rigorous Pre-flight Check: The AI will perform a final logical review of all updated files to ensure they are consistent and do not cause regressions.
 
-Advanced Dungeon Generation: Overhaul the dungeon.js system to create larger, non-linear, maze-like floors with impassable walls.
+🚧 Development Roadmap (REVISED - Strategic Priorities)
 
-Floor Progression: Implement the logic for advancing to the next floor after defeating a boss.
+Recently Completed:
 
-Inventory System: Build the UI and logic for equipping and managing items.
+✅ Core Combat System: Turn-based combat with all actions working (Attack, Skill, Defend, Flee).
 
-Full Event Implementation: Create the functional UIs for the Shop, Campfire, and Shrine choices.
+✅ Battle Screen Transitions: Fixed battle entry and UI responsiveness.
+
+✅ Multi-enemy encounters with "Focus Target" UI and auto-targeting.
+
+✅ Battle Outcome Screens (Victory/Defeat) and 90% Gold Death Penalty.
+
+✅ Developer Hotkey System for streamlined testing.
+
+✅ **Basic Hero Souls Meta-Progression System**: Persistent currency earned on death, 3 permanent upgrades, localStorage integration.
+
+🎯 PHASE 1: Making Runs Feel Worthwhile (CRITICAL - Week 1-2)
+
+1. Multi-Floor Progression System: 3-5 floors per run with boss progression and healing between floors.
+
+2. ~~Basic Hero Souls Meta-Progression~~: ✅ **COMPLETED** - Persistent currency, 3 permanent upgrades (Vitality, Fortune, Wisdom).
+
+3. Functional Room Events: Working shop (potions/upgrades), shrine blessings, treasure rooms.
+
+🎯 PHASE 2: Depth & Replayability (HIGH - Week 3-4)
+
+4. Enemy Variety: Affix system (Vicious, Swift, Armored) and elite encounters.
+
+5. Basic Equipment System: 3-4 item slots with random drops and simple bonuses.
+
+6. Build Variety: Character specialization through gear and upgrade choices.
+
+🎯 PHASE 3: Polish & Expansion (MEDIUM/LOW - Week 5+)
+
+7. Advanced Soul Forge: Complex upgrade trees and character-specific paths.
+
+8. Full 8-Slot Inventory: Complete equipment system with crafting.
+
+9. 30-Floor Campaign: Multiple acts with unique themes and bosses.
+
+⚠️ STRATEGIC REASONING:
+The original roadmap focused on complex systems before establishing the core roguelike loop. 
+Current runs are too short (2-3 battles) with no progression reward, making death feel purely punitive.
+This revised roadmap prioritizes making each run feel meaningful and death feel like progress toward future success.
+
+📝 Changelog
+This section will track minor version changes, additions, and balance tweaks moving forward.
+
+**v6.3 (August 6, 2025)**: 🎉 **MAJOR UPDATE - Hero Souls Meta-Progression System**
+- ✅ **Implemented complete Hero Souls system** with persistent localStorage storage
+- ✅ **Added Soul Forge** accessible from main menu with 3 permanent upgrades
+- ✅ **Soul earning**: 1 soul per enemy defeated, displayed on outcome screens
+- ✅ **Permanent upgrades**: Vitality (+20% HP), Fortune (+50% gold), Wisdom (+25% XP)
+- ✅ **UI enhancements**: Purple soul theme, upgrade status indicators
+- ✅ **Death now feels rewarding**: Souls collected automatically, persist through resets
+- 🔧 **Fixed combat system**: Added missing UI updates after all player actions
+- 🔧 **Fixed battle screen**: Ensured action buttons always visible
+- 📖 **Updated README**: Comprehensive documentation of Hero Souls implementation
+
+v6.2 (August 5, 2025): Fully expanded all sections to serve as a complete, standalone master document. Added detailed explanations for all planned and implemented features. Formalized the final Developer/AI collaboration protocol.
+
+v6.1 (August 5, 2025): Added detailed documentation for the Developer Hotkey System to the Technical Architecture section.

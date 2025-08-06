@@ -2,220 +2,160 @@
 
 import { GameState } from "../core/state.js";
 import { GameConfig } from "../constants/config.js";
+import Logger from "../core/logger.js";
+import { t, Localization } from "../core/localization.js";
 
 export class CombatSystem {
-  constructor({ getSystem }) {
-    this.getSystem = getSystem;
-    this.logCallback = null;
-    this.updateCallback = null;
-  }
+  constructor({ forceUpdate }) {
+    this.updateCallback = forceUpdate;
+    this.onLog = () => {}; // This will be set by startBattle to update the UI combat log
+  }
 
-  startBattle(enemies, options = {}) {
-    this.logCallback = options.onLog || (() => {});
-    this.updateCallback = options.onUpdate || (() => {});
-    const loc = this.getSystem("localization");
+  startBattle(enemies, options = {}) {
+    this.onLog = options.onLog || (() => {});
+    GameState.update('battleInProgress', true);
+    if (GameState.current.player) GameState.current.player.isAlive = true;
 
-    GameState.current.battleInProgress = true;
-    // Make sure player starts battle 'alive' for consistent checks
-    if(GameState.current.player) GameState.current.player.isAlive = true;
+    GameState.current.enemies = enemies.map((enemy, index) => ({
+      ...enemy,
+      originalIndex: index,
+      isAlive: true,
+      statusEffects: [],
+    }));
 
-    GameState.current.enemies = enemies.map((enemy) => ({
-      ...enemy,
-      stats: { ...enemy.stats },
-      maxStats: { ...enemy.maxStats },
-      isAlive: true,
-      statusEffects: [], // Initialize status effects array
-    }));
+    const enemyNames = enemies.map(e => e.nameKey ? t(e.nameKey) : 'Enemy').join(', ');
+    const startMessage = t('combat.messages.battleBegins', {enemies: enemyNames});
+    Logger.log(startMessage, 'COMBAT');
+    this.onLog(startMessage);
 
-    this.log(`A battle begins! Enemies: ${enemies.map(e => e.name).join(", ")}`);
-
-    this.calculateTurnOrder();
-
+    this.calculateTurnOrder();
     this.processTurn();
-  }
+  }
 
-  calculateTurnOrder() {
-    const player = { ...GameState.current.player, id: 'player', isPlayer: true };
-    const enemies = GameState.current.enemies.map((e, i) => ({ ...e, id: `${e.name}_${i}`, isPlayer: false }));
+  calculateTurnOrder() {
+    const player = { ...GameState.current.player, id: 'player' };
+    const enemies = GameState.current.enemies.map(e => ({ ...e, id: `enemy_${e.originalIndex}` }));
+    GameState.current.turnOrder = [...enemies, player].sort((a, b) => b.stats.spd - a.stats.spd).map(unit => unit.id);
+    GameState.current.currentTurnIndex = 0;
+    GameState.update('turnOrder', GameState.current.turnOrder);
+  }
 
-    GameState.current.turnOrder = [...enemies, player]
-      .sort((a, b) => b.stats.spd - a.stats.spd)
-      .map(unit => unit.id);
+  isPlayerTurn() {
+    if (!GameState.current.battleInProgress) return false;
+    const id = GameState.current.turnOrder[GameState.current.currentTurnIndex];
+    return id === 'player';
+  }
 
-    GameState.current.currentTurnIndex = 0;
-  }
+  playerAttack(targetIndex) {
+    if (!this.isPlayerTurn()) return;
+    const target = GameState.current.enemies.find(e => e.originalIndex === targetIndex);
+    if (!target || !target.isAlive) return;
 
-  getCurrentTurnUnit() {
-    const id = GameState.current.turnOrder[GameState.current.currentTurnIndex];
-    if (id === "player") {
-      return GameState.current.player;
-    }
-    return GameState.current.enemies.find(e => `${e.name}_${GameState.current.enemies.indexOf(e)}` === id);
-  }
-    
-    isPlayerTurn() {
-        if (!GameState.current.battleInProgress) return false;
-        const id = GameState.current.turnOrder[GameState.current.currentTurnIndex];
-        return id === 'player';
-    }
+    const dmg = this.calculateDamage(GameState.current.player, target);
+    target.stats.hp = Math.max(0, target.stats.hp - dmg);
+    this.onLog(t('combat.messages.youAttack', {target: target.nameKey ? t(target.nameKey) : 'Enemy', damage: dmg}));
+    if (target.stats.hp <= 0) this.killUnit(target);
+    this.updateCallback(); // ← ADDED UI UPDATE
+    this.nextTurn();
+  }
 
-  playerAttack(targetIndex = 0) {
-    if (!this.isPlayerTurn()) {
-      this.log("It's not your turn!");
-      return;
-    }
-    const target = GameState.current.enemies[targetIndex];
-    if (!target || !target.isAlive) {
-      this.log("Invalid target!");
-      return;
-    }
-    const dmg = this.calculateDamage(GameState.current.player, target);
-    target.stats.hp = Math.max(0, target.stats.hp - dmg);
-    this.log(`You attack ${target.name} for ${dmg} damage!`);
-
-    if (target.stats.hp <= 0) {
-      this.killUnit(target);
-    }
-    this.nextTurn();
-  }
-
-  playerDefend() {
-    if (!this.isPlayerTurn()) {
-      this.log("It's not your turn!");
-      return;
-    }
-    this.log("You take a defensive stance!");
-    GameState.current.player.defending = true;
-    this.nextTurn();
-  }
-
-  playerSkill(targetIndex = 0) {
-    if (!this.isPlayerTurn()) {
-      this.log("It's not your turn!");
-      return;
-    }
+  playerSkill(targetIndex) {
+    if (!this.isPlayerTurn()) return;
     const player = GameState.current.player;
     const skillId = player.abilities[0];
     const skillData = GameConfig.ABILITIES[skillId];
-    const loc = this.getSystem("localization");
-
     if (!skillData) {
-        this.log("Skill not found!");
-        return;
+      Logger.log(`Skill not found: ${skillId}`, 'ERROR');
+      return;
     }
-
     if (!GameState.spendResource(skillData.cost)) {
-        const resourceName = loc.get(`${player.resource.name.toLowerCase()}Resource`);
-        this.log(loc.get('insufficientResource').replace('{resourceName}', resourceName));
-        return;
+      const resourceName = player.resource.nameKey ? t(player.resource.nameKey) : 'Resource';
+      const skillName = typeof skillData.name === 'object' ? skillData.name.en : skillData.name;
+      this.onLog(`Not enough ${resourceName} for ${skillName}.`);
+      return;
     }
+    const skillName = typeof skillData.name === 'object' ? (skillData.name[Localization.getCurrentLanguage()] || skillData.name.en) : skillData.name;
+    this.onLog(t('combat.messages.youUseSkill', {skill: skillName}));
     
-    const skillName = loc.get(`skill_${skillId}_name`);
-    this.log(loc.get('combat_use_skill').replace('{character}', player.name).replace('{skill}', skillName));
-
     const targets = skillData.target === 'all' 
-        ? GameState.current.enemies.filter(e => e.isAlive)
-        : [GameState.current.enemies[targetIndex]].filter(e => e && e.isAlive);
-
-    if (targets.length === 0) {
-        this.log("No valid targets!");
-        this.nextTurn();
-        return;
-    }
-        
-    targets.forEach(target => {
-        // Apply damage
-        if (skillData.damageMultiplier) {
-            const dmg = this.calculateDamage(player, target, skillData.damageMultiplier);
-            target.stats.hp = Math.max(0, target.stats.hp - dmg);
-            this.log(`${player.name}'s ${skillName} hits ${target.name} for ${dmg} damage!`);
-            if (target.stats.hp <= 0) {
-                this.killUnit(target);
-            }
-        }
-
-        // Apply status effect
-        if (skillData.effect && target.isAlive) {
-            // Check if the effect from the same source already exists
-            const existingEffectIndex = target.statusEffects.findIndex(
-                e => e.type === skillData.effect.type && e.source === player.id
-            );
-
-            if (existingEffectIndex > -1) {
-                // Refresh duration of existing effect
-                target.statusEffects[existingEffectIndex].duration = skillData.effect.duration;
-                this.log(`${target.name}'s ${skillData.effect.type} duration was refreshed.`);
-            } else {
-                // Apply new effect
-                target.statusEffects.push({ ...skillData.effect, source: player.id });
-                if(skillData.effect.type === 'poison') {
-                    this.log(`${target.name} is poisoned!`);
-                } else if (skillData.effect.type === 'weaken') {
-                    this.log(loc.get('combat_weaken_applied').replace('{target}', target.name));
-                }
-            }
-        }
-    });
-
-    this.nextTurn();
-  }
-
-  playerFlee() {
-    if (Math.random() < GameConfig.COMBAT.fleeChance) {
-      this.log("You successfully escaped from battle!");
-      this.endBattle(false);
-    } else {
-      this.log("You couldn't escape!");
-      this.nextTurn();
-    }
-  }
-
-  enemyAttack(enemy) {
-    const player = GameState.current.player;
-    let dmg = this.calculateDamage(enemy, player);
-    
-    if (player.defending) {
-      dmg = Math.floor(dmg * 0.5);
-      this.log("Your defensive stance reduces the damage!");
-      player.defending = false;
-    }
-    
-    player.stats.hp = Math.max(0, player.stats.hp - dmg);
-    this.log(`${enemy.name} attacks you for ${dmg} damage!`);
-
-    if (player.stats.hp <= 0) {
-      this.killUnit(player);
-    }
-  }
+      ? GameState.current.enemies.filter(e => e.isAlive)
+      : [GameState.current.enemies.find(e => e.originalIndex === targetIndex)].filter(Boolean);
     
-  processTurn() {
+    targets.forEach(target => {
+      if (skillData.damageMultiplier) {
+          const dmg = this.calculateDamage(player, target, skillData.damageMultiplier);
+          target.stats.hp = Math.max(0, target.stats.hp - dmg);
+          const skillName = typeof skillData.name === 'object' ? (skillData.name[Localization.getCurrentLanguage()] || skillData.name.en) : skillData.name;
+          const targetName = target.nameKey ? t(target.nameKey) : 'Enemy';
+          this.onLog(t('combat.messages.skillHits', {skill: skillName, target: targetName, damage: dmg}));
+          if (target.stats.hp <= 0) this.killUnit(target);
+      }
+      if (skillData.effect && target.isAlive) {
+          const existingEffect = target.statusEffects.find(e => e.type === skillData.effect.type);
+          if (existingEffect) {
+              existingEffect.duration = skillData.effect.duration;
+          } else {
+              target.statusEffects.push({ ...skillData.effect });
+          }
+          const targetName = target.nameKey ? t(target.nameKey) : 'Enemy';
+          this.onLog(t('combat.messages.targetAfflicted', {target: targetName, effect: skillData.effect.type}));
+      }
+    });
+    this.updateCallback(); // ← ADDED UI UPDATE
+    this.nextTurn();
+  }
+  
+  playerDefend() {
+    if (!this.isPlayerTurn()) return;
+    this.onLog(t('combat.messages.defensiveStance'));
+    GameState.current.player.defending = true;
+    this.updateCallback(); // ← ADDED UI UPDATE
+    this.nextTurn();
+  }
+
+  playerFlee() {
+    if (!this.isPlayerTurn()) return;
+    if (Math.random() < GameConfig.COMBAT.fleeChance) {
+      this.onLog(t('combat.messages.successfulEscape'));
+      GameState.current.onBattleEnd(false, null);
+    } else {
+      this.onLog(t('combat.messages.failedEscape'));
+      this.updateCallback(); // ← ADDED UI UPDATE
+      this.nextTurn();
+    }
+  }
+
+  enemyAttack(enemy) {
+    const player = GameState.current.player;
+    let dmg = this.calculateDamage(enemy, player);
+    if (player.defending) {
+        dmg = Math.floor(dmg * 0.5);
+        this.onLog(t('combat.messages.defenseReduced'));
+    }
+    player.stats.hp = Math.max(0, player.stats.hp - dmg);
+    const enemyName = enemy.nameKey ? t(enemy.nameKey) : 'Enemy';
+    this.onLog(t('combat.messages.enemyAttacks', {enemy: enemyName, damage: dmg}));
+    if (player.stats.hp <= 0) this.killUnit(player);
+    this.updateCallback(); // ← ADDED UI UPDATE
+  }
+  
+  processTurn() {
     if (!GameState.current.battleInProgress) return;
-
-    const unitId = GameState.current.turnOrder[GameState.current.currentTurnIndex];
-    const isPlayer = unitId === 'player';
-    const unit = isPlayer ? GameState.current.player : GameState.current.enemies.find(e => `${e.name}_${GameState.current.enemies.indexOf(e)}` === unitId);
-
+    const unit = this.getCurrentTurnUnit();
     if (!unit || !unit.isAlive) {
         this.nextTurn();
         return;
     }
-
-    // Process status effects at the start of the turn
     this.processStatusEffects(unit);
-    
-    // Check if status effects killed the unit
     if (!unit.isAlive) {
         this.nextTurn();
         return;
     }
-    
-    if (isPlayer) {
-        // Player's turn is handled by UI events
-        this.log(`It's your turn!`);
-        GameState.current.player.defending = false; // Defend only lasts for one enemy attack
+    if (this.isPlayerTurn()) {
+        this.onLog(t('combat.messages.yourTurn'));
+        GameState.current.player.defending = false;
         this.updateCallback();
     } else {
-        // Enemy AI
         setTimeout(() => {
             if(unit.isAlive && GameState.current.battleInProgress) {
                 this.enemyAttack(unit);
@@ -225,114 +165,111 @@ export class CombatSystem {
     }
   }
 
-  processStatusEffects(unit) {
-      if (!unit.statusEffects) unit.statusEffects = [];
-      const remainingEffects = [];
-      const loc = this.getSystem("localization");
-
-      unit.statusEffects.forEach(effect => {
-          // Apply DoT damage
-          if (effect.type === 'poison') {
-              const poisonDmg = effect.damage;
-              unit.stats.hp = Math.max(0, unit.stats.hp - poisonDmg);
-              this.log(loc.get('combat_poison_damage').replace('{target}', unit.name).replace('{damage}', poisonDmg));
-              if (unit.stats.hp <= 0) {
-                  this.killUnit(unit);
-              }
-          }
-          
-          // Decrement duration
-          effect.duration--;
-          if (effect.duration > 0) {
-              remainingEffects.push(effect);
-          } else {
-              this.log(loc.get('combat_status_wore_off').replace('{character}', unit.name).replace('{effect}', effect.type));
-          }
-      });
-      unit.statusEffects = remainingEffects;
-  }
-
-  nextTurn() {
+  nextTurn() {
     if (!GameState.current.battleInProgress) return;
-
-    this.checkBattleEnd();
-    if (!GameState.current.battleInProgress) return;
-
-    GameState.current.currentTurnIndex = (GameState.current.currentTurnIndex + 1) % GameState.current.turnOrder.length;
-    
-    // This is a safeguard against an empty turn order.
+    const battleOutcome = this.checkBattleEnd();
+    if (battleOutcome !== null) {
+        const rewards = battleOutcome ? GameState.current.enemies.map(e => ({
+            gold: e.goldReward ? (Math.floor(Math.random() * (e.goldReward.max - e.goldReward.min + 1)) + e.goldReward.min) : 0, 
+            xp: e.xpReward || 0 
+        })) : null;
+        GameState.current.onBattleEnd(battleOutcome, rewards);
+        return;
+    }
+    GameState.current.currentTurnIndex = (GameState.current.currentTurnIndex + 1) % GameState.current.turnOrder.length;
+    GameState.update('currentTurnIndex', GameState.current.currentTurnIndex);
     if (GameState.current.turnOrder.length > 0) {
         this.processTurn();
     }
-  }
-
-  calculateDamage(attacker, defender, multiplier = 1.0) {
-      // Apply stat modifications from status effects
-      let attackerAtk = attacker.stats.atk;
-      attacker.statusEffects?.forEach(effect => {
-          if (effect.type === 'weaken' && effect.stat === 'atk') {
-              attackerAtk *= effect.amount;
-          }
-      });
-
-    let dmg = attackerAtk - defender.stats.def;
-    if (dmg < 1) dmg = 1;
-    dmg = Math.floor(dmg * multiplier);
-
-    if (Math.random() * 100 < attacker.stats.crit) {
-      dmg = Math.floor(dmg * GameConfig.COMBAT.baseCritMultiplier);
-      this.log(`Critical hit!`);
-    }
-    return Math.max(1, dmg);
-  }
+  }
+  
+  checkBattleEnd() {
+    const allEnemiesDead = GameState.current.enemies.every(e => !e.isAlive);
+    const playerDead = GameState.current.player.stats.hp <= 0;
+    if (allEnemiesDead) {
+        this.onLog(t('combat.messages.allEnemiesDefeated'));
+        GameState.update('battleInProgress', false); // ← ADDED BATTLE END STATE
+        return true;
+    } else if (playerDead) {
+        this.onLog(t('combat.messages.youDefeated'));
+        GameState.update('battleInProgress', false); // ← ADDED BATTLE END STATE
+        return false;
+    }
+    return null;
+  }
 
   killUnit(unit) {
-      // Set the unit's isAlive flag to false
-      unit.isAlive = false;
-
-      if (unit.id === 'player') {
-          this.log(`You have been defeated...`);
-      } else {
-          this.log(`${unit.name} is defeated!`);
-          
-          // The checkBattleEnd function will handle removing from turn order now
-          // This simplifies logic and prevents race conditions with turn index
-      }
-      this.updateCallback();
-  }
-    
-  checkBattleEnd() {
-    const allEnemiesDead = GameState.current.enemies.every(e => !e.isAlive);
-    const playerDead = GameState.current.player.stats.hp <= 0;
-
-    if (allEnemiesDead) {
-      this.log(`Victory! You defeated all enemies.`);
-      const goldReward = 10 + GameState.current.currentFloor * 5;
-      const xpReward = 25 + GameState.current.currentFloor * 10;
-      GameState.addGold(goldReward);
-      GameState.addExperience(xpReward);
-      this.log(`You gained ${goldReward} gold and ${xpReward} XP!`);
-      this.endBattle(true);
-    } else if (playerDead) {
-      this.endBattle(false);
-    }
-  }
-    
-  endBattle(victory) {
-    if (!GameState.current.battleInProgress) return; // Prevent double execution
-    GameState.current.battleInProgress = false;
-    // Clear status effects from player
-    if(GameState.current.player) {
-        GameState.current.player.statusEffects = [];
-        GameState.current.player.defending = false;
+    unit.isAlive = false;
+    if (unit.id === 'player') {
+        this.onLog(t('combat.messages.youDefeated'));
+    } else {
+        const unitName = unit.nameKey ? t(unit.nameKey) : 'Enemy';
+        this.onLog(t('combat.messages.unitDefeated', {unit: unitName}));
+        // Award Hero Soul for enemy defeat
+        GameState.awardSouls(1, `Defeating ${unitName}`);
     }
-    GameState.current.onBattleEnd?.(victory);
+    this.updateCallback();
+  }
+  
+  processStatusEffects(unit) {
+    if (!unit.statusEffects) unit.statusEffects = [];
+    const remainingEffects = [];
+    unit.statusEffects.forEach(effect => {
+        if (effect.type === 'poison') {
+            const poisonDmg = effect.damage;
+            unit.stats.hp = Math.max(0, unit.stats.hp - poisonDmg);
+            const unitName = unit.nameKey ? t(unit.nameKey) : (unit.id === 'player' ? 'Player' : 'Enemy');
+            this.onLog(t('combat.messages.poisonDamage', {unit: unitName, damage: poisonDmg}));
+            if (unit.stats.hp <= 0) this.killUnit(unit);
+        }
+        effect.duration--;
+        if (effect.duration > 0) {
+            remainingEffects.push(effect);
+        } else {
+            const unitName = unit.nameKey ? t(unit.nameKey) : (unit.id === 'player' ? 'Player' : 'Enemy');
+            this.onLog(t('combat.messages.statusWoreOff', {unit: unitName, effect: effect.type}));
+        }
+    });
+    unit.statusEffects = remainingEffects;
+  }
+  
+  getCurrentTurnUnit() {
+    const id = GameState.current.turnOrder[GameState.current.currentTurnIndex];
+    if (id === "player") return GameState.current.player;
+    const enemyIndex = parseInt(id.split('_')[1]);
+    return GameState.current.enemies.find(e => e.originalIndex === enemyIndex);
+  }
+  
+  instantWin() {
+    if (!GameState.current.battleInProgress) return;
+    Logger.log('DEBUG: Instantly winning battle.', 'SYSTEM');
+    GameState.current.enemies.forEach(e => {
+        e.stats.hp = 0;
+        e.isAlive = false;
+    });
+    this.updateCallback(); // ← ADDED UI UPDATE
+    this.nextTurn();
   }
 
-  log(msg) {
-    if (this.logCallback) {
-      this.logCallback(msg);
-    }
-    console.log(msg);
-  }
+  calculateDamage(attacker, defender, multiplier = 1.0) {
+    if (defender.id === 'player' && GameState.current.godMode) {
+        Logger.log('GOD MODE: Player takes 0 damage.', 'SYSTEM');
+        return 0;
+    }
+    if (attacker.id === 'player' && GameState.current.godMode) {
+        Logger.log('GOD MODE: Player deals 9999 damage.', 'SYSTEM');
+        return 9999;
+    }
+    
+    let attackerAtk = attacker.stats.atk;
+    const defenderDef = defender.stats.def;
+    let baseDmg = (attackerAtk * attackerAtk) / (attackerAtk + defenderDef);
+    if (baseDmg < 1) baseDmg = 1;
+    let finalDmg = Math.floor(baseDmg * multiplier);
+    if (Math.random() * 100 < attacker.stats.crit) {
+        finalDmg = Math.floor(finalDmg * GameConfig.COMBAT.baseCritMultiplier);
+        this.onLog(t('combat.messages.criticalHit'));
+    }
+    return Math.max(1, finalDmg);
+  }
 }

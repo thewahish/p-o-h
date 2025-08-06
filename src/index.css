@@ -2,7 +2,49 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Optional: custom styles */
-body {
-  @apply bg-gray-900 text-white;
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background-color: #0c0a09; /* A dark base background */
+  overscroll-behavior: none; /* Prevents pull-to-refresh on mobile */
+}
+
+/* === PORTRAIT LOCK STYLES (CORRECTED) === */
+#orientation-overlay {
+    /* By default, the overlay is completely hidden. */
+    display: none; 
+    position: fixed;
+    inset: 0;
+    background-color: #111827;
+    color: #e5e7eb;
+    z-index: 9999;
+}
+
+#orientation-overlay .message {
+    /* This is just the styling for the message box itself. */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+    font-size: 1.25rem;
+    font-family: sans-serif;
+    padding: 2rem;
+    background-color: #1f2937;
+    border-radius: 0.5rem;
+    border: 1px solid #ca8a04;
+}
+
+/* This rule ONLY activates when the screen is wider than it is tall. */
+@media (orientation: landscape) {
+    #root {
+        /* Hide the game. */
+        display: none;
+    }
+    #orientation-overlay {
+        /* Show the overlay and apply flexbox to center the message. */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
 }
