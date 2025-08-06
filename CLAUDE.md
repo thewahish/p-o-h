@@ -19,17 +19,20 @@ npm run deploy   # Deploy to GitHub Pages
 
 ### State Management
 - **Global State**: Single singleton object in `src/core/state.js` with subscription model
+- **Save System**: Character-specific saves with 3 slots per character in localStorage
 - **State Updates**: All state changes go through `GameState.update()` or dedicated methods
 - **Reactivity**: Components subscribe to state changes via `GameState.subscribe()`
 
 ### Core Systems
 - **Combat**: `src/systems/combat.js` - Turn-based combat with damage formula: `(ATK² / (ATK + DEF))`
-- **Dungeon**: `src/systems/dungeon.js` - Procedural maze generation with 11x11 grid and wall-based pathfinding
+- **Dungeon**: `src/systems/dungeon.js` - Procedural 5x9 maze generation with character-specific boss scaling
 - **Inventory**: `src/systems/inventory.js` - Item and equipment management (planned)
+- **Save System**: Character-specific progression paths with individual save slots (`src/components/save-slot-screen.jsx`)
 
 ### Screen Navigation
 Screens are controlled by `GameState.current.currentScreen`:
-- `'main-menu'` - Character selection
+- `'main-menu'` - Character selection with Soul Forge access
+- `'save-slots'` - Save slot management (New Game/Load/Delete with confirmations)
 - `'exploration'` - Dungeon grid navigation
 - `'battle'` - Turn-based combat UI
 - `'shop'` - Item purchasing
@@ -50,24 +53,47 @@ Screens are controlled by `GameState.current.currentScreen`:
 - God mode and instant win debug features
 
 ### Character System
-- Three playable characters with unique resources (Vigor, Mana, Energy)  
-- Level-up system with stat growth rates
-- XP curve: baseXP + (level-1) * increment
+- Three playable characters with unique resources (Vigor, Mana, Energy)
+- **Character-Specific Progression**: Each character has unique progression paths and boss scaling
+- **Balanced Progression**: XP curve adjusted (100 base + 120 increment) to prevent rapid leveling after level 3
+- **Balanced Stats**: Lower starting stats for more strategic gameplay
+- **Resource Management**: Reduced resource pools require careful ability usage
+- **Individual Save System**: 3 save slots per character with separate progression
+- **Boss Scaling**: All characters face the same boss difficulty (1.0x) for fair balance
+- Character growth rates balanced for long-term progression
 
 ### Dungeon System
 - **Grid Size**: 5x9 compact maze layout (optimized for large, visible squares)
-- **Screen Optimization**: Maximum square size utilizing full screen space
+- **Strategic Visibility**: Full dungeon path revealed from start for strategic planning
+- **Clean Path Display**: Unvisited paths appear plain/empty until explored
 - **Maze Generation**: Recursive backtracking algorithm creates unique layouts each floor
 - **Wall System**: Hard walls (⬛) block movement, creating strategic path choices
 - **Room Placement**: Strategic positioning prevents direct access to boss/shrine rooms
-- **Room Types**: Wall ⬛, Battle ⚔️, Elite 💀, Shop 🏪, Shrine ⛩️, Treasure 💎, Boss 👹
+- **Room Types**: Wall 🧱, Path (empty), Battle ⚔️, Elite 💀, Shop 🏪, Shrine ⛩️, Treasure 💎, Boss 👹, Stairs 🔄
 - **Navigation**: WASD/Arrow keys + click adjacent rooms to move
+- **Progressive Discovery**: Room types revealed only when entered
 - **Replayability**: Each floor generates a completely new maze layout
 
+### Floor Progression System
+- **Stairs Mechanic**: Defeat boss to spawn stairs (🔄) to next floor
+- **Floor Transitions**: Automatic dungeon reset and generation for new floor
+- **Balanced Rewards**: Much lower gold/reward scaling for challenging economy
+- **Partial Healing**: 25% HP restoration when advancing floors
+
+### Dynamic Difficulty Scaling
+- **Enemy Stats**: Base 20% + 5% exponential scaling per floor (significantly increased from previous versions)
+- **Multi-Enemy Encounters**: 30% base chance + 10% per floor (max 60%)
+- **Triple Encounters**: Available from floor 5+ (20% chance)
+- **Elite Scaling**: 50% base + 10% per floor bonus, may have minions (floor 3+)
+- **Boss Scaling**: 80% base + 15% per floor bonus, with character-specific modifiers
+- **Character-Specific Boss Naming**: Bosses get unique titles based on character progression path (e.g., "Floor 2 defensive_tank Nemesis")
+- **Reward Scaling**: Treasures give 20% more gold per floor, shrine bonuses increase (all significantly reduced from previous versions)
+
 ### Floor Progression
-- Enemy scaling: 20% stat increase per floor
-- Elite enemies: +50% stat bonus over regular encounters
-- Boss placement: Always positioned furthest from starting location
+- Enemy scaling: Enhanced compound scaling (base + exponential)
+- Elite enemies: Floor-scaling bonuses with "Elite" prefix and possible minions
+- Boss encounters: Enhanced scaling with unique "Floor X Lord" titles
+- Boss placement: Always positioned furthest from starting location  
 - Death penalty: 90% gold loss, Hero Souls retained
 
 ## Debug Features
@@ -84,12 +110,56 @@ Screens are controlled by `GameState.current.currentScreen`:
 - Integrated logging system (`src/core/logger.js`)
 - Log categories: SYSTEM, COMBAT, STATE, UI, INPUT, ERROR
 
+## Character-Specific Save System
+
+### Save System Implementation
+- **3 Save Slots per Character**: Each character (Taha, Mais, Ibrahim) has independent save data
+- **Character Selection Flow**: Main Menu → Character Selection → Save Slot Management → Game
+- **Save Data Structure**: Includes characterId, level, floor, gold, experience, and character-specific progression
+- **Confirmation Dialogs**: New Game overwrites, Load Game, and Delete operations all require confirmation
+- **Automatic Saving**: Game state is automatically saved during progression (manual save functionality available)
+
+### Character Progression Paths
+Each character has unique progression characteristics defined in `src/constants/characters.js`:
+
+#### Taha (Warrior)
+- **Progression Path**: `defensive_tank`
+- **Boss Scaling**: 1.0x (same difficulty as all characters)
+- **Preferred Enemy Types**: `brute`, `physical`
+- **Unique Rewards**: `heavy_armor`, `shields`
+
+#### Mais (Sorceress)  
+- **Progression Path**: `elemental_mage`
+- **Boss Scaling**: 1.0x (same difficulty as all characters)
+- **Preferred Enemy Types**: `magical`, `undead`
+- **Unique Rewards**: `staves`, `mana_crystals`
+
+#### Ibrahim (Rogue)
+- **Progression Path**: `assassin_berserker`
+- **Boss Scaling**: 1.0x (same difficulty as all characters)
+- **Preferred Enemy Types**: `fast`, `elite`
+- **Unique Rewards**: `daggers`, `poisons`
+
+### Save System Usage
+- Save slots display: Level, Floor, Gold, and Last Played timestamp
+- Empty slots show "Empty Slot" with option to start New Game
+- Existing saves show Load/Delete options with confirmation
+- Character-specific save keys: `pathOfHeroes_save_${characterId}_${slotNumber}`
+
 ## Important Implementation Notes
+
+### Documentation Maintenance (CRITICAL RULE)
+- **ALWAYS update README.md** to match all CLAUDE.md changes after implementing new features
+- README.md serves as user-facing documentation and must stay synchronized
+- Check both files for consistency before completing any major feature implementation
+- Version numbers and changelogs must be updated in both files simultaneously
 
 ### State Management Patterns
 - Never mutate `GameState.current` directly - use provided methods
 - Always call `GameState._notify()` after state changes
 - Components should subscribe to state in `useEffect` with cleanup
+- Use character-specific save methods: `GameState.saveGame(characterId, slotNumber)`
+- Load character data with: `GameState.loadGame(characterId, slotNumber)`
 
 ### Combat Implementation
 - Combat is turn-based with automatic enemy AI after 800ms delay
@@ -111,6 +181,14 @@ Screens are controlled by `GameState.current.currentScreen`:
 - Large text (3xl) and increased spacing for better visibility
 - Click/tap navigation for adjacent accessible rooms only
 - Combat UI shows turn indicators and action buttons
+
+### Visual Indicators
+- **Clean Paths**: Unvisited path rooms appear plain/empty (clean and uncluttered)
+- **Discovered Rooms**: Actual room type icons after visiting (⚔️, 💀, 🏪, etc.)
+- **Completed Rooms**: Color-coded backgrounds (green for battles, blue for stairs, etc.)
+- **Wall Blocks**: Stone-colored 🧱 icons, clearly blocking and non-interactive
+- **Player Position**: Amber pulsing background with character icon (🧍)
+- **Strategic Planning**: Full maze layout visible for route planning to boss/shops
 
 ## Testing & Debugging
 
@@ -157,4 +235,5 @@ function MyComponent() {
 - ✅ Character names, enemy names, skills localized
 - ✅ Hero Souls system fully localized
 - ✅ Main menu with language toggle
+- ✅ Save slot system fully localized with confirmation dialogs
 - ✅ RTL support for Arabic interface

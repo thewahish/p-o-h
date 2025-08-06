@@ -77,8 +77,10 @@ export default function BattleScreen({ player, enemies: initialEnemies, combatSy
     const isPlayerTurn = combatSystem.isPlayerTurn();
     const playerSkillData = player ? GameConfig.ABILITIES[player.abilities[0]] : null;
     const xpInfo = getXpInfo();
-    const focusedEnemy = GameState.current.enemies.find(e => e.originalIndex === focusedTargetId);
-    const otherEnemies = GameState.current.enemies.filter(e => e.isAlive && e.originalIndex !== focusedTargetId);
+    const enemies = GameState.current.enemies || [];
+    const aliveEnemies = enemies.filter(e => e.isAlive);
+    const focusedEnemy = enemies.find(e => e.originalIndex === focusedTargetId);
+    const otherEnemies = enemies.filter(e => e.isAlive && e.originalIndex !== focusedTargetId);
     const currentLanguage = Localization.getCurrentLanguage();
 
     return (
@@ -86,6 +88,16 @@ export default function BattleScreen({ player, enemies: initialEnemies, combatSy
             <div className="w-full max-w-3xl mx-auto flex flex-col flex-grow min-h-0">
                 <div className="text-center mb-4 flex-shrink-0">
                     <h1 className="text-2xl font-bold text-amber-400">⚔️ {t('combat.battle')} ⚔️</h1>
+                    {/* Wave Combat Indicator */}
+                    {(combatSystem.totalWaves > 1 || enemies.length > 1) && (
+                        <div className="inline-block bg-gray-700 border border-amber-500 rounded-full px-3 py-1 text-sm text-amber-300 font-semibold mb-2">
+                            {combatSystem.totalWaves > 1 ? (
+                                <>🌊 Wave {combatSystem.currentWave}/{combatSystem.totalWaves}</>
+                            ) : (
+                                <>⚔️ {t('combat.messages.enemiesRemaining', {alive: aliveEnemies.length, total: enemies.length})}</>
+                            )}
+                        </div>
+                    )}
                     <p className="text-lg text-gray-300">{isPlayerTurn ? t('combat.playerTurn', {player: player?.nameKey ? t(player.nameKey) : 'Player'}) : t('combat.enemyTurn')}</p>
                 </div>
 
@@ -119,7 +131,7 @@ export default function BattleScreen({ player, enemies: initialEnemies, combatSy
                     {otherEnemies.map(enemy => (
                         <button key={enemy.originalIndex} onClick={() => setFocusedTargetId(enemy.originalIndex)} className="w-full bg-gray-700/50 hover:bg-gray-700/80 rounded-lg p-2 border border-gray-500 text-left flex items-center text-sm transition-all">
                             <div className="w-8 h-8 rounded-full bg-gray-900 flex items-center justify-center mr-3 text-lg">{enemy.isAlive ? '👹' : '💀'}</div>
-                            <div className="flex-grow text-white font-semibold">{enemy.nameKey ? t(enemy.nameKey) : 'Enemy'}</div>
+                            <div className="flex-grow text-white font-semibold">{enemy.level ? `Lv.${enemy.level} ${enemy.nameKey ? t(enemy.nameKey) : 'Enemy'}` : (enemy.nameKey ? t(enemy.nameKey) : 'Enemy')}</div>
                             <div className="w-1/3 h-3 bg-gray-900 rounded-full overflow-hidden mr-2"><div className="h-3 bg-red-500" style={{ width: `${getHpPercent(enemy)}%` }}></div></div>
                             <div className="text-gray-400 text-right w-20">{enemy.stats.hp} / {enemy.maxStats.hp}</div>
                         </button>
@@ -131,7 +143,7 @@ export default function BattleScreen({ player, enemies: initialEnemies, combatSy
                                 <div className="flex-shrink-0 w-24 h-24 bg-gray-900 rounded-lg flex items-center justify-center text-5xl border-2 border-red-700">{focusedEnemy.isAlive ? '👹' : '💀'}</div>
                                 <div className="flex-grow min-w-0">
                                     <div className="flex justify-between items-center mb-2">
-                                        <h2 className="text-xl font-bold text-red-400 truncate">{focusedEnemy.nameKey ? t(focusedEnemy.nameKey) : 'Enemy'}</h2>
+                                        <h2 className="text-xl font-bold text-red-400 truncate">{focusedEnemy.level ? `Lv.${focusedEnemy.level} ${focusedEnemy.nameKey ? t(focusedEnemy.nameKey) : 'Enemy'}` : (focusedEnemy.nameKey ? t(focusedEnemy.nameKey) : 'Enemy')}</h2>
                                         <div className="flex gap-2 flex-shrink-0">
                                             {focusedEnemy.statusEffects?.map((effect, i) => <div key={i} className="text-sm bg-purple-500/50 border border-purple-400 rounded-full px-2 py-0.5">{effect.icon} {effect.duration}</div>)}
                                         </div>

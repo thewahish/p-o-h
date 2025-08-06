@@ -1,21 +1,33 @@
 // filename: src/components/soul-forge.jsx
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { GameState } from '../core/state';
 import Logger from '../core/logger';
 import { t } from '../core/localization.js';
 
-export default function SoulForge({ onClose }) {
-    const totalSouls = GameState.current.totalSouls;
-    const upgrades = GameState.getSoulUpgrades();
-    const purchased = GameState.current.soulUpgrades;
-    // Using global localization system
+export default function SoulForge({ characterId, slotNumber, onClose }) {
+    // Use state to trigger re-renders when purchases happen
+    const [refreshKey, setRefreshKey] = useState(0);
+    
+    // Recalculate these values on every render/refresh
+    const totalSouls = GameState.getCharacterSouls(characterId, slotNumber);
+    const characterLevel = GameState.getCharacterLevel(characterId, slotNumber);
+    const upgrades = GameState.getSoulUpgrades(characterId, characterLevel);
+    const purchased = GameState.getCharacterUpgrades(characterId, slotNumber);
 
     const handlePurchase = (upgradeId) => {
-        if (GameState.purchaseUpgrade(upgradeId)) {
-            Logger.log(`Successfully purchased ${upgrades[upgradeId].name}`, 'UI');
+        const currentSouls = GameState.getCharacterSouls(characterId, slotNumber);
+        const upgradeCost = upgrades[upgradeId].cost;
+        const isAlreadyOwned = purchased[upgradeId];
+        
+        Logger.log(`Purchase attempt: ${upgradeId}, Souls: ${currentSouls}, Cost: ${upgradeCost}, Owned: ${isAlreadyOwned}`, 'UI');
+        
+        if (GameState.purchaseCharacterUpgrade(characterId, slotNumber, upgradeId)) {
+            Logger.log(`Successfully purchased ${upgrades[upgradeId].nameKey} for ${characterId} slot ${slotNumber}`, 'UI');
+            // Force re-render to update UI
+            setRefreshKey(prev => prev + 1);
         } else {
-            Logger.log(`Cannot purchase ${upgrades[upgradeId].name} - insufficient souls or already owned`, 'UI');
+            Logger.log(`Cannot purchase ${upgrades[upgradeId].nameKey} - insufficient souls or already owned`, 'UI');
         }
     };
 
@@ -37,8 +49,12 @@ export default function SoulForge({ onClose }) {
     return (
         <div className="fixed inset-0 bg-gray-900/90 flex items-center justify-center z-[100] p-4">
             <div className="bg-gray-800 border-2 border-purple-500 rounded-lg p-6 max-w-lg w-full shadow-2xl">
-                <div className="flex justify-between items-center mb-6">
+                <div className="flex justify-between items-start mb-6">
                     <h1 className="text-3xl font-bold text-purple-400">⚡ {t('souls.forge')}</h1>
+                    <div className="text-center">
+                        <p className="text-lg text-purple-300">{t(`characters.${characterId}.name`)}</p>
+                        <p className="text-sm text-purple-400">{t('saveSlots.slot')} {slotNumber}</p>
+                    </div>
                     <button 
                         onClick={onClose}
                         className="text-gray-400 hover:text-white text-2xl font-bold"

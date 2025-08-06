@@ -38,13 +38,11 @@ export const GameConfig = {
         maxSlots: 20,
     },
 
-// --- START MODIFICATION ---
     XP_CURVE: {
-        baseXP: 100,
-        increment: 50,
+        baseXP: 80,     // Further reduced for better early game progression
+        increment: 60,  // Much gentler curve for first 5-7 levels
         maxLevel: 60,
     },
-// --- END MODIFICATION ---
 
     RARITIES: {
         common: { name: { en: 'Common', ar: 'شائع' }, chance: 60, statMult: 1.0, color: '#95a5a6' },

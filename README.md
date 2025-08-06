@@ -1,7 +1,7 @@
-Path of Heroes – Consolidated Master README v6.2
-Last Updated: August 5, 2025
+Path of Heroes – Consolidated Master README v7.0
+Last Updated: August 6, 2025
 
-Status: In Development (Core Combat Loop Stable)
+Status: In Development (Character-Specific Save System & Strategic Dungeon Complete)
 
 GitHub Repository: https://github.com/thewahish/p-o-h
 
@@ -71,26 +71,36 @@ Enemies: Demonic imps, Cultists. Champion variants with powerful abilities appea
 
 Final Demo Boss: The Crypt Lord
 
-🗺️ Exploration & The Grid System
-Floor progression is handled via strategic exploration of a procedurally generated grid.
+🗺️ Strategic Dungeon System
+Floor progression is handled via strategic exploration of a fully visible, procedurally generated maze.
 
-Generation: Each floor generates a new grid larger than 7x7 (e.g., 9x9 or 11x11). The player starts at a designated entrance, and the boss room is at a designated exit. The generation algorithm creates impassable walls and maze-like paths, ensuring the player cannot simply walk in a straight line to the boss. Branches and dead-ends will hide risk-reward opportunities.
+**Revolutionary Design**: Full dungeon layout revealed from start for strategic planning, but room contents remain hidden until explored.
 
-Room Types & Icons: A room's icon indicates the event within.
+Generation: Each floor generates a compact 5x9 maze using recursive backtracking algorithm. Clean paths and distinctive 🧱 wall barriers create strategic route choices.
 
-Battle ⚔️: A combat encounter with one or more enemies, scaled to the current floor.
+**Strategic Visibility**: Players can see all possible routes to boss/shops/shrines, enabling tactical decision-making about optimal paths.
 
-Elite Battle 💀: A difficult combat encounter with powerful "Elite" enemies that drop a guaranteed Relic upon victory.
+**Progressive Discovery**: Unvisited rooms appear as plain/empty spaces until explored, then reveal their true nature.
 
-Shop 🏪: Spend gold on items, potions, and relics. One purchase per visit.
+Room Types & Icons: Room contents discovered through exploration.
 
-Campfire 🔥: A safe room to either heal OR upgrade a skill.
+Wall 🧱: Impassable barriers with distinctive stone styling
 
-Shrine ⛩️: Be offered a choice between three powerful, passive blessings (Relics).
+Path (Empty): Clean, navigable spaces that hide encounters until visited
 
-Mystery ❓: A random narrative or choice-based event.
+Battle ⚔️: Combat encounters with floor-scaled enemies
 
-Boss 👹: A fight against the area's boss to proceed to the next floor.
+Elite Battle 💀: Challenging encounters with enhanced enemies and minions
+
+Shop 🏪: Purchase items and consumables (one purchase per visit)
+
+Shrine ⛩️: Receive powerful stat blessings with floor-based scaling
+
+Treasure 💎: Find gold with floor-appropriate rewards
+
+Boss 👹: Floor boss with character-specific scaling and unique titles
+
+Stairs 🔄: Appear after boss defeat to advance floors
 
 ⚔️ Combat System
 Combat is the core challenge of the game, designed to be strategic and turn-based.
@@ -135,16 +145,20 @@ Gear (Planned): Equipment will be generated with random prefixes and suffixes th
 | Sturdy | of the Bear | Sturdy Helm of the Bear | +DEF, +HP |
 | Sharp | of Haste | Sharp Dagger of Haste | +ATK, +SPD |
 
-🧙 Playable Characters
+🧙 Character-Specific Progression System
+**Revolutionary Save System**: Each character has 3 independent save slots with unique progression paths.
+
 Warrior (Taha / طه)
 
 Role: Tank / Melee
 
 Resource: Vigor
 
-Flavor: A stoic guardian of a forgotten citadel, Taha's strength comes from his unyielding resolve and mastery of shield and blade.
+Progression Path: defensive_tank - Faces physical enemies, gets defensive rewards
 
-Starting Skill: Shield Bash - Deals minor damage and applies the Weaken debuff to an enemy.
+Balance: Standard boss difficulty (1.0x) with high survivability
+
+Starting Skill: Shield Bash - Deals damage and weakens enemy attack
 
 Sorceress (Mais / ميس)
 
@@ -152,9 +166,11 @@ Role: Ranged Mage
 
 Resource: Mana
 
-Flavor: A scholar who delved too deep into forbidden texts, Mais wields raw elemental power at the cost of her own physical resilience.
+Progression Path: elemental_mage - Faces magical enemies, gets magical rewards
 
-Starting Skill: Fireball - Deals damage to all enemies.
+Balance: Standard boss difficulty (1.0x) with high damage potential
+
+Starting Skill: Fireball - Deals AoE damage to all enemies
 
 Rogue (Ibrahim / إبراهيم)
 
@@ -162,18 +178,34 @@ Role: Assassin / DoT Specialist
 
 Resource: Energy
 
-Flavor: A former royal spy betrayed by his own, Ibrahim now walks the shadows, using potent alchemical poisons and lightning-fast strikes to dispatch his foes.
+Progression Path: assassin_berserker - Faces elite enemies, gets stealth rewards
 
-Starting Skill: Venom Strike - Deals high initial damage and applies a potent Poison effect.
+Balance: Standard boss difficulty (1.0x) with high critical damage
 
-📈 Progression & Rewards (In-Run)
-Leveling Up: Upon reaching an XP threshold, the hero levels up, gaining core stats based on their growthRates and fully restoring HP and resources.
+Starting Skill: Venom Strike - High damage with poison DoT effect
 
-Battle Outcome Screen: After a battle, a dedicated screen appears.
+**Character Balance**: All characters face equal boss difficulty for fair gameplay. Stats and progression balanced through extensive simulation testing.
 
-Victory: Displays Gold and XP earned. (Planned) Will also present a choice of 3 random "reward cards" (e.g., a new item, a new skill, a stat boost).
+📈 Balanced Progression & Character-Specific Saves
+**XP Curve Balance**: Adjusted progression (100 base + 120 increment) prevents rapid leveling after level 3 while maintaining strategic pacing.
 
-Defeat: Displays the 90% Gold penalty and returns the player to the Main Menu.
+Leveling Up: Characters gain stats based on unique growthRates and fully restore HP/resources.
+
+**Character-Specific Save System**:
+- **3 Save Slots per Character**: Independent progression for Taha, Mais, and Ibrahim
+- **New Game/Load/Delete**: Full save management with confirmation dialogs
+- **Persistent Character Data**: Level, floor, gold, experience saved per character/slot
+- **Save Slot Display**: Shows level, floor, gold, and last played timestamp
+
+**Battle Outcome Screens**:
+Victory: Displays Gold and XP earned with floor-appropriate rewards
+
+Defeat: 90% Gold penalty but Hero Souls retained for meta-progression
+
+**Room Rewards**:
+- **Treasure Rooms**: Floor-scaled gold rewards (3-10 base + 20% per floor)
+- **Shrine Blessings**: Stat bonuses with floor scaling (+0.5 per floor)
+- **Floor Completion**: Gold and Hero Soul rewards for advancing
 
 ✨ Meta-Progression: The Soul Forge (IMPLEMENTED)
 This system ensures every run feels meaningful, even in defeat.
@@ -229,9 +261,20 @@ Frontend: React 18
 
 Build Tool: Vite
 
-Styling: TailwindCSS (v3.4.17).
+Styling: TailwindCSS (v3.4.17)
 
-State Management: A global singleton object (src/core/state.js) with a subscription model.
+State Management: Global singleton (src/core/state.js) with subscription model
+
+**Advanced Save System**: Character-specific localStorage with 3 slots per character
+- Save keys: `pathOfHeroes_save_${characterId}_${slotNumber}`
+- Methods: `GameState.saveGame()`, `GameState.loadGame()`, `GameState.deleteSave()`
+- Automatic save on game start and progression
+
+**Localization System**: Complete bilingual support (English/Arabic)
+- External JSON files: `public/locales/en.json`, `public/locales/ar.json`
+- Centralized translation: `t('key.path')` with dynamic placeholders
+- RTL support with language toggle (🌍 button)
+- Save system fully localized with confirmation dialogs
 
 Debugging: A persistent, global debugger (persistent-debugger.jsx + logger.js) and a system of in-game developer hotkeys for testing.
 | Key | Action | Use Case |
@@ -247,32 +290,42 @@ File Naming Convention: All components and modules in src use kebab-case (e.g., 
 File Structure:
 
 p-o-h/
+├── public/
+│   └── locales/
+│       ├── en.json          # English translations
+│       └── ar.json          # Arabic translations
+│
 └── src/
     ├── components/
     │   ├── battle-screen.jsx
-    │   ├── debug-panel.jsx
     │   ├── outcome-screen.jsx
     │   ├── persistent-debugger.jsx
-    │   └── shop-screen.jsx
+    │   ├── save-slot-screen.jsx    # NEW: Character save management
+    │   ├── shop-screen.jsx
+    │   └── soul-forge.jsx          # Meta-progression system
     │
     ├── constants/
-    │   ├── characters.js
-    │   ├── config.js
-    │   ├── enemies.js
-    │   └── localization.js
+    │   ├── characters.js       # Character progression paths
+    │   ├── config.js          # XP curve and game settings
+    │   └── enemies.js         # Enhanced enemy scaling
     │
     ├── core/
+    │   ├── localization.js    # Bilingual translation system
     │   ├── logger.js
-    │   └── state.js
+    │   └── state.js          # Advanced save/load methods
     │
     ├── systems/
-    │   ├── combat.js
-    │   ├── dungeon.js
+    │   ├── combat.js         # Turn-based combat system
+    │   ├── dungeon.js        # Strategic maze generation
     │   └── inventory.js
     │
-    ├── App.jsx
+    ├── App.jsx              # Main game flow and screen management
     ├── main.jsx
-    └── index.css
+    ├── index.css
+    │
+    ├── CLAUDE.md            # Developer documentation
+    ├── README.md            # User-facing documentation
+    └── WALL_ICONS.md        # Asset customization guide
 Development Protocol & AI Assistant Guidelines:
 
 Master README Review: The AI assistant will always reference the latest version of this document.
@@ -301,29 +354,32 @@ Recently Completed:
 
 ✅ **Basic Hero Souls Meta-Progression System**: Persistent currency earned on death, 3 permanent upgrades, localStorage integration.
 
-🎯 PHASE 1: Making Runs Feel Worthwhile (CRITICAL - Week 1-2)
+🎯 PHASE 1: Character-Specific Progression (COMPLETED ✅)
 
-1. Multi-Floor Progression System: 3-5 floors per run with boss progression and healing between floors.
+1. ✅ **Strategic Dungeon System**: Full maze visibility with progressive room discovery
+2. ✅ **Character-Specific Save System**: 3 slots per character with independent progression
+3. ✅ **Balanced Progression**: XP curve and character balance through simulation testing
+4. ✅ **Enhanced Combat**: Character-specific boss scaling and difficulty balance
+5. ✅ **Complete Localization**: Bilingual support with RTL and external translation files
 
-2. ~~Basic Hero Souls Meta-Progression~~: ✅ **COMPLETED** - Persistent currency, 3 permanent upgrades (Vitality, Fortune, Wisdom).
+🎯 PHASE 2: Enhanced Gameplay Features (CURRENT - Week 1-2)
 
-3. Functional Room Events: Working shop (potions/upgrades), shrine blessings, treasure rooms.
+6. Character-Specific Enemy Encounters: preferredEnemyTypes implementation
+7. Character-Specific Rewards: uniqueRewards system for tailored progression
+8. Auto-save During Gameplay: Progress preservation during floor advancement
+9. Room Event Variety: Enhanced shop, shrine, and treasure mechanics
 
-🎯 PHASE 2: Depth & Replayability (HIGH - Week 3-4)
+🎯 PHASE 3: Content & Polish (HIGH - Week 3-4)
 
-4. Enemy Variety: Affix system (Vicious, Swift, Armored) and elite encounters.
+10. Enemy Variety: Affix system (Vicious, Swift, Armored) and enhanced elite encounters
+11. Equipment System: Character-appropriate gear drops and progression
+12. Build Variety: Character specialization through gear and upgrade synergies
 
-5. Basic Equipment System: 3-4 item slots with random drops and simple bonuses.
+🎯 PHASE 4: Advanced Features (MEDIUM - Week 5+)
 
-6. Build Variety: Character specialization through gear and upgrade choices.
-
-🎯 PHASE 3: Polish & Expansion (MEDIUM/LOW - Week 5+)
-
-7. Advanced Soul Forge: Complex upgrade trees and character-specific paths.
-
-8. Full 8-Slot Inventory: Complete equipment system with crafting.
-
-9. 30-Floor Campaign: Multiple acts with unique themes and bosses.
+13. Story Integration: Character-specific narrative content
+14. Advanced Soul Forge: Character-specific upgrade trees
+15. 30-Floor Campaign: Multiple acts with character-tailored encounters
 
 ⚠️ STRATEGIC REASONING:
 The original roadmap focused on complex systems before establishing the core roguelike loop. 
@@ -333,6 +389,18 @@ This revised roadmap prioritizes making each run feel meaningful and death feel 
 📝 Changelog
 This section will track minor version changes, additions, and balance tweaks moving forward.
 
+**v7.0 (August 6, 2025)**: 🚀 **REVOLUTIONARY UPDATE - Character-Specific Progression & Strategic Dungeons**
+- ✅ **Character-Specific Save System**: 3 independent save slots per character with full progression tracking
+- ✅ **Strategic Dungeon Design**: Full maze visibility with progressive room discovery, clean path display
+- ✅ **Balanced Character Progression**: Extensive simulation testing, equal boss difficulty for all characters
+- ✅ **Enhanced XP Curve**: Prevents rapid leveling after level 3 (100 base + 120 increment)
+- ✅ **Visual Interface Overhaul**: Clean paths, distinctive 🧱 walls, plain room discovery system
+- ✅ **Complete Save Management**: New Game/Load/Delete with confirmation dialogs and timestamps
+- ✅ **Localization Excellence**: Full bilingual support with external JSON files and RTL layout
+- ✅ **Character Balance**: Removed unfair boss scaling modifiers based on mathematical analysis
+- 🔧 **Fixed Save Slot Flow**: Proper screen transitions from character selection to exploration
+- 📖 **Documentation Sync**: README and CLAUDE.md fully aligned with new features
+
 **v6.3 (August 6, 2025)**: 🎉 **MAJOR UPDATE - Hero Souls Meta-Progression System**
 - ✅ **Implemented complete Hero Souls system** with persistent localStorage storage
 - ✅ **Added Soul Forge** accessible from main menu with 3 permanent upgrades
@@ -340,9 +408,6 @@ This section will track minor version changes, additions, and balance tweaks mov
 - ✅ **Permanent upgrades**: Vitality (+20% HP), Fortune (+50% gold), Wisdom (+25% XP)
 - ✅ **UI enhancements**: Purple soul theme, upgrade status indicators
 - ✅ **Death now feels rewarding**: Souls collected automatically, persist through resets
-- 🔧 **Fixed combat system**: Added missing UI updates after all player actions
-- 🔧 **Fixed battle screen**: Ensured action buttons always visible
-- 📖 **Updated README**: Comprehensive documentation of Hero Souls implementation
 
 v6.2 (August 5, 2025): Fully expanded all sections to serve as a complete, standalone master document. Added detailed explanations for all planned and implemented features. Formalized the final Developer/AI collaboration protocol.
 

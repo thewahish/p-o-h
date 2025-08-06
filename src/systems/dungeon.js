@@ -3,6 +3,7 @@
 import { GameConfig } from '../constants/config';
 import { GameState } from '../core/state';
 import { EnemyDatabase, getFloorEnemies, getFloorBoss } from '../constants/enemies';
+import { Characters } from '../constants/characters';
 import Logger from '../core/logger';
 
 export const RoomTypes = { 
@@ -14,19 +15,21 @@ export const RoomTypes = {
     CAMPFIRE: 'campfire', 
     SHRINE: 'shrine', 
     TREASURE: 'treasure', 
-    BOSS: 'boss' 
+    BOSS: 'boss',
+    STAIRS: 'stairs'
 };
 
 export const RoomIcons = { 
-    [RoomTypes.EMPTY]: '·', 
-    [RoomTypes.WALL]: '⬛', 
+    [RoomTypes.EMPTY]: '', // Plain empty for paths
+    [RoomTypes.WALL]: '🧱', // Distinctive wall icon (can be changed to other blocking icons)
     [RoomTypes.BATTLE]: '⚔️', 
     [RoomTypes.ELITE]: '💀', 
     [RoomTypes.SHOP]: '🏪', 
     [RoomTypes.CAMPFIRE]: '🔥', 
     [RoomTypes.SHRINE]: '⛩️', 
     [RoomTypes.TREASURE]: '💎', 
-    [RoomTypes.BOSS]: '👹' 
+    [RoomTypes.BOSS]: '👹',
+    [RoomTypes.STAIRS]: '🔄'
 };
 
 const GRID_WIDTH = 5;  // Fewer columns for much larger squares
@@ -40,15 +43,65 @@ function getScaledEnemy(enemyId, floor) {
     }
 
     const scaledEnemy = JSON.parse(JSON.stringify(baseEnemy));
-    const scalingFactor = 1 + (floor - 1) * 0.20; // 20% stat increase per floor
-
-    scaledEnemy.baseStats.hp = Math.floor(scaledEnemy.baseStats.hp * scalingFactor);
-    scaledEnemy.baseStats.atk = Math.floor(scaledEnemy.baseStats.atk * scalingFactor);
-    scaledEnemy.baseStats.def = Math.floor(scaledEnemy.baseStats.def * scalingFactor);
+    
+    // Level-based scaling like modern RPGs (WoW style)
+    const playerLevel = GameState.current.level || 1;
+    
+    // Determine enemy level based on floor and player level
+    let enemyLevel;
+    if (floor <= 2) {
+        enemyLevel = Math.max(1, playerLevel - 1); // Slightly easier early game
+    } else if (floor <= 4) {
+        enemyLevel = playerLevel; // Same level as player
+    } else if (floor <= 7) {
+        enemyLevel = Math.max(1, playerLevel + Math.floor(Math.random() * 2)); // Player level or +1
+    } else {
+        enemyLevel = Math.max(1, playerLevel + Math.floor(Math.random() * 3) - 1); // Player level -1 to +1
+    }
+    
+    // For bosses, always make them at least player level + 1
+    if (scaledEnemy.isBoss) {
+        enemyLevel = Math.max(playerLevel + 1, enemyLevel);
+    }
+    
+    // Store enemy level for display and combat
+    scaledEnemy.level = enemyLevel;
+    
+    // Level-based stat scaling (balanced like WoW)
+    const levelDifference = enemyLevel - 1;
+    const levelMultiplier = 1 + levelDifference * 0.12; // 12% increase per level above 1
+    
+    // Scale base stats with level
+    scaledEnemy.baseStats.hp = Math.ceil(scaledEnemy.baseStats.hp * levelMultiplier);
+    scaledEnemy.baseStats.atk = Math.ceil(scaledEnemy.baseStats.atk * levelMultiplier);
+    scaledEnemy.baseStats.def = Math.ceil(scaledEnemy.baseStats.def * levelMultiplier);
+    scaledEnemy.baseStats.spd = Math.ceil(scaledEnemy.baseStats.spd * (1 + levelDifference * 0.08)); // Slower speed scaling
+    
+    // Crit scales with level but caps at reasonable amount
+    if (scaledEnemy.baseStats.crit) {
+        scaledEnemy.baseStats.crit = Math.min(30, scaledEnemy.baseStats.crit + levelDifference * 1.5);
+    }
+    
+    // Balance adjustments for better combat feel (like modern RPGs)
+    if (!scaledEnemy.isBoss) {
+        // Regular enemies: very slight damage reduction only (removed HP reduction)
+        scaledEnemy.baseStats.atk = Math.ceil(scaledEnemy.baseStats.atk * 0.95);
+    }
     
     // Create stats from baseStats for combat system
     scaledEnemy.stats = { ...scaledEnemy.baseStats };
     scaledEnemy.maxStats = { ...scaledEnemy.baseStats };
+    
+    // Scale rewards based on enemy level
+    const rewardMultiplier = 1 + (enemyLevel - 1) * 0.08;
+    scaledEnemy.goldReward.min = Math.ceil(scaledEnemy.goldReward.min * rewardMultiplier);
+    scaledEnemy.goldReward.max = Math.ceil(scaledEnemy.goldReward.max * rewardMultiplier);
+    scaledEnemy.xpReward = Math.ceil(scaledEnemy.xpReward * rewardMultiplier);
+    
+    // Store level for display (translation happens at render time)
+    // Don't set displayName here - let the UI handle translation
+    
+    Logger.log(`Generated Lv.${enemyLevel} ${scaledEnemy.nameKey} (Player Lv.${playerLevel}, Floor ${floor})`, 'SYSTEM');
     return scaledEnemy;
 }
 
@@ -115,7 +168,7 @@ export function generateDungeon() {
     const dungeon = Array(GRID_HEIGHT).fill(null).map((_, y) =>
         Array(GRID_WIDTH).fill(null).map((_, x) => ({
             type: maze[y][x].type,
-            revealed: false,
+            revealed: maze[y][x].isPath || false, // Reveal all path rooms from start
             visited: false,
             completed: false,
             encounter: null,
@@ -187,12 +240,11 @@ export function generateDungeon() {
     // Populate encounters
     populateEncounters(dungeon, floor);
 
-    // Initialize game state
-    revealAdjacentRooms(dungeon, start.x, start.y);
+    // Initialize game state  
     GameState.current.dungeon = dungeon;
     GameState.current.playerPos = { ...start };
     GameState._notify();
-    Logger.log(`Generated maze-like dungeon for floor ${floor} with ${pathRooms.length + 1} rooms.`, 'SYSTEM');
+    Logger.log(`Generated visible dungeon for floor ${floor} with ${pathRooms.length + 1} rooms. Path fully revealed for strategic planning.`, 'SYSTEM');
     return dungeon;
 }
 
@@ -207,22 +259,65 @@ function populateEncounters(dungeon, floor) {
             if (room.type === RoomTypes.BATTLE) {
                 const randomEnemy = availableEnemies[Math.floor(Math.random() * availableEnemies.length)];
                 room.encounter = [getScaledEnemy(randomEnemy, floor)];
-                // 30% chance for double enemy encounter
-                if (Math.random() < 0.3) {
+                
+                // Increased chance for multiple enemies on higher floors
+                const multiEnemyChance = Math.min(0.6, 0.3 + (floor - 1) * 0.1); // 30% base, +10% per floor, max 60%
+                if (Math.random() < multiEnemyChance) {
                     const secondEnemy = availableEnemies[Math.floor(Math.random() * availableEnemies.length)];
                     room.encounter.push(getScaledEnemy(secondEnemy, floor));
+                    
+                    // Chance for triple encounters on very high floors
+                    if (floor >= 5 && Math.random() < 0.2) {
+                        const thirdEnemy = availableEnemies[Math.floor(Math.random() * availableEnemies.length)];
+                        room.encounter.push(getScaledEnemy(thirdEnemy, floor));
+                    }
                 }
             } else if (room.type === RoomTypes.ELITE) {
                 const eliteEnemy = availableEnemies[Math.floor(Math.random() * availableEnemies.length)];
                 const scaledElite = getScaledEnemy(eliteEnemy, floor);
-                // Elite enemies get 50% stat boost
-                scaledElite.baseStats.hp = Math.floor(scaledElite.baseStats.hp * 1.5);
-                scaledElite.baseStats.atk = Math.floor(scaledElite.baseStats.atk * 1.5);
+                
+                // Elite enemies get enhanced scaling based on floor
+                const eliteBonus = 1.5 + (floor - 1) * 0.1; // Base 50% + 10% per floor
+                scaledElite.baseStats.hp = Math.floor(scaledElite.baseStats.hp * eliteBonus);
+                scaledElite.baseStats.atk = Math.floor(scaledElite.baseStats.atk * eliteBonus);
+                scaledElite.baseStats.def = Math.floor(scaledElite.baseStats.def * eliteBonus);
                 scaledElite.stats = { ...scaledElite.baseStats };
                 scaledElite.maxStats = { ...scaledElite.baseStats };
+                
+                // Add "Elite" prefix to name
+                scaledElite.nameKey = `Elite ${scaledElite.nameKey}`;
+                
                 room.encounter = [scaledElite];
+                
+                // High floor elite encounters may have minions
+                if (floor >= 3 && Math.random() < 0.4) {
+                    const minion = availableEnemies[Math.floor(Math.random() * availableEnemies.length)];
+                    room.encounter.push(getScaledEnemy(minion, floor));
+                }
             } else if (room.type === RoomTypes.BOSS && bossEnemy) {
-                room.encounter = [getScaledEnemy(bossEnemy, floor)];
+                const scaledBoss = getScaledEnemy(bossEnemy, floor);
+                
+                // Character-specific boss scaling
+                const characterId = GameState.current.selectedCharacter?.toUpperCase() || 'WARRIOR';
+                const character = Characters[characterId];
+                const characterModifier = character?.bossScalingModifier || 1.0;
+                
+                // Bosses get extra scaling and unique naming
+                let bossBonus = 1.8 + (floor - 1) * 0.15; // Base 80% + 15% per floor
+                bossBonus *= characterModifier; // Apply character-specific scaling
+                
+                scaledBoss.baseStats.hp = Math.floor(scaledBoss.baseStats.hp * bossBonus);
+                scaledBoss.baseStats.atk = Math.floor(scaledBoss.baseStats.atk * bossBonus);
+                scaledBoss.baseStats.def = Math.floor(scaledBoss.baseStats.def * bossBonus);
+                scaledBoss.stats = { ...scaledBoss.baseStats };
+                scaledBoss.maxStats = { ...scaledBoss.baseStats };
+                
+                if (floor > 1) {
+                    const progressionPath = character?.progressionPath || 'standard';
+                    scaledBoss.nameKey = `${scaledBoss.nameKey} - Floor ${floor} ${progressionPath} Nemesis`;
+                }
+                
+                room.encounter = [scaledBoss];
             }
         }
     }
@@ -235,4 +330,31 @@ export function revealAdjacentRooms(grid, x, y) {
             grid[pos.y][pos.x].revealed = true;
         }
     });
+}
+
+export function spawnStairs() {
+    const dungeon = GameState.current.dungeon;
+    if (!dungeon) return;
+    
+    // Find the boss room position
+    let bossRoom = null;
+    for (let y = 0; y < GRID_HEIGHT; y++) {
+        for (let x = 0; x < GRID_WIDTH; x++) {
+            if (dungeon[y][x].type === RoomTypes.BOSS) {
+                bossRoom = { x, y };
+                break;
+            }
+        }
+        if (bossRoom) break;
+    }
+    
+    if (!bossRoom) return;
+    
+    // Transform the boss room into stairs after boss defeat
+    dungeon[bossRoom.y][bossRoom.x].type = RoomTypes.STAIRS;
+    dungeon[bossRoom.y][bossRoom.x].encounter = null;
+    dungeon[bossRoom.y][bossRoom.x].completed = true;
+    
+    GameState._notify();
+    Logger.log('Stairs to next floor have appeared!', 'SYSTEM');
 }

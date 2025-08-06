@@ -76,7 +76,8 @@
     "crit": "CRIT",
     "level": "Lvl",
     "floor": "Floor",
-    "gold": "Gold"
+    "gold": "Gold",
+    "souls": "Souls"
   },
   "resources": {
     "vigor": "Vigor",
@@ -122,7 +123,11 @@
       "allEnemiesDefeated": "Victory! You defeated all enemies.",
       "poisonDamage": "{unit} takes {damage} damage from poison.",
       "statusWoreOff": "{unit}'s {effect} effect wore off.",
-      "criticalHit": "Critical hit!"
+      "criticalHit": "Critical hit!",
+    "enemiesRemaining": "{alive}/{total} Enemies Remaining",
+    "waveCleared": "Wave {wave} cleared! Preparing for wave {next}...",
+    "waveBegins": "Wave {wave}/{total} begins!",
+    "waveSpawn": "Wave {wave}/{total} - {enemies} appear!"
     }
   },
   "skills": {
@@ -159,7 +164,8 @@
     "shrine": "Shrine",
     "treasure": "Treasure Room",
     "boss": "Boss Room",
-    "campfire": "Campfire"
+    "campfire": "Campfire",
+    "stairs": "Stairs to Next Floor"
   },
   "shop": {
     "welcome": "Welcome to my shop!",
@@ -205,6 +211,82 @@
     "wisdom": {
       "name": "Wisdom",
       "description": "+25% Experience gain for all heroes"
+    },
+    "strength": {
+      "name": "Strength",
+      "description": "+15% Attack damage for all heroes"
+    },
+    "resilience": {
+      "name": "Resilience", 
+      "description": "+20% Defense for all heroes"
+    },
+    "swiftness": {
+      "name": "Swiftness",
+      "description": "+10% Speed for all heroes"
+    },
+    "merchantsFavor": {
+      "name": "Merchant's Favor",
+      "description": "Shop items cost 25% less gold"
+    },
+    "battleMastery": {
+      "name": "Battle Mastery",
+      "description": "+10% Critical hit chance for all heroes"
+    },
+    "treasureHunter": {
+      "name": "Treasure Hunter",
+      "description": "Treasure rooms give 50% more gold"
+    },
+    "floorMaster": {
+      "name": "Floor Master",
+      "description": "Heal 50% HP when advancing floors"
+    },
+    "soulReaper": {
+      "name": "Soul Reaper",
+      "description": "Gain +1 extra Hero Soul per enemy defeated"
+    },
+    "legendaryLuck": {
+      "name": "Legendary Luck",
+      "description": "5% chance for enemies to drop rare rewards"
+    },
+    "transcendence": {
+      "name": "Transcendence",
+      "description": "Start each run with +1 level"
+    },
+    "shieldMastery": {
+      "name": "Shield Mastery",
+      "description": "Warrior: Shield Bash reduces enemy damage by 50%"
+    },
+    "armorExpert": {
+      "name": "Armor Expert", 
+      "description": "Warrior: +30% Defense and immunity to poison"
+    },
+    "guardianSpirit": {
+      "name": "Guardian Spirit",
+      "description": "Warrior: Revive once per run at 25% HP"
+    },
+    "manaFlow": {
+      "name": "Mana Flow",
+      "description": "Sorceress: +50% Mana regeneration per turn"
+    },
+    "elementalMastery": {
+      "name": "Elemental Mastery",
+      "description": "Sorceress: Fireball has 25% chance to stun enemies"
+    },
+    "arcaneTranscendence": {
+      "name": "Arcane Transcendence", 
+      "description": "Sorceress: Cast two spells per turn"
+    },
+    "poisonMastery": {
+      "name": "Poison Mastery",
+      "description": "Rogue: Poison deals double damage and spreads"
+    },
+    "shadowStep": {
+      "name": "Shadow Step",
+      "description": "Rogue: 25% chance to dodge all damage"
+    },
+    "deathFromShadows": {
+      "name": "Death from Shadows",
+      "description": "Rogue: Critical hits instantly defeat enemies below 25% HP"
     }
   },
   "status": {
@@ -247,7 +329,8 @@
     "blessingDetails": "✨ You receive the {blessing}! +{bonus} {stat}",
     "itemFound": "Item Found!",
     "reward": "Reward!",
-    "continue": "Continue"
+    "continue": "Continue",
+    "floorComplete": "🎉 Floor {floor} Complete! +{gold} Gold, +{souls} Hero Souls"
   },
   "blessings": {
     "strength": "Blessing of Strength",
@@ -257,6 +340,42 @@
   },
   "exploration": {
     "controls": "Use WASD or Arrow Keys to navigate the maze. Click adjacent rooms to move."
+  },
+  "events": {
+    "battleIntro": "You have encountered: {enemies}",
+    "bossIntro": "You face the fearsome {boss}!",
+    "eliteIntro": "A powerful {elite} blocks your path!",
+    "shopIntro": "You discover a merchant's shop",
+    "shrineIntro": "You find an ancient shrine",
+    "treasureIntro": "You've found a treasure chest!",
+    "encounterIntro": "You approach the {event}",
+    "battleOutro": "The battle is over. You continue your journey...",
+    "shopOutro": "You leave the merchant behind",
+    "shrineOutro": "You feel blessed as you depart",
+    "treasureOutro": "With your newfound riches, you move on",
+    "encounterOutro": "You return to your path through the dungeon",
+    "preparing": "Preparing for encounter...",
+    "returning": "Returning to exploration...",
+    "continue": "Continue",
+    "autoAdvancing": "Auto-advancing",
+    "unknownEnemies": "Unknown Foes"
+  },
+  "saveSlots": {
+    "selectSlot": "Select a save slot",
+    "slot": "Slot",
+    "newGame": "New Game",
+    "load": "Load",
+    "delete": "Delete",
+    "empty": "Empty Slot",
+    "level": "Level",
+    "floor": "Floor", 
+    "gold": "Gold",
+    "back": "Back",
+    "confirm": "Confirm",
+    "cancel": "Cancel",
+    "confirmOverwrite": "Overwrite existing save in slot {slot}?",
+    "confirmDelete": "Delete save in slot {slot}?",
+    "switchCharacter": "Switch Character"
   },
   "debug": {
     "title": "Debugger",

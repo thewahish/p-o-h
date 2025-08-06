@@ -16,20 +16,69 @@ export class CombatSystem {
     GameState.update('battleInProgress', true);
     if (GameState.current.player) GameState.current.player.isAlive = true;
 
-    GameState.current.enemies = enemies.map((enemy, index) => ({
-      ...enemy,
-      originalIndex: index,
-      isAlive: true,
-      statusEffects: [],
-    }));
-
-    const enemyNames = enemies.map(e => e.nameKey ? t(e.nameKey) : 'Enemy').join(', ');
-    const startMessage = t('combat.messages.battleBegins', {enemies: enemyNames});
+    // Wave combat system: organize enemies into waves
+    this.organizeWaves(enemies);
+    
+    // Start with first wave
+    this.currentWave = 1;
+    this.spawnWave(1);
+    
+    const totalEnemies = enemies.length;
+    const startMessage = t('combat.messages.battleBegins', {enemies: `${totalEnemies} enemies in ${this.totalWaves} waves`});
     Logger.log(startMessage, 'COMBAT');
     this.onLog(startMessage);
 
     this.calculateTurnOrder();
     this.processTurn();
+  }
+  
+  organizeWaves(enemies) {
+    // Organize enemies into waves for better pacing
+    this.allWaveEnemies = enemies;
+    this.waves = [];
+    
+    if (enemies.length <= 2) {
+      // Single wave for 1-2 enemies
+      this.waves = [enemies];
+    } else if (enemies.length === 3) {
+      // 2 waves: 2 + 1 for triple encounters
+      this.waves = [
+        enemies.slice(0, 2),
+        enemies.slice(2, 3)
+      ];
+    } else {
+      // For larger encounters (shouldn't happen often but just in case)
+      const waveSize = Math.ceil(enemies.length / Math.ceil(enemies.length / 2));
+      for (let i = 0; i < enemies.length; i += waveSize) {
+        this.waves.push(enemies.slice(i, i + waveSize));
+      }
+    }
+    
+    this.totalWaves = this.waves.length;
+    Logger.log(`Combat organized into ${this.totalWaves} waves: ${this.waves.map(w => w.length).join(', ')} enemies`, 'COMBAT');
+  }
+  
+  spawnWave(waveNumber) {
+    const waveEnemies = this.waves[waveNumber - 1];
+    if (!waveEnemies) return;
+    
+    GameState.current.enemies = waveEnemies.map((enemy, index) => ({
+      ...enemy,
+      originalIndex: index,
+      isAlive: true,
+      statusEffects: [],
+    }));
+    
+    const waveMessage = waveNumber === 1 ? 
+      t('combat.messages.waveBegins', {wave: waveNumber, total: this.totalWaves}) :
+      t('combat.messages.waveSpawn', {
+        wave: waveNumber, 
+        total: this.totalWaves, 
+        enemies: waveEnemies.map(e => e.level ? `Lv.${e.level} ${e.nameKey ? t(e.nameKey) : 'Enemy'}` : (e.nameKey ? t(e.nameKey) : 'Enemy')).join(', ')
+      });
+    
+    this.onLog(waveMessage);
+    Logger.log(waveMessage, 'COMBAT');
   }
 
   calculateTurnOrder() {
@@ -53,7 +102,7 @@ export class CombatSystem {
 
     const dmg = this.calculateDamage(GameState.current.player, target);
     target.stats.hp = Math.max(0, target.stats.hp - dmg);
-    this.onLog(t('combat.messages.youAttack', {target: target.nameKey ? t(target.nameKey) : 'Enemy', damage: dmg}));
+    this.onLog(t('combat.messages.youAttack', {target: target.level ? `Lv.${target.level} ${target.nameKey ? t(target.nameKey) : 'Enemy'}` : (target.nameKey ? t(target.nameKey) : 'Enemy'), damage: dmg}));
     if (target.stats.hp <= 0) this.killUnit(target);
     this.updateCallback(); // ← ADDED UI UPDATE
     this.nextTurn();
@@ -86,7 +135,7 @@ export class CombatSystem {
           const dmg = this.calculateDamage(player, target, skillData.damageMultiplier);
           target.stats.hp = Math.max(0, target.stats.hp - dmg);
           const skillName = typeof skillData.name === 'object' ? (skillData.name[Localization.getCurrentLanguage()] || skillData.name.en) : skillData.name;
-          const targetName = target.nameKey ? t(target.nameKey) : 'Enemy';
+          const targetName = target.level ? `Lv.${target.level} ${target.nameKey ? t(target.nameKey) : 'Enemy'}` : (target.nameKey ? t(target.nameKey) : 'Enemy');
           this.onLog(t('combat.messages.skillHits', {skill: skillName, target: targetName, damage: dmg}));
           if (target.stats.hp <= 0) this.killUnit(target);
       }
@@ -97,7 +146,7 @@ export class CombatSystem {
           } else {
               target.statusEffects.push({ ...skillData.effect });
           }
-          const targetName = target.nameKey ? t(target.nameKey) : 'Enemy';
+          const targetName = target.level ? `Lv.${target.level} ${target.nameKey ? t(target.nameKey) : 'Enemy'}` : (target.nameKey ? t(target.nameKey) : 'Enemy');
           this.onLog(t('combat.messages.targetAfflicted', {target: targetName, effect: skillData.effect.type}));
       }
     });
@@ -133,7 +182,7 @@ export class CombatSystem {
         this.onLog(t('combat.messages.defenseReduced'));
     }
     player.stats.hp = Math.max(0, player.stats.hp - dmg);
-    const enemyName = enemy.nameKey ? t(enemy.nameKey) : 'Enemy';
+    const enemyName = enemy.level ? `Lv.${enemy.level} ${enemy.nameKey ? t(enemy.nameKey) : 'Enemy'}` : (enemy.nameKey ? t(enemy.nameKey) : 'Enemy');
     this.onLog(t('combat.messages.enemyAttacks', {enemy: enemyName, damage: dmg}));
     if (player.stats.hp <= 0) this.killUnit(player);
     this.updateCallback(); // ← ADDED UI UPDATE
@@ -186,13 +235,34 @@ export class CombatSystem {
   checkBattleEnd() {
     const allEnemiesDead = GameState.current.enemies.every(e => !e.isAlive);
     const playerDead = GameState.current.player.stats.hp <= 0;
+    
     if (allEnemiesDead) {
-        this.onLog(t('combat.messages.allEnemiesDefeated'));
-        GameState.update('battleInProgress', false); // ← ADDED BATTLE END STATE
-        return true;
+        // Check if there are more waves to spawn
+        if (this.currentWave < this.totalWaves) {
+            this.onLog(t('combat.messages.waveCleared', {wave: this.currentWave, next: this.currentWave + 1}));
+            
+            // Award small bonus for clearing wave (except the final one)
+            GameState.awardSouls(1, `Clearing wave ${this.currentWave}`);
+            
+            // Brief pause before next wave (for dramatic effect)
+            setTimeout(() => {
+                this.currentWave++;
+                this.spawnWave(this.currentWave);
+                this.calculateTurnOrder();
+                this.processTurn();
+                this.updateCallback(); // Update UI to show new wave
+            }, 1500); // 1.5 second pause
+            
+            return null; // Battle continues
+        } else {
+            // All waves completed
+            this.onLog(t('combat.messages.allEnemiesDefeated'));
+            GameState.update('battleInProgress', false);
+            return true;
+        }
     } else if (playerDead) {
         this.onLog(t('combat.messages.youDefeated'));
-        GameState.update('battleInProgress', false); // ← ADDED BATTLE END STATE
+        GameState.update('battleInProgress', false);
         return false;
     }
     return null;
@@ -203,10 +273,10 @@ export class CombatSystem {
     if (unit.id === 'player') {
         this.onLog(t('combat.messages.youDefeated'));
     } else {
-        const unitName = unit.nameKey ? t(unit.nameKey) : 'Enemy';
+        const unitName = unit.level ? `Lv.${unit.level} ${unit.nameKey ? t(unit.nameKey) : 'Enemy'}` : (unit.nameKey ? t(unit.nameKey) : 'Enemy');
         this.onLog(t('combat.messages.unitDefeated', {unit: unitName}));
         // Award Hero Soul for enemy defeat
-        GameState.awardSouls(1, `Defeating ${unitName}`);
+        GameState.awardSouls(3, `Defeating ${unitName}`); // Increased from 1 to 3 for meaningful early gains
     }
     this.updateCallback();
   }
