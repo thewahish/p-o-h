@@ -25,16 +25,16 @@ export default function RewardPopup({ reward, onClose }) {
     };
 
     return (
-        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[200] p-4">
-            <div className="bg-gray-800 border-2 border-amber-500 rounded-lg p-6 max-w-sm w-full text-center shadow-2xl animate-pulse">
+        <div className="fixed inset-0 bg-rpg-bg-darkest/60 flex items-center justify-center z-[200] p-4">
+            <div className="bg-rpg-bg-darker border-2 border-rpg-primary rounded-lg p-6 max-w-sm w-full text-center shadow-2xl animate-pulse backdrop-blur-sm">
                 <div className="text-6xl mb-4">{getRewardIcon(reward.type)}</div>
-                <h2 className="text-2xl font-bold text-amber-400 mb-4">{getRewardTitle(reward.type)}</h2>
-                <div className="text-lg text-white mb-6">
+                <h2 className="text-2xl font-bold text-rpg-primary mb-4">{getRewardTitle(reward.type)}</h2>
+                <div className="text-lg text-rpg-text mb-6">
                     {reward.message}
                 </div>
                 <button
                     onClick={onClose}
-                    className="w-full bg-amber-600 hover:bg-amber-500 text-white font-bold py-3 px-4 rounded-lg text-xl transition-transform transform hover:scale-105"
+                    className="w-full bg-rpg-primary hover:bg-rpg-secondary text-rpg-text font-bold py-3 px-4 rounded-lg text-xl transition-transform transform hover:scale-105"
                 >
                     {t('rewards.continue')}
                 </button>

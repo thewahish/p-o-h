@@ -157,6 +157,13 @@
     "graveGolem": "غوليم القبر",
     "cryptLord": "سيد الخبايا"
   },
+  "prefixes": {
+    "elite": "نخبة",
+    "vicious": "شرس",
+    "swift": "سريع",
+    "armored": "مدرع",
+    "regenerating": "متجدد"
+  },
   "rooms": {
     "battle": "غرفة المعركة",
     "elite": "معركة النخبة",

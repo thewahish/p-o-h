@@ -2,27 +2,44 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  /* Dark RPG Theme Colors */
+  --bg-gradient: radial-gradient(ellipse at center, #1a0f0a 0%, #0d0604 40%, #000000 100%);
+  --primary: #d4a656;
+  --secondary: #5c4423;
+  --text: #f8e4c0;
+  --health-gradient: linear-gradient(90deg, #8b0000, #ff4500, #ff6347);
+  --mana-gradient: linear-gradient(90deg, #191970, #4169e1, #87ceeb);
+  
+  /* Rarity Colors */
+  --common: #95a5a6;
+  --uncommon: #27ae60;
+  --rare: #3498db;
+  --epic: #9b59b6;
+  --mythic: #e67e22;
+  --legendary: #f1c40f;
+}
+
 html, body, #root {
   height: 100%;
   margin: 0;
   padding: 0;
-  background-color: #0c0a09; /* A dark base background */
+  background: var(--bg-gradient);
+  color: var(--text);
   overscroll-behavior: none; /* Prevents pull-to-refresh on mobile */
 }
 
-/* === PORTRAIT LOCK STYLES (CORRECTED) === */
+/* === PORTRAIT LOCK STYLES === */
 #orientation-overlay {
-    /* By default, the overlay is completely hidden. */
     display: none; 
     position: fixed;
     inset: 0;
-    background-color: #111827;
-    color: #e5e7eb;
+    background: var(--bg-gradient);
+    color: var(--text);
     z-index: 9999;
 }
 
 #orientation-overlay .message {
-    /* This is just the styling for the message box itself. */
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -30,9 +47,10 @@ html, body, #root {
     font-size: 1.25rem;
     font-family: sans-serif;
     padding: 2rem;
-    background-color: #1f2937;
+    background: rgba(20, 15, 10, 0.9);
     border-radius: 0.5rem;
-    border: 1px solid #ca8a04;
+    border: 2px solid var(--primary);
+    backdrop-filter: blur(10px);
 }
 
 /* This rule ONLY activates when the screen is wider than it is tall. */

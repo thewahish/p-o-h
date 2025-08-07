@@ -168,7 +168,7 @@ export function generateDungeon() {
     const dungeon = Array(GRID_HEIGHT).fill(null).map((_, y) =>
         Array(GRID_WIDTH).fill(null).map((_, x) => ({
             type: maze[y][x].type,
-            revealed: maze[y][x].isPath || false, // Reveal all path rooms from start
+            revealed: true, // Reveal all rooms from start for strategic planning
             visited: false,
             completed: false,
             encounter: null,
@@ -284,8 +284,8 @@ function populateEncounters(dungeon, floor) {
                 scaledElite.stats = { ...scaledElite.baseStats };
                 scaledElite.maxStats = { ...scaledElite.baseStats };
                 
-                // Add "Elite" prefix to name
-                scaledElite.nameKey = `Elite ${scaledElite.nameKey}`;
+                // Add Elite prefix properly for localization
+                scaledElite.prefixKey = 'prefixes.elite';
                 
                 room.encounter = [scaledElite];
                 

@@ -118,21 +118,21 @@ export default function App() {
     };
 
     const getRoomBackgroundColor = (room, isPlayerHere) => {
-        if (isPlayerHere) return "bg-amber-600 animate-pulse";
-        if (!room.revealed) return "bg-gray-900";
-        if (room.type === RoomTypes.WALL) return "bg-stone-800 text-stone-400"; // Distinctive wall background
+        if (isPlayerHere) return "bg-rpg-primary animate-pulse";
+        if (!room.revealed) return "bg-rpg-bg-darker";
+        if (room.type === RoomTypes.WALL) return "bg-rpg-secondary text-rpg-text opacity-60"; // Distinctive wall background
         if (room.completed) {
             switch (room.type) {
-                case RoomTypes.BATTLE: case RoomTypes.ELITE: case RoomTypes.BOSS: return "bg-green-900 text-green-400";
-                case RoomTypes.TREASURE: return "bg-yellow-900 text-yellow-400";
-                case RoomTypes.SHRINE: return "bg-purple-900 text-purple-400";
-                case RoomTypes.STAIRS: return "bg-blue-900 text-blue-400";
-                default: return "bg-gray-700";
+                case RoomTypes.BATTLE: case RoomTypes.ELITE: case RoomTypes.BOSS: return "bg-uncommon bg-opacity-30 text-uncommon";
+                case RoomTypes.TREASURE: return "bg-legendary bg-opacity-30 text-legendary";
+                case RoomTypes.SHRINE: return "bg-epic bg-opacity-30 text-epic";
+                case RoomTypes.STAIRS: return "bg-rare bg-opacity-30 text-rare";
+                default: return "bg-rpg-bg-darker";
             }
         }
         // Special highlighting for stairs (even when not completed)
-        if (room.type === RoomTypes.STAIRS) return "bg-blue-700 hover:bg-blue-600 animate-pulse";
-        return "bg-gray-600 hover:bg-gray-500";
+        if (room.type === RoomTypes.STAIRS) return "bg-rare bg-opacity-50 hover:bg-rare hover:bg-opacity-70 animate-pulse";
+        return "bg-rpg-bg-darker hover:bg-rpg-secondary hover:bg-opacity-50";
     };
 
     const movePlayer = useCallback((dx, dy) => {
@@ -413,10 +413,10 @@ export default function App() {
     // Show loading screen if localization not ready
     if (!localizationReady) {
         return (
-            <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black text-white flex items-center justify-center">
+            <div className="min-h-screen bg-rpg-radial text-rpg-text flex items-center justify-center">
                 <div className="text-center">
                     <div className="text-2xl mb-4">🌍</div>
-                    <div className="text-lg text-gray-300">Loading...</div>
+                    <div className="text-lg text-rpg-text opacity-80">Loading...</div>
                 </div>
             </div>
         );
@@ -516,10 +516,10 @@ export default function App() {
     // Don't render exploration if dungeon or playerPos not ready
     if (dungeon.length === 0 || !playerPos) {
         return (
-            <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black text-white flex items-center justify-center">
+            <div className="min-h-screen bg-rpg-radial text-rpg-text flex items-center justify-center">
                 <div className="text-center">
                     <div className="text-2xl mb-4">🏗️</div>
-                    <div className="text-lg text-gray-300">{t('menu.loading')}</div>
+                    <div className="text-lg text-rpg-text opacity-80">{t('menu.loading')}</div>
                 </div>
                 <PersistentDebugger />
             </div>
@@ -527,26 +527,26 @@ export default function App() {
     }
 
     return (
-        <div className="h-screen bg-gradient-to-b from-gray-900 to-black text-white p-1 flex flex-col overflow-hidden">
+        <div className="h-screen bg-rpg-radial text-rpg-text p-1 flex flex-col overflow-hidden">
             {/* Compact Top Stats Panel */}
-            <div className="bg-gray-800 rounded-lg px-2 py-1.5 mb-1 border border-amber-600 shrink-0">
+            <div className="bg-rpg-bg-darker bg-opacity-80 rounded-lg px-2 py-1.5 mb-1 border border-rpg-primary shrink-0 backdrop-blur-sm">
                 {/* First Row - Core Stats */}
                 <div className="grid grid-cols-4 gap-2 text-center text-xs mb-1.5">
                     <div>
-                        <div className="text-gray-400 text-xs leading-none">{t('stats.floor')}</div>
-                        <div className="text-amber-400 font-bold text-sm leading-none">{gameState.currentFloor}</div>
+                        <div className="text-rpg-text opacity-70 text-xs leading-none">{t('stats.floor')}</div>
+                        <div className="text-rpg-primary font-bold text-sm leading-none">{gameState.currentFloor}</div>
                     </div>
                     <div>
-                        <div className="text-gray-400 text-xs leading-none">{t('stats.level')}</div>
-                        <div className="text-cyan-400 font-bold text-sm leading-none">{gameState.level}</div>
+                        <div className="text-rpg-text opacity-70 text-xs leading-none">{t('stats.level')}</div>
+                        <div className="text-mana-light font-bold text-sm leading-none">{gameState.level}</div>
                     </div>
                     <div>
-                        <div className="text-gray-400 text-xs leading-none">{t('stats.gold')}</div>
-                        <div className="text-yellow-400 font-bold text-sm leading-none">{gameState.gold}</div>
+                        <div className="text-rpg-text opacity-70 text-xs leading-none">{t('stats.gold')}</div>
+                        <div className="text-legendary font-bold text-sm leading-none">{gameState.gold}</div>
                     </div>
                     <div>
-                        <div className="text-gray-400 text-xs leading-none">{t('stats.souls')}</div>
-                        <div className="text-purple-400 font-bold text-sm leading-none">{currentSouls + gameState.currentRunSouls}</div>
+                        <div className="text-rpg-text opacity-70 text-xs leading-none">{t('stats.souls')}</div>
+                        <div className="text-epic font-bold text-sm leading-none">{currentSouls + gameState.currentRunSouls}</div>
                     </div>
                 </div>
                 
@@ -554,20 +554,20 @@ export default function App() {
                 <div className="flex items-center gap-2">
                     {/* XP Bar */}
                     <div className="flex-1">
-                        <div className="flex justify-between text-xs text-gray-400 leading-none mb-0.5">
+                        <div className="flex justify-between text-xs text-rpg-text opacity-70 leading-none mb-0.5">
                             <span>XP: {gameState.experience}/{nextLevelXP}</span>
                             <span>{Math.floor(xpPercent)}%</span>
                         </div>
-                        <div className="h-1.5 bg-gray-700 rounded-full overflow-hidden">
-                            <div className="h-1.5 bg-cyan-400 transition-all duration-300" style={{width: `${Math.min(100, Math.max(0, xpPercent))}%`}}></div>
+                        <div className="h-1.5 bg-rpg-bg-darkest bg-opacity-80 rounded-full overflow-hidden">
+                            <div className="h-1.5 bg-mana-light transition-all duration-300" style={{width: `${Math.min(100, Math.max(0, xpPercent))}%`}}></div>
                         </div>
                     </div>
                     
                     {/* Player HP */}
                     {player && (
                         <div className="text-xs text-center">
-                            <div className="text-gray-400 text-xs leading-none">HP</div>
-                            <div className="text-red-400 font-bold text-sm leading-none">
+                            <div className="text-rpg-text opacity-70 text-xs leading-none">HP</div>
+                            <div className="text-health-mid font-bold text-sm leading-none">
                                 {player.stats.hp}/{player.maxStats.hp}
                             </div>
                         </div>
@@ -576,7 +576,7 @@ export default function App() {
             </div>
                 
                 {/* Dungeon Grid - Takes remaining space */}
-                <div className="bg-gray-800 rounded-lg p-1.5 border border-gray-700 flex-1 flex flex-col min-h-0">
+                <div className="bg-rpg-bg-darker bg-opacity-60 rounded-lg p-1.5 border border-rpg-secondary flex-1 flex flex-col min-h-0 backdrop-blur-sm">
                     <div className="grid grid-cols-5 gap-1 flex-1 w-full max-w-sm mx-auto">
                         {dungeon.map((row, y) =>
                             row.map((room, x) => {
@@ -594,7 +594,7 @@ export default function App() {
                         )}
                     </div>
 
-                    <div className="text-center text-xs text-gray-400 mt-1 px-1 leading-tight">
+                    <div className="text-center text-xs text-rpg-text opacity-60 mt-1 px-1 leading-tight">
                         {t('exploration.controls')}
                     </div>
                 </div>
@@ -607,9 +607,9 @@ export default function App() {
 
 function MainMenu({ onCharacterSelect, currentLanguage }) {
     return (
-        <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-gray-900 to-black text-white px-4">
-            <h1 className="text-5xl font-extrabold text-amber-400 mb-3 drop-shadow-lg">{t('game.title')}</h1>
-            <p className="text-lg text-gray-300 mb-6">{t('game.subtitle')}</p>
+        <div className="min-h-screen flex flex-col items-center justify-center bg-rpg-radial text-rpg-text px-4">
+            <h1 className="text-5xl font-extrabold text-rpg-primary mb-3 drop-shadow-lg">{t('game.title')}</h1>
+            <p className="text-lg text-rpg-text opacity-80 mb-6">{t('game.subtitle')}</p>
             
             {/* Language Toggle Button */}
             <div className="mb-4">
@@ -618,7 +618,7 @@ function MainMenu({ onCharacterSelect, currentLanguage }) {
                         const newLang = currentLanguage === 'en' ? 'ar' : 'en';
                         Localization.setLanguage(newLang);
                     }}
-                    className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-sm rounded-lg border border-gray-500 transition-all duration-200"
+                    className="px-4 py-2 bg-rpg-secondary hover:bg-rpg-primary text-sm rounded-lg border border-rpg-primary transition-all duration-200"
                 >
                     🌍 {currentLanguage === 'en' ? 'العربية' : 'English'}
                 </button>
@@ -627,9 +627,9 @@ function MainMenu({ onCharacterSelect, currentLanguage }) {
             
             <div className="flex flex-wrap justify-center gap-4 max-w-lg">
                 {Object.values(Characters).map((char) => (
-                    <button key={char.id} onClick={() => onCharacterSelect(char.id)} className="px-6 py-4 bg-gray-800 hover:bg-gray-700 text-lg rounded-lg border border-amber-600 shadow-md transition-all duration-200">
+                    <button key={char.id} onClick={() => onCharacterSelect(char.id)} className="px-6 py-4 bg-rpg-bg-darker bg-opacity-80 hover:bg-rpg-secondary text-lg rounded-lg border border-rpg-primary shadow-md transition-all duration-200 backdrop-blur-sm">
                         {t(char.nameKey)}{" "}
-                        <span className="text-sm text-gray-400">({t(char.roleKey)})</span>
+                        <span className="text-sm text-rpg-text opacity-70">({t(char.roleKey)})</span>
                     </button>
                 ))}
             </div>

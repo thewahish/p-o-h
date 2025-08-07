@@ -39,35 +39,35 @@ export default function SoulForge({ characterId, slotNumber, onClose }) {
 
     const getUpgradeButtonClass = (status) => {
         switch (status) {
-            case 'owned': return 'bg-green-600 text-green-100 cursor-default';
-            case 'available': return 'bg-amber-600 hover:bg-amber-500 text-white cursor-pointer';
-            case 'locked': return 'bg-gray-600 text-gray-400 cursor-not-allowed';
+            case 'owned': return 'bg-uncommon text-rpg-text cursor-default';
+            case 'available': return 'bg-rpg-primary hover:bg-rpg-secondary text-rpg-text cursor-pointer';
+            case 'locked': return 'bg-rpg-secondary bg-opacity-50 text-rpg-text opacity-50 cursor-not-allowed';
             default: return '';
         }
     };
 
     return (
-        <div className="fixed inset-0 bg-gray-900/90 flex items-center justify-center z-[100] p-4">
-            <div className="bg-gray-800 border-2 border-purple-500 rounded-lg p-6 max-w-lg w-full shadow-2xl">
+        <div className="fixed inset-0 bg-rpg-bg-darkest/90 flex items-center justify-center z-[100] p-4">
+            <div className="bg-rpg-bg-darker border-2 border-epic rounded-lg p-6 max-w-lg w-full shadow-2xl backdrop-blur-sm">
                 <div className="flex justify-between items-start mb-6">
-                    <h1 className="text-3xl font-bold text-purple-400">⚡ {t('souls.forge')}</h1>
+                    <h1 className="text-3xl font-bold text-epic">⚡ {t('souls.forge')}</h1>
                     <div className="text-center">
-                        <p className="text-lg text-purple-300">{t(`characters.${characterId}.name`)}</p>
-                        <p className="text-sm text-purple-400">{t('saveSlots.slot')} {slotNumber}</p>
+                        <p className="text-lg text-epic">{t(`characters.${characterId}.name`)}</p>
+                        <p className="text-sm text-epic opacity-80">{t('saveSlots.slot')} {slotNumber}</p>
                     </div>
                     <button 
                         onClick={onClose}
-                        className="text-gray-400 hover:text-white text-2xl font-bold"
+                        className="text-rpg-text opacity-70 hover:text-rpg-primary text-2xl font-bold"
                     >
                         ×
                     </button>
                 </div>
 
                 <div className="mb-6 text-center">
-                    <div className="text-2xl font-bold text-purple-300">
+                    <div className="text-2xl font-bold text-epic">
                         👻 {totalSouls} {t('souls.heroSouls')}
                     </div>
-                    <div className="text-sm text-gray-400 mt-1">
+                    <div className="text-sm text-rpg-text opacity-70 mt-1">
                         {t('souls.permanentUpgrades')}
                     </div>
                 </div>
@@ -79,14 +79,14 @@ export default function SoulForge({ characterId, slotNumber, onClose }) {
                         const canAfford = status === 'available';
                         
                         return (
-                            <div key={upgradeId} className="bg-gray-700 rounded-lg p-4 border border-gray-600">
+                            <div key={upgradeId} className="bg-rpg-bg-darker bg-opacity-60 rounded-lg p-4 border border-rpg-secondary backdrop-blur-sm">
                                 <div className="flex justify-between items-start mb-2">
-                                    <h3 className="text-lg font-bold text-white">{t(`upgrades.${upgradeId}.name`)}</h3>
-                                    <div className="text-purple-300 font-bold">
+                                    <h3 className="text-lg font-bold text-rpg-text">{t(`upgrades.${upgradeId}.name`)}</h3>
+                                    <div className="text-epic font-bold">
                                         {isOwned ? `✓ ${t('souls.owned')}` : `${upgrade.cost} 👻`}
                                     </div>
                                 </div>
-                                <p className="text-gray-300 text-sm mb-3">{t(`upgrades.${upgradeId}.description`)}</p>
+                                <p className="text-rpg-text opacity-80 text-sm mb-3">{t(`upgrades.${upgradeId}.description`)}</p>
                                 <button
                                     onClick={() => canAfford && handlePurchase(upgradeId)}
                                     disabled={!canAfford}

@@ -157,6 +157,13 @@
     "graveGolem": "Grave Golem",
     "cryptLord": "The Crypt Lord"
   },
+  "prefixes": {
+    "elite": "Elite",
+    "vicious": "Vicious",
+    "swift": "Swift",
+    "armored": "Armored",
+    "regenerating": "Regenerating"
+  },
   "rooms": {
     "battle": "Battle Room",
     "elite": "Elite Battle", 

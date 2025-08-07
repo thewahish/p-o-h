@@ -34,24 +34,24 @@ export default function LanguageSelection({ onLanguageSelected }) {
 
     if (!isLoaded) {
         return (
-            <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black text-white flex items-center justify-center">
+            <div className="min-h-screen bg-rpg-radial text-rpg-text flex items-center justify-center">
                 <div className="text-center">
                     <div className="text-2xl mb-4">🌍</div>
-                    <div className="text-lg text-gray-300">Loading...</div>
+                    <div className="text-lg text-rpg-text opacity-80">Loading...</div>
                 </div>
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black text-white flex items-center justify-center px-4">
-            <div className="bg-gray-800 border-2 border-amber-500 rounded-lg p-8 max-w-md w-full text-center shadow-2xl">
+        <div className="min-h-screen bg-rpg-radial text-rpg-text flex items-center justify-center px-4">
+            <div className="bg-rpg-bg-darker border-2 border-rpg-primary rounded-lg p-8 max-w-md w-full text-center shadow-2xl backdrop-blur-sm">
                 <div className="mb-8">
-                    <h1 className="text-4xl font-bold text-amber-400 mb-4">🌍</h1>
+                    <h1 className="text-4xl font-bold text-rpg-primary mb-4">🌍</h1>
                     <h2 className="text-2xl font-bold mb-2">
                         {Localization.get('language.select')}
                     </h2>
-                    <div className="text-lg text-gray-300">
+                    <div className="text-lg text-rpg-text opacity-80">
                         Select Language / اختر اللغة
                     </div>
                 </div>
@@ -62,13 +62,13 @@ export default function LanguageSelection({ onLanguageSelected }) {
                         onClick={() => handleLanguageSelect('en')}
                         className={`w-full p-4 rounded-lg text-xl font-bold transition-all duration-200 flex items-center justify-center gap-3 ${
                             selectedLanguage === 'en'
-                                ? 'bg-amber-600 border-2 border-amber-400 text-white shadow-lg scale-105'
-                                : 'bg-gray-700 border-2 border-gray-600 text-gray-300 hover:bg-gray-600'
+                                ? 'bg-rpg-primary border-2 border-rpg-secondary text-rpg-text shadow-lg scale-105'
+                                : 'bg-rpg-secondary border-2 border-rpg-primary text-rpg-text opacity-80 hover:bg-rpg-primary hover:opacity-100'
                         }`}
                     >
                         <span className="text-2xl">🇺🇸</span>
                         <span>English</span>
-                        {selectedLanguage === 'en' && <span className="text-green-400">✓</span>}
+                        {selectedLanguage === 'en' && <span className="text-uncommon">✓</span>}
                     </button>
 
                     {/* Arabic Option */}
@@ -76,25 +76,25 @@ export default function LanguageSelection({ onLanguageSelected }) {
                         onClick={() => handleLanguageSelect('ar')}
                         className={`w-full p-4 rounded-lg text-xl font-bold transition-all duration-200 flex items-center justify-center gap-3 ${
                             selectedLanguage === 'ar'
-                                ? 'bg-amber-600 border-2 border-amber-400 text-white shadow-lg scale-105'
-                                : 'bg-gray-700 border-2 border-gray-600 text-gray-300 hover:bg-gray-600'
+                                ? 'bg-rpg-primary border-2 border-rpg-secondary text-rpg-text shadow-lg scale-105'
+                                : 'bg-rpg-secondary border-2 border-rpg-primary text-rpg-text opacity-80 hover:bg-rpg-primary hover:opacity-100'
                         }`}
                         dir="rtl"
                     >
                         <span className="text-2xl">🇸🇦</span>
                         <span>العربية</span>
-                        {selectedLanguage === 'ar' && <span className="text-green-400">✓</span>}
+                        {selectedLanguage === 'ar' && <span className="text-uncommon">✓</span>}
                     </button>
                 </div>
 
                 <button
                     onClick={handleConfirm}
-                    className="w-full bg-green-600 hover:bg-green-500 text-white font-bold py-3 px-6 rounded-lg text-xl transition-all duration-200 transform hover:scale-105 shadow-lg"
+                    className="w-full bg-uncommon hover:bg-rare text-rpg-text font-bold py-3 px-6 rounded-lg text-xl transition-all duration-200 transform hover:scale-105 shadow-lg"
                 >
                     {Localization.get('language.confirm')} / متابعة
                 </button>
 
-                <div className="mt-6 text-sm text-gray-400">
+                <div className="mt-6 text-sm text-rpg-text opacity-60">
                     You can change this later in settings
                     <br />
                     يمكنك تغيير هذا لاحقاً في الإعدادات

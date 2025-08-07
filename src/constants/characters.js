@@ -1,4 +1,8 @@
-// filename: src/constants/characters.js
+// filename: src/constants/balanced-characters.js
+
+/**
+ * Balanced character configurations with improved HP pools, resource management, and growth rates
+ */
 export const Characters = {
     WARRIOR: {
         id: 'warrior',
@@ -8,14 +12,27 @@ export const Characters = {
         roleKey: 'characters.warrior.role',
         descriptionKey: 'characters.warrior.description',
         traits: ['characters.warrior.traits.highDefense', 'characters.warrior.traits.resolute', 'characters.warrior.traits.areaStrikes'],
-        baseStats: { hp: 70, resource: 35, atk: 10, def: 8, spd: 5, crit: 8 },
-        growthRates: { hp: 4, atk: 1, def: 1.5, spd: 0.3, crit: 0.1 },
+        baseStats: { 
+            hp: 100, // Increased from 70 for survivability
+            resource: 50, // Increased from 35 for more ability usage
+            atk: 12, 
+            def: 10, // Increased defense
+            spd: 6, 
+            crit: 10 // Increased crit
+        },
+        growthRates: { 
+            hp: 6, // Higher HP growth
+            atk: 1.2, 
+            def: 1.8, // Strong defensive growth
+            spd: 0.4, 
+            crit: 0.2 
+        },
         abilities: ['shield_bash'],
         // Character-specific progression path
         progressionPath: 'defensive_tank',
-        preferredEnemyTypes: ['brute', 'physical'], // Faces more physical enemies
-        bossScalingModifier: 1.0, // All characters face same boss difficulty
-        uniqueRewards: ['heavy_armor', 'shields'], // Gets more defensive items
+        preferredEnemyTypes: ['brute', 'physical'],
+        bossScalingModifier: 1.0,
+        uniqueRewards: ['heavy_armor', 'shields'],
     },
     SORCERESS: {
         id: 'sorceress',
@@ -25,14 +42,27 @@ export const Characters = {
         roleKey: 'characters.sorceress.role',
         descriptionKey: 'characters.sorceress.description',
         traits: ['characters.sorceress.traits.elementalMagic', 'characters.sorceress.traits.spellMastery', 'characters.sorceress.traits.ancientKnowledge'],
-        baseStats: { hp: 50, resource: 50, atk: 12, def: 5, spd: 6, crit: 10 },
-        growthRates: { hp: 2.5, atk: 1.2, def: 0.5, spd: 0.5, crit: 0.3 },
+        baseStats: { 
+            hp: 80, // Increased from 50 for better survivability
+            resource: 70, // Increased from 50 for multiple casts
+            atk: 14, // Higher attack for mage
+            def: 6, 
+            spd: 7, 
+            crit: 12 
+        },
+        growthRates: { 
+            hp: 4, // Better HP growth
+            atk: 1.4, // Strong magical growth
+            def: 0.6, 
+            spd: 0.6, 
+            crit: 0.4 
+        },
         abilities: ['fireball'],
         // Character-specific progression path
         progressionPath: 'elemental_mage',
-        preferredEnemyTypes: ['magical', 'undead'], // Faces more magical enemies
-        bossScalingModifier: 1.0, // All characters face same boss difficulty
-        uniqueRewards: ['staves', 'mana_crystals'], // Gets more magical items
+        preferredEnemyTypes: ['magical', 'undead'],
+        bossScalingModifier: 1.0,
+        uniqueRewards: ['staves', 'mana_crystals'],
     },
     ROGUE: {
         id: 'rogue',
@@ -42,13 +72,26 @@ export const Characters = {
         roleKey: 'characters.rogue.role',
         descriptionKey: 'characters.rogue.description',
         traits: ['characters.rogue.traits.berserkerRage', 'characters.rogue.traits.rawStrength', 'characters.rogue.traits.intimidating'],
-        baseStats: { hp: 60, resource: 40, atk: 13, def: 6, spd: 8, crit: 15 },
-        growthRates: { hp: 3, atk: 1.3, def: 0.8, spd: 0.7, crit: 0.5 },
+        baseStats: { 
+            hp: 90, // Increased from 60
+            resource: 60, // Increased from 40
+            atk: 15, // Highest attack
+            def: 7, 
+            spd: 10, // Highest speed
+            crit: 18 // Highest crit
+        },
+        growthRates: { 
+            hp: 5, // Good HP growth
+            atk: 1.5, // Excellent attack growth
+            def: 0.9, 
+            spd: 0.8, // Good speed growth
+            crit: 0.6 // Excellent crit growth
+        },
         abilities: ['venom_strike'],
         // Character-specific progression path
         progressionPath: 'assassin_berserker',
-        preferredEnemyTypes: ['fast', 'elite'], // Faces more agile and dangerous enemies
-        bossScalingModifier: 1.0, // All characters face same boss difficulty
-        uniqueRewards: ['daggers', 'poisons'], // Gets more assassin-focused items
+        preferredEnemyTypes: ['fast', 'elite'],
+        bossScalingModifier: 1.0,
+        uniqueRewards: ['daggers', 'poisons'],
     }
 };

@@ -6,12 +6,12 @@ import Logger from '../core/logger';
 import { t } from '../core/localization';
 
 const rarityColors = {
-    common: 'text-gray-300',
-    uncommon: 'text-green-400',
-    rare: 'text-blue-400',
-    epic: 'text-purple-500',
-    mythic: 'text-orange-400',
-    legendary: 'text-yellow-400',
+    common: 'text-common',
+    uncommon: 'text-uncommon',
+    rare: 'text-rare',
+    epic: 'text-epic',
+    mythic: 'text-mythic',
+    legendary: 'text-legendary',
 };
 
 export default function ShopScreen({ inventorySystem, onLeave }) {
@@ -53,23 +53,23 @@ export default function ShopScreen({ inventorySystem, onLeave }) {
     };
 
     return (
-        <div className="fixed inset-0 bg-gray-900/90 flex items-center justify-center z-[100] p-4">
-            <div className="bg-gray-800 border-2 border-amber-500 rounded-lg p-6 max-w-sm w-full text-center shadow-2xl">
-                <h1 className="text-4xl font-bold mb-6 text-amber-400">🏪 {t('shop.title')}</h1>
-                <div className="mb-4 bg-gray-700 rounded-lg p-3 border border-amber-400">
-                    <div className="text-xl font-bold text-yellow-400">💰 {GameState.current.gold} {t('stats.gold')}</div>
+        <div className="fixed inset-0 bg-rpg-bg-darkest/90 flex items-center justify-center z-[100] p-4">
+            <div className="bg-rpg-bg-darker border-2 border-rpg-primary rounded-lg p-6 max-w-sm w-full text-center shadow-2xl backdrop-blur-sm">
+                <h1 className="text-4xl font-bold mb-6 text-rpg-primary">🏪 {t('shop.title')}</h1>
+                <div className="mb-4 bg-rpg-secondary rounded-lg p-3 border border-rpg-primary">
+                    <div className="text-xl font-bold text-legendary">💰 {GameState.current.gold} {t('stats.gold')}</div>
                 </div>
-                <p className="text-gray-400 mb-6">{t('shop.onePurchaseOnly')}</p>
+                <p className="text-rpg-text opacity-70 mb-6">{t('shop.onePurchaseOnly')}</p>
 
                 <div className="space-y-4 mb-8">
                     {items.map(item => (
-                        <div key={item.id} className="bg-gray-900 p-4 rounded-lg text-left">
+                        <div key={item.id} className="bg-rpg-bg-darkest bg-opacity-80 p-4 rounded-lg text-left backdrop-blur-sm">
                             <h2 className={`font-bold text-lg ${rarityColors[item.rarity]}`}>
                                 {item.prefixKey ? `${t(item.prefixKey)} ` : ''}{t(item.nameKey || 'items.sword')}
                             </h2>
-                            <p className="text-sm text-gray-500 capitalize">{t(`rarities.${item.rarity}`)} {item.slot}</p>
+                            <p className="text-sm text-rpg-text opacity-60 capitalize">{t(`rarities.${item.rarity}`)} {item.slot}</p>
                             <div className="flex justify-between items-center mt-2">
-                                <div className="text-gray-300">
+                                <div className="text-rpg-text opacity-80">
                                     {Object.entries(item.stats).map(([stat, value]) => (
                                         <span key={stat} className="mr-4">{stat.toUpperCase()}: +{value}</span>
                                     ))}
@@ -77,7 +77,7 @@ export default function ShopScreen({ inventorySystem, onLeave }) {
                                 <button
                                     onClick={() => handlePurchase(item)}
                                     disabled={purchased || GameState.current.gold < item.price}
-                                    className="bg-green-600 hover:bg-green-500 disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-bold py-2 px-4 rounded"
+                                    className="bg-uncommon hover:bg-rare disabled:bg-rpg-secondary disabled:bg-opacity-50 disabled:cursor-not-allowed text-rpg-text font-bold py-2 px-4 rounded"
                                     data-item-id={item.id}
                                 >
                                     {item.price} G
@@ -88,11 +88,11 @@ export default function ShopScreen({ inventorySystem, onLeave }) {
                 </div>
 
                 {purchased ? (
-                     <p className="text-green-400">{t('shop.thankYou')}</p>
+                     <p className="text-uncommon">{t('shop.thankYou')}</p>
                 ) : (
                     <button
                         onClick={onLeave}
-                        className="w-full bg-red-700 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg"
+                        className="w-full bg-health-full hover:bg-health-mid text-rpg-text font-bold py-2 px-4 rounded-lg"
                     >
                         {t('shop.leave')}
                     </button>

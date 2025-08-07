@@ -74,13 +74,13 @@ Final Demo Boss: The Crypt Lord
 🗺️ Strategic Dungeon System
 Floor progression is handled via strategic exploration of a fully visible, procedurally generated maze.
 
-**Revolutionary Design**: Full dungeon layout revealed from start for strategic planning, but room contents remain hidden until explored.
+**No Fog of War Design**: Full dungeon layout revealed from start with NO hidden paths or fog of war mechanics. ALL rooms are visible for complete strategic planning.
 
 Generation: Each floor generates a compact 5x9 maze using recursive backtracking algorithm. Clean paths and distinctive 🧱 wall barriers create strategic route choices.
 
-**Strategic Visibility**: Players can see all possible routes to boss/shops/shrines, enabling tactical decision-making about optimal paths.
+**Strategic Visibility**: Players can see all possible routes to boss/shops/shrines, enabling tactical decision-making about optimal paths before moving.
 
-**Progressive Discovery**: Unvisited rooms appear as plain/empty spaces until explored, then reveal their true nature.
+**Progressive Discovery**: All rooms visible but unvisited rooms appear as plain/empty spaces until explored, then reveal their true nature (events remain surprises).
 
 Room Types & Icons: Room contents discovered through exploration.
 
@@ -275,6 +275,32 @@ State Management: Global singleton (src/core/state.js) with subscription model
 - Centralized translation: `t('key.path')` with dynamic placeholders
 - RTL support with language toggle (🌍 button)
 - Save system fully localized with confirmation dialogs
+
+## 🎨 Dark RPG Theme Colors
+
+### Color Palette
+- **Background**: `radial-gradient(ellipse at center, #1a0f0a 0%, #0d0604 40%, #000000 100%)`
+- **Primary**: `#d4a656` (Golden amber)
+- **Secondary**: `#5c4423` (Dark brown)
+- **Text**: `#f8e4c0` (Light cream)
+
+### Resource Bars
+- **Health**: `linear-gradient(90deg, #8b0000, #ff4500, #ff6347)` (Dark red to orange-red)
+- **Mana**: `linear-gradient(90deg, #191970, #4169e1, #87ceeb)` (Midnight blue to sky blue)
+
+### Item Rarity Colors
+- **Common**: `#95a5a6` (Gray)
+- **Uncommon**: `#27ae60` (Green)
+- **Rare**: `#3498db` (Blue)
+- **Epic**: `#9b59b6` (Purple)
+- **Mythic**: `#e67e22` (Orange)
+- **Legendary**: `#f1c40f` (Gold)
+
+### Implementation Notes
+- Dark theme creates immersive dungeon atmosphere
+- High contrast ensures mobile readability
+- Gradient backgrounds add depth and visual interest
+- Color-coded rarities provide immediate item value recognition
 
 Debugging: A persistent, global debugger (persistent-debugger.jsx + logger.js) and a system of in-game developer hotkeys for testing.
 | Key | Action | Use Case |
