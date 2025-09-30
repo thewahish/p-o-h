@@ -6,8 +6,8 @@
  */
 
 export const GameConfig = {
-    DEBUG_MODE: true,
-    GAME_VERSION: "V.38.2", // Updated for balance overhaul
+    DEBUG_MODE: import.meta.env.DEV, // Only enabled in development mode
+    GAME_VERSION: "V.40.1", // Final demo balance - 2 starting potions, moderate difficulty
     LOADING_DURATION_MS: 1000,
 
     SCREENS: {
@@ -29,18 +29,17 @@ export const GameConfig = {
     AUTOSAVE_FLOORS: [1, 5, 10],
 
     INVENTORY: {
-        startingGold: 100, // Increased starting gold
+        startingGold: 100, // Starting gold for shop purchases
         maxSlots: 20,
-        // Starting potions to give players options from the beginning
+        // 2 starting potions for balanced roguelike challenge (Option 4)
         startingPotions: [
-            { type: 'hp_potion', quantity: 3 },
-            { type: 'resource_potion', quantity: 2 }
+            { type: 'hp_potion', quantity: 2 }  // 100 HP emergency healing total
         ]
     },
 
     XP_CURVE: {
-        baseXP: 60,     // Reduced for faster early progression
-        increment: 40,  // Gentler curve for more levels before difficulty spike
+        baseXP: 70,     // Moderate leveling curve (Option 4)
+        increment: 50,  // Balanced curve for steady progression
         maxLevel: 60,
     },
 

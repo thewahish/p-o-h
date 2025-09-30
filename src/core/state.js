@@ -501,8 +501,8 @@ export const GameState = {
 
     calculateFloorReward() {
         const baseGold = 5 + (this.current.currentFloor * 2); // Much lower: 7 gold for floor 1, 9 for floor 2, etc.
-        const baseSouls = Math.max(2, Math.floor(this.current.currentFloor / 3)); // Minimum 2 souls per floor, scaling up
-        
+        const baseSouls = 5 + Math.floor(this.current.currentFloor / 2); // Option 3: 5-10 souls per floor (Floor 1=5, Floor 2=6, Floor 10=10)
+
         return {
             gold: baseGold,
             souls: baseSouls,
