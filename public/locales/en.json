@@ -315,7 +315,12 @@
   "items": {
     "sword": "Sword",
     "staff": "Staff",
-    "hp_potion": "Health Potion"
+    "hp_potion": "Health Potion",
+    "heavy_armor": "Heavy Armor",
+    "shield": "Shield",
+    "mana_crystal": "Mana Crystal",
+    "dagger": "Dagger",
+    "poison_vial": "Poison Vial"
   },
   "rarities": {
     "common": "Common",
@@ -387,7 +392,7 @@
   "debug": {
     "title": "Debugger",
     "gameState": "Game State",
-    "consoleLog": "Console Log", 
+    "consoleLog": "Console Log",
     "copyLogs": "Copy All Logs",
     "initialized": "Debugger initialized",
     "toggleOn": "Debugger panel opened",
@@ -400,5 +405,8 @@
     "errorCopyingLogs": "Failed to copy logs:",
     "errorInitializing": "Error initializing system:",
     "systemInitialized": "System initialized:"
+  },
+  "system": {
+    "gameSaved": "Game Saved!"
   }
 }

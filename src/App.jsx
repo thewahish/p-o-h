@@ -13,6 +13,7 @@ import { InventorySystem } from "./systems/inventory.js";
 import { Localization, t } from "./core/localization.js";
 import LanguageSelection from "./components/language-selection.jsx";
 import { GameConfig } from "./constants/config.js";
+import autoSaveService, { SaveTriggers } from "./services/autosave.js";
 
 // === Import UI screens ===
 import BattleScreen from "./components/battle-screen.jsx";
@@ -47,6 +48,7 @@ export default function App() {
     const [selectedCharacter, setSelectedCharacter] = useState(null);
     const [showSaveSlots, setShowSaveSlots] = useState(false);
     const [interimScreen, setInterimScreen] = useState(null); // { type: 'intro'|'outro', eventType, eventData, onContinue }
+    const [showSaveIndicator, setShowSaveIndicator] = useState(false);
     
     const forceUI = useCallback(() => {
         setGameState({ ...GameState.current });
@@ -95,6 +97,23 @@ export default function App() {
             if (localizationUnsubscribe) {
                 localizationUnsubscribe();
             }
+        };
+    }, []);
+
+    // Subscribe to auto-save events for UI feedback
+    useEffect(() => {
+        const unsubSaveComplete = autoSaveService.subscribe('saveComplete', () => {
+            setShowSaveIndicator(true);
+            setTimeout(() => setShowSaveIndicator(false), 2000);
+        });
+
+        const unsubSaveError = autoSaveService.subscribe('saveError', (error) => {
+            Logger.log(`Auto-save failed: ${error.message}`, 'ERROR');
+        });
+
+        return () => {
+            unsubSaveComplete();
+            unsubSaveError();
         };
     }, []);
 
@@ -160,7 +179,8 @@ export default function App() {
 
     useEffect(() => {
         const handleKeyPress = (e) => {
-            if (['0', '1', '2', '3', '5'].includes(e.key)) {
+            // DEBUG HOTKEYS - Only enabled in development mode
+            if (GameConfig.DEBUG_MODE && ['0', '1', '2', '3', '5'].includes(e.key)) {
                 e.preventDefault();
                 Logger.log(`Developer hotkey pressed: ${e.key}`, 'INPUT');
                 switch (e.key) {
@@ -324,13 +344,16 @@ export default function App() {
                         souls: floorReward.souls
                     })
                 });
-                
+
+                // AUTO-SAVE: Floor completion
+                autoSaveService.performAutoSave(SaveTriggers.FLOOR_COMPLETE);
+
                 // Reset for new floor and generate new dungeon
                 setTimeout(() => {
                     GameState.resetForNewFloor();
                     generateDungeon();
                 }, 2000);
-                
+
                 room.completed = true;
                 break;
         }
@@ -374,8 +397,11 @@ export default function App() {
             if (currentRoom.type === RoomTypes.BOSS) {
                 spawnStairs();
                 Logger.log('Boss defeated! Stairs to next floor have appeared!', 'SYSTEM');
+
+                // AUTO-SAVE: Boss defeat
+                autoSaveService.performAutoSave(SaveTriggers.BOSS_DEFEAT);
             }
-            
+
             setBattleResults({ gold: totalGold, xp: totalXp });
         } else {
             const penalty = GameState.applyDeathPenalty();
@@ -404,6 +430,10 @@ export default function App() {
         } else {
             // Collect souls before reset
             GameState.collectRunSouls();
+
+            // AUTO-SAVE: Player death (save soul progress before reset)
+            autoSaveService.performAutoSave(SaveTriggers.PLAYER_DEATH);
+
             GameState.reset();
         }
     };
@@ -528,6 +558,14 @@ export default function App() {
 
     return (
         <div className="h-screen bg-rpg-radial text-rpg-text p-1 flex flex-col overflow-hidden">
+            {/* Auto-save indicator */}
+            {showSaveIndicator && (
+                <div className="fixed top-4 right-4 z-50 bg-uncommon text-white px-4 py-2 rounded-lg shadow-lg flex items-center gap-2 animate-fade-in">
+                    <span>💾</span>
+                    <span className="font-bold">{t('system.gameSaved')}</span>
+                </div>
+            )}
+
             {/* Compact Top Stats Panel */}
             <div className="bg-rpg-bg-darker bg-opacity-80 rounded-lg px-2 py-1.5 mb-1 border border-rpg-primary shrink-0 backdrop-blur-sm">
                 {/* First Row - Core Stats */}

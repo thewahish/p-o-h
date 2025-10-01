@@ -5,6 +5,7 @@ import { GameState } from '../core/state';
 import { EnemyDatabase, getFloorEnemies, getFloorBoss } from '../constants/enemies';
 import { Characters } from '../constants/characters';
 import Logger from '../core/logger';
+import characterService from '../services/character-service.js';
 
 export const RoomTypes = { 
     EMPTY: 'empty', 
@@ -249,32 +250,62 @@ export function generateDungeon() {
 }
 
 function populateEncounters(dungeon, floor) {
-    const availableEnemies = getFloorEnemies(floor);
     const bossEnemy = getFloorBoss(floor);
+
+    // Use CharacterService for character-specific encounters if available
+    const useCharacterService = GameState.current.selectedCharacter && characterService.currentCharacterId;
 
     for (let y = 0; y < GRID_HEIGHT; y++) {
         for (let x = 0; x < GRID_WIDTH; x++) {
             const room = dungeon[y][x];
-            
+
             if (room.type === RoomTypes.BATTLE) {
-                const randomEnemy = availableEnemies[Math.floor(Math.random() * availableEnemies.length)];
-                room.encounter = [getScaledEnemy(randomEnemy, floor)];
-                
+                // Use character-specific enemy generation
+                let enemyIds = [];
+                if (useCharacterService) {
+                    enemyIds.push(characterService.generateEncounter(floor, 1)[0]);
+                } else {
+                    const availableEnemies = getFloorEnemies(floor);
+                    const randomEnemy = availableEnemies[Math.floor(Math.random() * availableEnemies.length)];
+                    enemyIds.push(randomEnemy);
+                }
+
+                room.encounter = [getScaledEnemy(enemyIds[0], floor)];
+
                 // Increased chance for multiple enemies on higher floors
                 const multiEnemyChance = Math.min(0.6, 0.3 + (floor - 1) * 0.1); // 30% base, +10% per floor, max 60%
                 if (Math.random() < multiEnemyChance) {
-                    const secondEnemy = availableEnemies[Math.floor(Math.random() * availableEnemies.length)];
-                    room.encounter.push(getScaledEnemy(secondEnemy, floor));
-                    
+                    let secondEnemyId;
+                    if (useCharacterService) {
+                        secondEnemyId = characterService.generateEncounter(floor, 1)[0];
+                    } else {
+                        const availableEnemies = getFloorEnemies(floor);
+                        secondEnemyId = availableEnemies[Math.floor(Math.random() * availableEnemies.length)];
+                    }
+                    room.encounter.push(getScaledEnemy(secondEnemyId, floor));
+
                     // Chance for triple encounters on very high floors
                     if (floor >= 5 && Math.random() < 0.2) {
-                        const thirdEnemy = availableEnemies[Math.floor(Math.random() * availableEnemies.length)];
-                        room.encounter.push(getScaledEnemy(thirdEnemy, floor));
+                        let thirdEnemyId;
+                        if (useCharacterService) {
+                            thirdEnemyId = characterService.generateEncounter(floor, 1)[0];
+                        } else {
+                            const availableEnemies = getFloorEnemies(floor);
+                            thirdEnemyId = availableEnemies[Math.floor(Math.random() * availableEnemies.length)];
+                        }
+                        room.encounter.push(getScaledEnemy(thirdEnemyId, floor));
                     }
                 }
             } else if (room.type === RoomTypes.ELITE) {
-                const eliteEnemy = availableEnemies[Math.floor(Math.random() * availableEnemies.length)];
-                const scaledElite = getScaledEnemy(eliteEnemy, floor);
+                // Use character-specific enemy for elites too
+                let eliteEnemyId;
+                if (useCharacterService) {
+                    eliteEnemyId = characterService.generateEncounter(floor, 1)[0];
+                } else {
+                    const availableEnemies = getFloorEnemies(floor);
+                    eliteEnemyId = availableEnemies[Math.floor(Math.random() * availableEnemies.length)];
+                }
+                const scaledElite = getScaledEnemy(eliteEnemyId, floor);
                 
                 // Elite enemies get enhanced scaling based on floor
                 const eliteBonus = 1.5 + (floor - 1) * 0.1; // Base 50% + 10% per floor

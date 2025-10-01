@@ -6,6 +6,8 @@ import { generateDungeon } from '../systems/dungeon.js';
 import { t } from '../core/localization.js';
 import Logger from '../core/logger.js';
 import SoulForge from './soul-forge.jsx';
+import characterService from '../services/character-service.js';
+import rewardService from '../services/reward-service.js';
 
 export default function SaveSlotScreen({ characterId, onBack, onGameStart }) {
     const [saveSlots, setSaveSlots] = useState([]);
@@ -41,6 +43,11 @@ export default function SaveSlotScreen({ characterId, onBack, onGameStart }) {
     const handleLoadGame = (slotNumber) => {
         const success = GameState.loadGame(characterId, slotNumber);
         if (success) {
+            // Initialize character-specific services
+            characterService.initialize(characterId);
+            rewardService.initialize(characterId);
+            Logger.log(`Initialized services for ${characterId}`, 'SYSTEM');
+
             // Generate dungeon for current floor
             generateDungeon();
             Logger.log(`Loaded ${characterId} from slot ${slotNumber}`, 'SYSTEM');
@@ -56,6 +63,12 @@ export default function SaveSlotScreen({ characterId, onBack, onGameStart }) {
     const startNewGame = (slotNumber) => {
         Logger.log(`Starting new game for ${characterId} in slot ${slotNumber}`, 'SYSTEM');
         GameState.newGame(characterId);
+
+        // Initialize character-specific services
+        characterService.initialize(characterId);
+        rewardService.initialize(characterId);
+        Logger.log(`Initialized services for ${characterId}`, 'SYSTEM');
+
         // Save immediately
         GameState.saveGame(characterId, slotNumber);
         // Generate dungeon

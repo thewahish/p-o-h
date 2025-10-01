@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { GameState } from '../core/state';
 import Logger from '../core/logger';
 import { t } from '../core/localization';
+import rewardService from '../services/reward-service.js';
 
 const rarityColors = {
     common: 'text-common',
@@ -15,10 +16,15 @@ const rarityColors = {
 };
 
 export default function ShopScreen({ inventorySystem, onLeave }) {
-    const [items, setItems] = useState(() => 
-        inventorySystem.generateItemsForShop(3, GameState.current.currentFloor)
-    );
+    const [items, setItems] = useState(() => {
+        // Use RewardService if character is set, fallback to InventorySystem
+        if (GameState.current.selectedCharacter && rewardService.currentCharacterId) {
+            return rewardService.generateItemsForShop(3, GameState.current.currentFloor);
+        }
+        return inventorySystem.generateItemsForShop(3, GameState.current.currentFloor);
+    });
     const [purchased, setPurchased] = useState(false);
+    const [errorMessages, setErrorMessages] = useState({});
 
     const handlePurchase = (item) => {
         if (purchased) return;
@@ -38,17 +44,16 @@ export default function ShopScreen({ inventorySystem, onLeave }) {
         } else {
             const itemName = (item.prefixKey ? `${t(item.prefixKey)} ` : '') + t(item.nameKey || 'items.sword');
             Logger.log(`Not enough gold to purchase ${itemName}.`, 'PLAYER');
-            // Show temporary message instead of alert
-            const button = document.querySelector(`[data-item-id="${item.id}"]`);
-            if (button) {
-                const originalText = button.innerHTML;
-                button.innerHTML = t('shop.notEnoughGold');
-                button.style.backgroundColor = '#dc2626';
-                setTimeout(() => {
-                    button.innerHTML = originalText;
-                    button.style.backgroundColor = '';
-                }, 2000);
-            }
+
+            // Show temporary error message using React state (XSS-safe)
+            setErrorMessages(prev => ({ ...prev, [item.id]: t('shop.notEnoughGold') }));
+            setTimeout(() => {
+                setErrorMessages(prev => {
+                    const updated = { ...prev };
+                    delete updated[item.id];
+                    return updated;
+                });
+            }, 2000);
         }
     };
 
@@ -77,10 +82,14 @@ export default function ShopScreen({ inventorySystem, onLeave }) {
                                 <button
                                     onClick={() => handlePurchase(item)}
                                     disabled={purchased || GameState.current.gold < item.price}
-                                    className="bg-uncommon hover:bg-rare disabled:bg-rpg-secondary disabled:bg-opacity-50 disabled:cursor-not-allowed text-rpg-text font-bold py-2 px-4 rounded"
+                                    className={`font-bold py-2 px-4 rounded transition-colors ${
+                                        errorMessages[item.id]
+                                            ? 'bg-health-full text-white'
+                                            : 'bg-uncommon hover:bg-rare disabled:bg-rpg-secondary disabled:bg-opacity-50 disabled:cursor-not-allowed text-rpg-text'
+                                    }`}
                                     data-item-id={item.id}
                                 >
-                                    {item.price} G
+                                    {errorMessages[item.id] || `${item.price} G`}
                                 </button>
                             </div>
                         </div>

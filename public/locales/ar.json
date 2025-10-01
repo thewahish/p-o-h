@@ -315,7 +315,12 @@
   "items": {
     "sword": "سيف",
     "staff": "عصا",
-    "hp_potion": "جرعة صحة"
+    "hp_potion": "جرعة صحة",
+    "heavy_armor": "درع ثقيل",
+    "shield": "ترس",
+    "mana_crystal": "بلورة مانا",
+    "dagger": "خنجر",
+    "poison_vial": "قارورة سم"
   },
   "rarities": {
     "common": "شائع",
@@ -400,5 +405,8 @@
     "errorCopyingLogs": "فشل نسخ السجلات:",
     "errorInitializing": "خطأ في تهيئة النظام:",
     "systemInitialized": "تم تهيئة النظام:"
+  },
+  "system": {
+    "gameSaved": "تم حفظ اللعبة!"
   }
 }
