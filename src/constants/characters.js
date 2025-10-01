@@ -13,12 +13,12 @@ export const Characters = {
         descriptionKey: 'characters.warrior.description',
         traits: ['characters.warrior.traits.highDefense', 'characters.warrior.traits.resolute', 'characters.warrior.traits.areaStrikes'],
         baseStats: {
-            hp: 100, // Keep original HP (balance via reduced potions instead)
-            resource: 50, // Keep resource pool
-            atk: 12, // Keep original ATK
-            def: 10, // Keep defense
+            hp: 115, // Increased from 100 for better survivability
+            resource: 55, // Increased from 50 for more ability usage
+            atk: 13, // Increased from 12 for better damage
+            def: 11, // Increased from 10 for better defense
             spd: 6,
-            crit: 10
+            crit: 12 // Increased from 10 for better burst
         },
         growthRates: { 
             hp: 6, // Higher HP growth
@@ -43,12 +43,12 @@ export const Characters = {
         descriptionKey: 'characters.sorceress.description',
         traits: ['characters.sorceress.traits.elementalMagic', 'characters.sorceress.traits.spellMastery', 'characters.sorceress.traits.ancientKnowledge'],
         baseStats: {
-            hp: 80, // Keep original HP (balance via reduced potions instead)
-            resource: 70, // Keep resource
-            atk: 14, // Keep original ATK
-            def: 6,
+            hp: 95, // Increased from 80 for better survivability
+            resource: 80, // Increased from 70 for more spell casts
+            atk: 15, // Increased from 14 for better damage
+            def: 7, // Increased from 6 for better defense
             spd: 7,
-            crit: 12
+            crit: 14 // Increased from 12 for better burst
         },
         growthRates: { 
             hp: 4, // Better HP growth
@@ -73,12 +73,12 @@ export const Characters = {
         descriptionKey: 'characters.rogue.description',
         traits: ['characters.rogue.traits.berserkerRage', 'characters.rogue.traits.rawStrength', 'characters.rogue.traits.intimidating'],
         baseStats: {
-            hp: 90, // Keep original HP (balance via reduced potions instead)
-            resource: 60, // Keep resource
-            atk: 15, // Keep original ATK
+            hp: 90,
+            resource: 60,
+            atk: 13, // Reduced from 15 for balance
             def: 7,
-            spd: 10, // Keep speed
-            crit: 18 // Keep crit
+            spd: 9, // Reduced from 10 for balance
+            crit: 14 // Reduced from 18 for balance
         },
         growthRates: { 
             hp: 5, // Good HP growth

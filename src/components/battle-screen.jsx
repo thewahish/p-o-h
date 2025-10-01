@@ -5,6 +5,7 @@ import { GameState } from '../core/state';
 import { GameConfig } from '../constants/config';
 import Logger from '../core/logger';
 import { t, Localization } from '../core/localization';
+import { PotionSystem } from '../systems/potions';
 
 export default function BattleScreen({ player, enemies: initialEnemies, combatSystem, combatLog }) {
     const [localLogs, setLocalLogs] = useState(combatLog || []);
@@ -39,6 +40,18 @@ export default function BattleScreen({ player, enemies: initialEnemies, combatSy
 
     const handleSkill = () => {
         if (focusedTargetId !== null) combatSystem.playerSkill(focusedTargetId);
+    };
+
+    const handleUsePotion = (potionType) => {
+        if (!isPlayerTurn) return;
+        const success = PotionSystem.usePotion(potionType);
+        if (success) {
+            const potionName = t(`items.${potionType}`);
+            const message = t('combat.messages.usedPotion', { potion: potionName });
+            Logger.log(message, 'COMBAT');
+            setLocalLogs(prev => [...prev, message]);
+            // Don't end turn, allow player to still act
+        }
     };
 
     // --- HELPER FUNCTIONS ---
@@ -94,7 +107,7 @@ export default function BattleScreen({ player, enemies: initialEnemies, combatSy
     const currentLanguage = Localization.getCurrentLanguage();
 
     return (
-        <div className="min-h-screen bg-rpg-radial text-rpg-text p-4 flex flex-col">
+        <div className="h-full bg-rpg-radial text-rpg-text p-4 flex flex-col overflow-y-auto">
             <div className="w-full max-w-3xl mx-auto flex flex-col flex-grow min-h-0">
                 <div className="text-center mb-4 flex-shrink-0">
                     <h1 className="text-2xl font-bold text-rpg-primary">⚔️ {t('combat.battle')} ⚔️</h1>
@@ -136,6 +149,27 @@ export default function BattleScreen({ player, enemies: initialEnemies, combatSy
                             <div className="h-4 bg-rpg-bg-darkest rounded overflow-hidden mb-1"><div className="h-4 bg-mana-light" style={{ width: `${xpInfo.percentage}%` }}></div></div>
                             <div className="text-sm text-right text-mana-light">{t('stats.xpShort')}: {xpInfo.current} / {xpInfo.required}</div>
                         </div>
+
+                        {/* Active Buffs Display */}
+                        {GameState.current.battleBuffs && GameState.current.battleBuffs.length > 0 && (
+                            <div className="mt-3 pt-3 border-t border-rpg-secondary">
+                                <h3 className="text-sm font-bold text-rpg-primary mb-2">✨ {t('combat.activeBuffs')}</h3>
+                                <div className="flex flex-wrap gap-2">
+                                    {GameState.current.battleBuffs.map((buff, index) => (
+                                        <div
+                                            key={index}
+                                            className="bg-legendary bg-opacity-20 border border-legendary rounded-lg px-3 py-1.5 text-sm"
+                                            title={typeof buff.description === 'object' ? t(buff.description) : buff.description}
+                                        >
+                                            <span className="text-lg mr-1">{buff.icon}</span>
+                                            <span className="font-bold text-legendary">
+                                                {typeof buff.name === 'object' ? t(buff.name) : buff.name}
+                                            </span>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
                     </div>
 
                     {otherEnemies.map(enemy => (
@@ -184,10 +218,38 @@ export default function BattleScreen({ player, enemies: initialEnemies, combatSy
                     
                     {/* Potions Row */}
                     <div className="grid grid-cols-4 gap-1 mb-4">
-                        <button disabled={!isPlayerTurn} className={`px-2 py-2 text-sm rounded font-bold transition-colors text-rpg-text ${ isPlayerTurn ? 'bg-health-full hover:bg-health-mid' : 'bg-rpg-secondary bg-opacity-50 cursor-not-allowed'}`}>❤️‍🩹 HP (3)</button>
-                        <button disabled={!isPlayerTurn} className={`px-2 py-2 text-sm rounded font-bold transition-colors text-rpg-text ${ isPlayerTurn ? 'bg-mana-full hover:bg-mana-light' : 'bg-rpg-secondary bg-opacity-50 cursor-not-allowed'}`}>🧪 MP (2)</button>
-                        <button disabled={!isPlayerTurn} className={`px-2 py-2 text-sm rounded font-bold transition-colors text-rpg-text ${ isPlayerTurn ? 'bg-legendary hover:bg-mythic' : 'bg-rpg-secondary bg-opacity-50 cursor-not-allowed'}`}>💖 G.HP (1)</button>
-                        <button disabled={!isPlayerTurn} className={`px-2 py-2 text-sm rounded font-bold transition-colors text-rpg-text ${ isPlayerTurn ? 'bg-epic hover:bg-legendary' : 'bg-rpg-secondary bg-opacity-50 cursor-not-allowed'}`}>🌟 Elixir (0)</button>
+                        <button
+                            onClick={() => handleUsePotion('hp_potion')}
+                            disabled={!isPlayerTurn || !GameState.current.potions?.hp_potion || GameState.current.potions.hp_potion <= 0}
+                            className={`px-2 py-2 text-sm rounded font-bold transition-colors text-rpg-text ${
+                                isPlayerTurn && GameState.current.potions?.hp_potion > 0 ? 'bg-health-full hover:bg-health-mid' : 'bg-rpg-secondary bg-opacity-50 opacity-50 cursor-not-allowed'
+                            }`}>
+                            ❤️‍🩹 HP ({GameState.current.potions?.hp_potion || 0})
+                        </button>
+                        <button
+                            onClick={() => handleUsePotion('resource_potion')}
+                            disabled={!isPlayerTurn || !GameState.current.potions?.resource_potion || GameState.current.potions.resource_potion <= 0}
+                            className={`px-2 py-2 text-sm rounded font-bold transition-colors text-rpg-text ${
+                                isPlayerTurn && GameState.current.potions?.resource_potion > 0 ? 'bg-mana-full hover:bg-mana-light' : 'bg-rpg-secondary bg-opacity-50 opacity-50 cursor-not-allowed'
+                            }`}>
+                            🧪 MP ({GameState.current.potions?.resource_potion || 0})
+                        </button>
+                        <button
+                            onClick={() => handleUsePotion('greater_hp_potion')}
+                            disabled={!isPlayerTurn || !GameState.current.potions?.greater_hp_potion || GameState.current.potions.greater_hp_potion <= 0}
+                            className={`px-2 py-2 text-sm rounded font-bold transition-colors text-rpg-text ${
+                                isPlayerTurn && GameState.current.potions?.greater_hp_potion > 0 ? 'bg-legendary hover:bg-mythic' : 'bg-rpg-secondary bg-opacity-50 opacity-50 cursor-not-allowed'
+                            }`}>
+                            💖 G.HP ({GameState.current.potions?.greater_hp_potion || 0})
+                        </button>
+                        <button
+                            onClick={() => handleUsePotion('elixir_of_vitality')}
+                            disabled={!isPlayerTurn || !GameState.current.potions?.elixir_of_vitality || GameState.current.potions.elixir_of_vitality <= 0}
+                            className={`px-2 py-2 text-sm rounded font-bold transition-colors text-rpg-text ${
+                                isPlayerTurn && GameState.current.potions?.elixir_of_vitality > 0 ? 'bg-epic hover:bg-legendary' : 'bg-rpg-secondary bg-opacity-50 opacity-50 cursor-not-allowed'
+                            }`}>
+                            🌟 Elixir ({GameState.current.potions?.elixir_of_vitality || 0})
+                        </button>
                     </div>
                     <div className="bg-rpg-bg-darkest bg-opacity-80 p-3 rounded border border-rpg-secondary h-24 overflow-y-auto text-sm backdrop-blur-sm">
                         <h3 className="text-rpg-primary font-bold mb-2">{t('combat.log')}:</h3>

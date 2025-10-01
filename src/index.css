@@ -20,13 +20,26 @@
   --legendary: #f1c40f;
 }
 
-html, body, #root {
+html, body {
   height: 100%;
   margin: 0;
   padding: 0;
   background: var(--bg-gradient);
   color: var(--text);
   overscroll-behavior: none; /* Prevents pull-to-refresh on mobile */
+  -webkit-text-size-adjust: 100%; /* Prevents text scaling on orientation change */
+}
+
+#root {
+  height: 100dvh; /* Dynamic viewport height - accounts for mobile browser toolbars */
+  margin: 0;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  background: var(--bg-gradient);
+  color: var(--text);
+  overscroll-behavior: none;
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
 }
 
 /* === PORTRAIT LOCK STYLES === */

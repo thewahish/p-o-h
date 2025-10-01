@@ -141,7 +141,7 @@ export default function SaveSlotScreen({ characterId, onBack, onGameStart }) {
 
     return (
         <>
-        <div className="min-h-screen bg-rpg-radial text-rpg-text p-4">
+        <div className="h-full bg-rpg-radial text-rpg-text p-4 overflow-y-auto">
             <div className="max-w-md mx-auto">
                 <div className="text-center mb-6">
                     <div className="flex justify-between items-center mb-4">

@@ -4,6 +4,7 @@ import { GameState } from "../core/state.js";
 import { GameConfig } from "../constants/config.js";
 import Logger from "../core/logger.js";
 import { t, Localization } from "../core/localization.js";
+import { BuffSystem } from "./buffs.js";
 
 export class CombatSystem {
   constructor({ forceUpdate }) {
@@ -15,6 +16,9 @@ export class CombatSystem {
     this.onLog = options.onLog || (() => {});
     GameState.update('battleInProgress', true);
     if (GameState.current.player) GameState.current.player.isAlive = true;
+
+    // Initialize buff system for this battle
+    BuffSystem.initializeBattle();
 
     // Wave combat system: organize enemies into waves
     this.organizeWaves(enemies);
@@ -103,6 +107,10 @@ export class CombatSystem {
     const dmg = this.calculateDamage(GameState.current.player, target);
     target.stats.hp = Math.max(0, target.stats.hp - dmg);
     this.onLog(t('combat.messages.youAttack', {target: target.level ? `Lv.${target.level} ${target.nameKey ? t(target.nameKey) : 'Enemy'}` : (target.nameKey ? t(target.nameKey) : 'Enemy'), damage: dmg}));
+
+    // Process buff effects after dealing damage (e.g., vampiric)
+    BuffSystem.processBuffEffects('damage_dealt', { damage: dmg, onLog: this.onLog.bind(this) });
+
     if (target.stats.hp <= 0) this.killUnit(target);
     this.updateCallback(); // ← ADDED UI UPDATE
     this.nextTurn();
@@ -123,6 +131,10 @@ export class CombatSystem {
       this.onLog(`Not enough ${resourceName} for ${skillName}.`);
       return;
     }
+
+    // Process buff effects when ability is used (e.g., lucky strikes for resource save chance)
+    const buffResult = BuffSystem.processBuffEffects('ability_used', { cost: skillData.cost, onLog: this.onLog.bind(this) });
+
     const skillName = typeof skillData.name === 'object' ? (skillData.name[Localization.getCurrentLanguage()] || skillData.name.en) : skillData.name;
     this.onLog(t('combat.messages.youUseSkill', {skill: skillName}));
     
@@ -137,6 +149,10 @@ export class CombatSystem {
           const skillName = typeof skillData.name === 'object' ? (skillData.name[Localization.getCurrentLanguage()] || skillData.name.en) : skillData.name;
           const targetName = target.level ? `Lv.${target.level} ${target.nameKey ? t(target.nameKey) : 'Enemy'}` : (target.nameKey ? t(target.nameKey) : 'Enemy');
           this.onLog(t('combat.messages.skillHits', {skill: skillName, target: targetName, damage: dmg}));
+
+          // Process buff effects after skill damage (e.g., vampiric)
+          BuffSystem.processBuffEffects('damage_dealt', { damage: dmg, onLog: this.onLog.bind(this) });
+
           if (target.stats.hp <= 0) this.killUnit(target);
       }
       if (skillData.effect && target.isAlive) {
@@ -201,6 +217,9 @@ export class CombatSystem {
         return;
     }
     if (this.isPlayerTurn()) {
+        // Process buff effects at turn start
+        BuffSystem.processBuffEffects('turn_start', { onLog: this.onLog.bind(this) });
+
         this.onLog(t('combat.messages.yourTurn'));
         GameState.current.player.defending = false;
         this.updateCallback();

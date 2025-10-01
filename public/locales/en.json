@@ -95,6 +95,7 @@
     "log": "Combat Log",
     "playerTurn": "{player}'s Turn",
     "enemyTurn": "Enemy Turn",
+    "activeBuffs": "Active Blessings",
     "victory": "Victory!",
     "defeat": "You Have Fallen...",
     "continue": "Continue",
@@ -124,6 +125,7 @@
       "poisonDamage": "{unit} takes {damage} damage from poison.",
       "statusWoreOff": "{unit}'s {effect} effect wore off.",
       "criticalHit": "Critical hit!",
+      "usedPotion": "You used {potion}!",
     "enemiesRemaining": "{alive}/{total} Enemies Remaining",
     "waveCleared": "Wave {wave} cleared! Preparing for wave {next}...",
     "waveBegins": "Wave {wave}/{total} begins!",
@@ -408,5 +410,13 @@
   },
   "system": {
     "gameSaved": "Game Saved!"
+  },
+  "buffs": {
+    "chooseYourBlessing": "Choose Your Blessing",
+    "selectOneBuffForBattle": "Select one buff to empower you in the upcoming battle",
+    "selected": "SELECTED",
+    "skip": "Skip",
+    "confirm": "Confirm Selection",
+    "buffsStackAcrossBattles": "Buffs stack and persist across multiple battles"
   }
 }

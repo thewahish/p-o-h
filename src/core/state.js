@@ -3,6 +3,7 @@
 import { Characters } from '../constants/characters';
 import { GameConfig } from '../constants/config';
 import Logger from './logger.js';
+import { PotionSystem } from '../systems/potions.js';
 
 export const GameState = {
     current: {
@@ -98,6 +99,10 @@ export const GameState = {
         if (!characterData) throw new Error(`Invalid character: ${characterId}`);
         
         this.current.player = this.createPlayerFromCharacter(characterData);
+
+        // Initialize starting potions
+        PotionSystem.initializeStartingPotions();
+
         Logger.log(`New game started with character: ${characterId}`, 'STATE');
         this._notify();
         return true;

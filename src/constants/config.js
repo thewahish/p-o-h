@@ -31,9 +31,10 @@ export const GameConfig = {
     INVENTORY: {
         startingGold: 100, // Starting gold for shop purchases
         maxSlots: 20,
-        // 2 starting potions for balanced roguelike challenge (Option 4)
+        // Starting potions for balanced roguelike challenge
         startingPotions: [
-            { type: 'hp_potion', quantity: 2 }  // 100 HP emergency healing total
+            { type: 'hp_potion', quantity: 3 },         // 150 HP emergency healing total
+            { type: 'resource_potion', quantity: 2 }    // 80 resource emergency restoration
         ]
     },
 

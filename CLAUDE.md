@@ -189,9 +189,10 @@ Redesigned battle interface for new systems:
 
 ### Developer Hotkeys (Global)
 - `0` - Toggle God Mode (invincibility + 9999 damage)
-- `1` - Heal player to full HP
-- `2` - Add 100 gold  
-- `3` - Gain one level
+- `1` - Restore HP to full
+- `2` - Restore resource (Mana/Vigor/Energy) to full
+- `3` - Add 100 gold
+- `4` - Gain one level
 - `5` - Instantly win current battle
 
 ### Persistent Debugger

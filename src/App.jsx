@@ -23,6 +23,7 @@ import SoulForge from "./components/soul-forge.jsx";
 import RewardPopup from "./components/reward-popup.jsx";
 import SaveSlotScreen from "./components/save-slot-screen.jsx";
 import EventInterimScreen from "./components/event-interim-screen.jsx";
+import BuffSelectionScreen from "./components/buff-selection-screen.jsx";
 
 Logger.log('App.jsx: Module loaded.', 'SYSTEM');
 
@@ -49,6 +50,8 @@ export default function App() {
     const [showSaveSlots, setShowSaveSlots] = useState(false);
     const [interimScreen, setInterimScreen] = useState(null); // { type: 'intro'|'outro', eventType, eventData, onContinue }
     const [showSaveIndicator, setShowSaveIndicator] = useState(false);
+    const [showBuffSelection, setShowBuffSelection] = useState(false);
+    const [pendingBattle, setPendingBattle] = useState(null);
     
     const forceUI = useCallback(() => {
         setGameState({ ...GameState.current });
@@ -180,7 +183,7 @@ export default function App() {
     useEffect(() => {
         const handleKeyPress = (e) => {
             // DEBUG HOTKEYS - Only enabled in development mode
-            if (GameConfig.DEBUG_MODE && ['0', '1', '2', '3', '5'].includes(e.key)) {
+            if (GameConfig.DEBUG_MODE && ['0', '1', '2', '3', '4', '5'].includes(e.key)) {
                 e.preventDefault();
                 Logger.log(`Developer hotkey pressed: ${e.key}`, 'INPUT');
                 switch (e.key) {
@@ -189,9 +192,34 @@ export default function App() {
                         GameState.update('godMode', newGodModeState);
                         Logger.log(`God Mode Toggled: ${newGodModeState ? 'ON' : 'OFF'}`, 'SYSTEM');
                         break;
-                    case '1': GameState.healPlayerToFull(); break;
-                    case '2': GameState.addGold(100); break;
-                    case '3': if(GameState.current.player) GameState.levelUp(); break;
+                    case '1':
+                        // Heal HP only
+                        if (GameState.current.player) {
+                            GameState.current.player.stats.hp = GameState.current.player.maxStats.hp;
+                            Logger.log('HP fully restored', 'SYSTEM');
+                            forceUI();
+                        }
+                        break;
+                    case '2':
+                        // Restore resource only
+                        if (GameState.current.player) {
+                            GameState.current.player.resource.current = GameState.current.player.resource.max;
+                            Logger.log('Resource fully restored', 'SYSTEM');
+                            forceUI();
+                        }
+                        break;
+                    case '3':
+                        // Add gold
+                        GameState.addGold(100);
+                        Logger.log('Added 100 gold', 'SYSTEM');
+                        break;
+                    case '4':
+                        // Level up
+                        if (GameState.current.player) {
+                            GameState.levelUp();
+                            Logger.log('Leveled up', 'SYSTEM');
+                        }
+                        break;
                     case '5':
                         if (GameState.current.battleInProgress) {
                             combatSystem.instantWin();
@@ -374,11 +402,22 @@ export default function App() {
     };
 
     const startBattle = (enemies) => {
-        const liveEnemies = enemies.map(e => ({ ...e }));
-        setCombatLog([]);
-        GameState.current.onBattleEnd = endBattle;
-        GameState.update('currentScreen', 'battle');
-        combatSystem.startBattle(liveEnemies, { onLog: (msg) => setCombatLog((prev) => [...prev, msg]) });
+        // Show buff selection screen before battle
+        setPendingBattle(enemies);
+        setShowBuffSelection(true);
+    };
+
+    const handleBuffSelected = (buffKey) => {
+        setShowBuffSelection(false);
+
+        if (pendingBattle) {
+            const liveEnemies = pendingBattle.map(e => ({ ...e }));
+            setCombatLog([]);
+            GameState.current.onBattleEnd = endBattle;
+            GameState.update('currentScreen', 'battle');
+            combatSystem.startBattle(liveEnemies, { onLog: (msg) => setCombatLog((prev) => [...prev, msg]) });
+            setPendingBattle(null);
+        }
     };
 
     const endBattle = (victory, rewards) => {
@@ -458,6 +497,9 @@ export default function App() {
     }
 
     // === SCREEN RENDERING LOGIC ===
+    if (showBuffSelection) {
+        return <><BuffSelectionScreen onBuffSelected={handleBuffSelected} /><PersistentDebugger /></>;
+    }
     if (interimScreen) {
         return <><EventInterimScreen {...interimScreen} /><PersistentDebugger /></>;
     }
@@ -557,7 +599,7 @@ export default function App() {
     }
 
     return (
-        <div className="h-screen bg-rpg-radial text-rpg-text p-1 flex flex-col overflow-hidden">
+        <div className="w-full max-w-2xl h-full bg-rpg-radial text-rpg-text p-1 flex flex-col overflow-hidden">
             {/* Auto-save indicator */}
             {showSaveIndicator && (
                 <div className="fixed top-4 right-4 z-50 bg-uncommon text-white px-4 py-2 rounded-lg shadow-lg flex items-center gap-2 animate-fade-in">
@@ -615,7 +657,7 @@ export default function App() {
                 
                 {/* Dungeon Grid - Takes remaining space */}
                 <div className="bg-rpg-bg-darker bg-opacity-60 rounded-lg p-1.5 border border-rpg-secondary flex-1 flex flex-col min-h-0 backdrop-blur-sm">
-                    <div className="grid grid-cols-5 gap-1 flex-1 w-full max-w-sm mx-auto">
+                    <div className="grid grid-cols-5 gap-1 w-full max-w-md mx-auto" style={{ aspectRatio: '5/9', maxHeight: '100%' }}>
                         {dungeon.map((row, y) =>
                             row.map((room, x) => {
                                 const isPlayerHere = playerPos && playerPos.x === x && playerPos.y === y;
@@ -645,7 +687,7 @@ export default function App() {
 
 function MainMenu({ onCharacterSelect, currentLanguage }) {
     return (
-        <div className="min-h-screen flex flex-col items-center justify-center bg-rpg-radial text-rpg-text px-4">
+        <div className="h-full flex flex-col items-center justify-center bg-rpg-radial text-rpg-text px-4">
             <h1 className="text-5xl font-extrabold text-rpg-primary mb-3 drop-shadow-lg">{t('game.title')}</h1>
             <p className="text-lg text-rpg-text opacity-80 mb-6">{t('game.subtitle')}</p>
             
