@@ -140,39 +140,39 @@ export const GameConfig = {
         // Offensive Buffs
         'berserker_rage': {
             name: { en: 'Berserker Rage', ar: 'غضب البرسيركر' },
-            description: { en: '+25% attack damage this battle', ar: '+25% ضرر الهجوم في هذه المعركة' },
+            description: { en: '+25% attack damage for the next battle', ar: '+25% ضرر الهجوم للمعركة القادمة' },
             icon: '🔥',
             effect: { stat: 'atk', multiplier: 1.25, duration: 'battle' }
         },
         'precision_strike': {
             name: { en: 'Precision Strike', ar: 'ضربة دقيقة' },
-            description: { en: '+15% critical hit chance this battle', ar: '+15% فرصة الضربة الحاسمة' },
+            description: { en: '+15% critical hit chance for the next battle', ar: '+15% فرصة الضربة الحاسمة للمعركة القادمة' },
             icon: '🎯',
             effect: { stat: 'crit', bonus: 15, duration: 'battle' }
         },
         'swift_reflexes': {
             name: { en: 'Swift Reflexes', ar: 'ردود فعل سريعة' },
-            description: { en: '+30% speed this battle', ar: '+30% سرعة في هذه المعركة' },
+            description: { en: '+30% speed for the next battle', ar: '+30% سرعة للمعركة القادمة' },
             icon: '⚡',
             effect: { stat: 'spd', multiplier: 1.3, duration: 'battle' }
         },
-        
+
         // Defensive Buffs
         'iron_skin': {
             name: { en: 'Iron Skin', ar: 'جلد حديدي' },
-            description: { en: '+40% defense this battle', ar: '+40% دفاع في هذه المعركة' },
+            description: { en: '+40% defense for the next battle', ar: '+40% دفاع للمعركة القادمة' },
             icon: '🛡️',
             effect: { stat: 'def', multiplier: 1.4, duration: 'battle' }
         },
         'vampiric_aura': {
             name: { en: 'Vampiric Aura', ar: 'هالة مصاص الدماء' },
-            description: { en: 'Heal 20% damage dealt as HP', ar: 'استعيد 20% من الضرر كصحة' },
+            description: { en: 'Heal 20% of damage dealt as HP', ar: 'استعيد 20% من الضرر كصحة' },
             icon: '🩸',
             effect: { type: 'vampiric', percentage: 20, duration: 'battle' }
         },
         'mana_surge': {
             name: { en: 'Mana Surge', ar: 'تدفق مانا' },
-            description: { en: '+50% resource regeneration this battle', ar: '+50% تجديد المورد' },
+            description: { en: '+50% resource regeneration for the next battle', ar: '+50% تجديد المورد للمعركة القادمة' },
             icon: '💫',
             effect: { type: 'resource_boost', multiplier: 1.5, duration: 'battle' }
         },

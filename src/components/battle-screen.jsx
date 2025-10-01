@@ -159,11 +159,11 @@ export default function BattleScreen({ player, enemies: initialEnemies, combatSy
                                         <div
                                             key={index}
                                             className="bg-legendary bg-opacity-20 border border-legendary rounded-lg px-3 py-1.5 text-sm"
-                                            title={typeof buff.description === 'object' ? t(buff.description) : buff.description}
+                                            title={typeof buff.description === 'object' ? buff.description[Localization.getCurrentLanguage()] : buff.description}
                                         >
                                             <span className="text-lg mr-1">{buff.icon}</span>
                                             <span className="font-bold text-legendary">
-                                                {typeof buff.name === 'object' ? t(buff.name) : buff.name}
+                                                {typeof buff.name === 'object' ? buff.name[Localization.getCurrentLanguage()] : buff.name}
                                             </span>
                                         </div>
                                     ))}
