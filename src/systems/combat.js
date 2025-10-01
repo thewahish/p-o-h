@@ -217,6 +217,25 @@ export class CombatSystem {
         return;
     }
     if (this.isPlayerTurn()) {
+        // Regenerate player resource at turn start
+        const player = GameState.current.player;
+        const baseRegen = GameConfig.COMBAT.resourceRegeneration.baseAmount || 8;
+        const levelBonus = (GameState.current.level - 1) * (GameConfig.COMBAT.resourceRegeneration.levelScaling || 0.5);
+        let resourceRegen = Math.floor(baseRegen + levelBonus);
+
+        // Apply buff modifiers to regeneration
+        const modifiedRegen = BuffSystem.getModifiedResourceRegen(resourceRegen);
+
+        // Add regenerated resource (capped at max)
+        const oldResource = player.resource.current;
+        player.resource.current = Math.min(player.resource.max, player.resource.current + modifiedRegen);
+        const actualRegen = player.resource.current - oldResource;
+
+        if (actualRegen > 0) {
+            const resourceName = player.resource.nameKey ? t(player.resource.nameKey) : 'Resource';
+            this.onLog(`+${actualRegen} ${resourceName} regenerated`);
+        }
+
         // Process buff effects at turn start
         BuffSystem.processBuffEffects('turn_start', { onLog: this.onLog.bind(this) });
 
