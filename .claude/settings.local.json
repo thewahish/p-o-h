@@ -7,7 +7,9 @@
       "Bash(git config:*)",
       "Bash(git add:*)",
       "Bash(git commit -m \"$(cat <<''EOF''\nFeat: Add auto-save system and character-specific services\n\n- Implement auto-save service with configurable triggers (floor complete, boss defeat, player death)\n- Add character-specific enemy generation via CharacterService\n- Add character-specific item rewards via RewardService\n- Integrate auto-save UI indicator (💾 \"Game Saved!\" notification)\n- Initialize services on new game and load game\n- Update shop screen to use RewardService for character-appropriate items\n- Add missing item translations (heavy_armor, shield, mana_crystal, dagger, poison_vial)\n- Fix shop error message display to use React state (XSS-safe)\n- Update permissions for git push and config commands\n- Update package-lock.json dependencies\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
-      "Bash(node:*)"
+      "Bash(node:*)",
+      "Bash(git commit:*)",
+      "Bash(npm run deploy:*)"
     ],
     "deny": []
   }

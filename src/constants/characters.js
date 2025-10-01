@@ -27,7 +27,16 @@ export const Characters = {
             spd: 0.4, 
             crit: 0.2 
         },
-        abilities: ['shield_bash'],
+        abilities: [
+            'power_strike',      // Level 1
+            'defensive_stance',  // Level 1
+            'shield_bash',       // Level 3
+            'battle_cry',        // Level 6
+            'whirlwind_attack',  // Level 9
+            'iron_will',         // Level 12
+            'execute',           // Level 15
+            'last_stand'         // Level 18
+        ],
         // Character-specific progression path
         progressionPath: 'defensive_tank',
         preferredEnemyTypes: ['brute', 'physical'],
@@ -57,7 +66,16 @@ export const Characters = {
             spd: 0.6, 
             crit: 0.4 
         },
-        abilities: ['fireball'],
+        abilities: [
+            'magic_missile',     // Level 1
+            'mana_shield',       // Level 1
+            'fireball',          // Level 3
+            'ice_shard',         // Level 6
+            'lightning_bolt',    // Level 9
+            'arcane_intellect',  // Level 12
+            'meteor',            // Level 15
+            'time_warp'          // Level 18
+        ],
         // Character-specific progression path
         progressionPath: 'elemental_mage',
         preferredEnemyTypes: ['magical', 'undead'],
@@ -87,7 +105,16 @@ export const Characters = {
             spd: 0.8, // Good speed growth
             crit: 0.6 // Excellent crit growth
         },
-        abilities: ['venom_strike'],
+        abilities: [
+            'quick_strike',      // Level 1
+            'evasion',           // Level 1
+            'venom_strike',      // Level 3
+            'shadow_step',       // Level 6
+            'fan_of_knives',     // Level 9
+            'deadly_precision',  // Level 12
+            'backstab',          // Level 15
+            'death_mark'         // Level 18
+        ],
         // Character-specific progression path
         progressionPath: 'assassin_berserker',
         preferredEnemyTypes: ['fast', 'elite'],
