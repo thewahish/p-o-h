@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { BuffSystem } from '../systems/buffs';
-import { t } from '../core/localization';
+import { t, Localization } from '../core/localization';
 import Logger from '../core/logger';
 
 /**
@@ -57,10 +57,10 @@ export default function BuffSelectionScreen({ onBuffSelected }) {
                         >
                             <div className="text-5xl mb-3 text-center">{buff.icon}</div>
                             <h3 className="text-xl font-bold text-rpg-primary mb-2 text-center">
-                                {typeof buff.name === 'object' ? t(buff.name) : buff.name}
+                                {typeof buff.name === 'object' ? buff.name[Localization.getCurrentLanguage()] : buff.name}
                             </h3>
                             <p className="text-sm text-rpg-text opacity-90 text-center">
-                                {typeof buff.description === 'object' ? t(buff.description) : buff.description}
+                                {typeof buff.description === 'object' ? buff.description[Localization.getCurrentLanguage()] : buff.description}
                             </p>
                             {selectedBuff === buff.key && (
                                 <div className="mt-3 text-center text-uncommon font-bold">✓ {t('buffs.selected')}</div>
