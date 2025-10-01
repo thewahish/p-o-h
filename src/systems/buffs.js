@@ -134,13 +134,23 @@ export class BuffSystem {
 
                 case 'ability_used':
                     if (effect.type === 'resource_save' && context.cost) {
-                        if (Math.random() < (effect.chance / 100)) {
+                        const roll = Math.random();
+                        const chance = effect.chance / 100;
+                        Logger.log(`[BUFF] Lucky Strikes roll: ${(roll * 100).toFixed(1)}% (need < ${effect.chance}%)`, 'SYSTEM');
+
+                        if (roll < chance) {
                             // Refund the resource cost
+                            const before = player.resource.current;
                             player.resource.current += context.cost;
+                            const after = player.resource.current;
+
+                            Logger.log(`[BUFF] Lucky Strikes triggered! Resource refunded: ${before} → ${after} (+${context.cost})`, 'SYSTEM');
                             if (context.onLog) {
-                                context.onLog(`${buff.icon} Lucky Strike: Resource saved!`);
+                                context.onLog(`${buff.icon} Lucky Strike: Resource saved! (+${context.cost})`);
                             }
                             return { resourceSaved: true };
+                        } else {
+                            Logger.log(`[BUFF] Lucky Strikes did not trigger`, 'SYSTEM');
                         }
                     }
                     break;
