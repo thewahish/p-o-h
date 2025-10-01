@@ -10,6 +10,7 @@ import { PotionSystem } from '../systems/potions';
 export default function BattleScreen({ player, enemies: initialEnemies, combatSystem, combatLog }) {
     const [localLogs, setLocalLogs] = useState(combatLog || []);
     const [feedbackMessages, setFeedbackMessages] = useState([]);
+    const [floatingNumbers, setFloatingNumbers] = useState([]);
     const [focusedTargetId, setFocusedTargetId] = useState(() => {
         const firstAliveEnemy = initialEnemies.find(e => e.isAlive);
         return firstAliveEnemy ? firstAliveEnemy.originalIndex : null;
@@ -39,9 +40,26 @@ export default function BattleScreen({ player, enemies: initialEnemies, combatSy
             const latestMessage = combatLog[combatLog.length - 1];
             if (latestMessage) {
                 addFeedbackMessage(latestMessage);
+
+                // Parse combat message for damage numbers
+                // Example: "You attack Goblin for 25 damage!" or "Critical Hit! 45 damage!"
+                const damageMatch = latestMessage.match(/(\d+)\s*damage/i);
+                const isCrit = /critical/i.test(latestMessage) || /💥/i.test(latestMessage);
+
+                if (damageMatch && focusedTargetId !== null) {
+                    const damage = parseInt(damageMatch[1], 10);
+                    addFloatingNumber(focusedTargetId, damage, isCrit ? 'crit' : 'damage');
+                }
+
+                // Check for healing
+                const healMatch = latestMessage.match(/heal(?:ed)?\s*(\d+)/i);
+                if (healMatch) {
+                    const heal = parseInt(healMatch[1], 10);
+                    // Healing on player would need player entity ID, skip for now
+                }
             }
         }
-    }, [combatLog]);
+    }, [combatLog, focusedTargetId]);
 
     // Add fading feedback message
     const addFeedbackMessage = (text, duration = 2000) => {
@@ -58,6 +76,25 @@ export default function BattleScreen({ player, enemies: initialEnemies, combatSy
         setTimeout(() => {
             setFeedbackMessages(prev => prev.filter(m => m.id !== id));
         }, duration);
+    };
+
+    // Add floating damage number over enemy
+    const addFloatingNumber = (entityId, value, type = 'damage') => {
+        const id = Date.now() + Math.random();
+        const newNumber = {
+            id,
+            entityId,
+            value,
+            type, // 'damage', 'heal', 'crit', 'miss'
+            timestamp: Date.now()
+        };
+
+        setFloatingNumbers(prev => [...prev, newNumber]);
+
+        // Auto-remove after animation (1.5s)
+        setTimeout(() => {
+            setFloatingNumbers(prev => prev.filter(n => n.id !== id));
+        }, 1500);
     };
 
     const handleAttack = () => {
@@ -134,7 +171,7 @@ export default function BattleScreen({ player, enemies: initialEnemies, combatSy
 
     return (
         <>
-            {/* Combat Feedback CSS Animation */}
+            {/* Combat Feedback CSS Animations */}
             <style>{`
                 @keyframes fadeInOut {
                     0% { opacity: 0; transform: translateY(20px); }
@@ -144,6 +181,26 @@ export default function BattleScreen({ player, enemies: initialEnemies, combatSy
                 }
                 .feedback-message {
                     animation: fadeInOut 2s ease-in-out forwards;
+                }
+
+                @keyframes floatUp {
+                    0% {
+                        opacity: 1;
+                        transform: translateY(0) scale(1);
+                    }
+                    50% {
+                        transform: translateY(-30px) scale(1.2);
+                    }
+                    100% {
+                        opacity: 0;
+                        transform: translateY(-60px) scale(0.8);
+                    }
+                }
+                .floating-number {
+                    animation: floatUp 1.5s ease-out forwards;
+                    pointer-events: none;
+                    font-weight: bold;
+                    text-shadow: 0 0 10px rgba(0, 0, 0, 0.8), 0 0 20px rgba(0, 0, 0, 0.5);
                 }
             `}</style>
 
@@ -222,7 +279,35 @@ export default function BattleScreen({ player, enemies: initialEnemies, combatSy
                     ))}
 
                     {focusedEnemy && (
-                        <div className={`bg-rpg-bg-darker bg-opacity-80 p-4 rounded-lg border-2 backdrop-blur-sm ${focusedEnemy.isAlive ? 'border-legendary' : 'border-rpg-secondary opacity-60'}`}>
+                        <div className={`relative bg-rpg-bg-darker bg-opacity-80 p-4 rounded-lg border-2 backdrop-blur-sm ${focusedEnemy.isAlive ? 'border-legendary' : 'border-rpg-secondary opacity-60'}`}>
+                             {/* Floating Damage Numbers */}
+                             {floatingNumbers
+                                .filter(n => n.entityId === focusedEnemy.originalIndex)
+                                .map(num => {
+                                    const getNumberStyle = () => {
+                                        switch (num.type) {
+                                            case 'crit':
+                                                return { color: '#ffff00', fontSize: '2.5rem' };
+                                            case 'heal':
+                                                return { color: '#44ff44', fontSize: '2rem' };
+                                            case 'miss':
+                                                return { color: '#999999', fontSize: '1.5rem' };
+                                            default: // damage
+                                                return { color: '#ff4444', fontSize: '2rem' };
+                                        }
+                                    };
+
+                                    return (
+                                        <div
+                                            key={num.id}
+                                            className="floating-number absolute top-4 left-1/2 transform -translate-x-1/2 z-50"
+                                            style={getNumberStyle()}
+                                        >
+                                            {num.type === 'heal' ? '+' : num.type === 'miss' ? 'MISS' : '-'}{num.type !== 'miss' && num.value}
+                                        </div>
+                                    );
+                                })}
+
                              <div className="flex gap-4 items-center">
                                 <div className="flex-shrink-0 w-24 h-24 bg-rpg-bg-darkest rounded-lg flex items-center justify-center text-5xl border-2 border-health-dark">{focusedEnemy.isAlive ? '👹' : '💀'}</div>
                                 <div className="flex-grow min-w-0">
