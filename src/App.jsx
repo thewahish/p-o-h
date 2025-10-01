@@ -298,12 +298,14 @@ export default function App() {
                 break;
             case RoomTypes.TREASURE:
                 if (!room.completed) {
-                    showEventIntro('treasure');
+                    // Go directly to reward without intro screen
+                    processRoomEvent(room, 'treasure');
                 }
                 break;
             case RoomTypes.SHRINE:
                 if (!room.completed) {
-                    showEventIntro('shrine');
+                    // Go directly to blessing without intro screen
+                    processRoomEvent(room, 'shrine');
                 }
                 break;
             case RoomTypes.STAIRS:
