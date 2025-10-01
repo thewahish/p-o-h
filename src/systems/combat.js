@@ -125,17 +125,25 @@ export class CombatSystem {
       Logger.log(`Skill not found: ${skillId}`, 'ERROR');
       return;
     }
+
+    const resourceBefore = player.resource.current;
     if (!GameState.spendResource(skillData.cost)) {
       const resourceName = player.resource.nameKey ? t(player.resource.nameKey) : 'Resource';
       const skillName = typeof skillData.name === 'object' ? skillData.name.en : skillData.name;
       this.onLog(`Not enough ${resourceName} for ${skillName}.`);
       return;
     }
+    const resourceAfterSpend = player.resource.current;
+
+    // Log resource expenditure
+    const resourceName = player.resource.nameKey ? t(player.resource.nameKey) : 'Resource';
+    const skillName = typeof skillData.name === 'object' ? (skillData.name[Localization.getCurrentLanguage()] || skillData.name.en) : skillData.name;
+    this.onLog(`Used ${skillName} (-${skillData.cost} ${resourceName})`);
+    Logger.log(`[COMBAT] Resource before: ${resourceBefore}, after spend: ${resourceAfterSpend}, cost: ${skillData.cost}`, 'COMBAT');
 
     // Process buff effects when ability is used (e.g., lucky strikes for resource save chance)
     const buffResult = BuffSystem.processBuffEffects('ability_used', { cost: skillData.cost, onLog: this.onLog.bind(this) });
 
-    const skillName = typeof skillData.name === 'object' ? (skillData.name[Localization.getCurrentLanguage()] || skillData.name.en) : skillData.name;
     this.onLog(t('combat.messages.youUseSkill', {skill: skillName}));
     
     const targets = skillData.target === 'all' 
@@ -231,9 +239,12 @@ export class CombatSystem {
         player.resource.current = Math.min(player.resource.max, player.resource.current + modifiedRegen);
         const actualRegen = player.resource.current - oldResource;
 
+        const resourceName = player.resource.nameKey ? t(player.resource.nameKey) : 'Resource';
         if (actualRegen > 0) {
-            const resourceName = player.resource.nameKey ? t(player.resource.nameKey) : 'Resource';
-            this.onLog(`+${actualRegen} ${resourceName} regenerated`);
+            this.onLog(`[Regen] +${actualRegen} ${resourceName} (${oldResource} → ${player.resource.current})`);
+            Logger.log(`[COMBAT] Resource regeneration: +${actualRegen} (${oldResource} → ${player.resource.current})`, 'COMBAT');
+        } else {
+            this.onLog(`[Regen] ${resourceName} already full (${player.resource.current}/${player.resource.max})`);
         }
 
         // Process buff effects at turn start
