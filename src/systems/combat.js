@@ -227,7 +227,7 @@ export class CombatSystem {
     if (this.isPlayerTurn()) {
         // Regenerate player resource at turn start
         const player = GameState.current.player;
-        const baseRegen = GameConfig.COMBAT.resourceRegeneration.baseAmount || 8;
+        const baseRegen = GameConfig.COMBAT.resourceRegeneration.baseAmount;
         const levelBonus = (GameState.current.level - 1) * (GameConfig.COMBAT.resourceRegeneration.levelScaling || 0.5);
         let resourceRegen = Math.floor(baseRegen + levelBonus);
 
