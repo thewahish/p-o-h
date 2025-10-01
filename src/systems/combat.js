@@ -5,6 +5,9 @@ import { GameConfig } from "../constants/config.js";
 import Logger from "../core/logger.js";
 import { t, Localization } from "../core/localization.js";
 import { BuffSystem } from "./buffs.js";
+import { BreakSystem } from "./break-system.js";
+import { UltimateSystem, UltimatePointGains } from "./ultimate-system.js";
+import { getAbilityElement, getElementalMultiplier } from "../constants/elements.js";
 
 export class CombatSystem {
   constructor({ forceUpdate }) {
@@ -19,6 +22,15 @@ export class CombatSystem {
 
     // Initialize buff system for this battle
     BuffSystem.initializeBattle();
+
+    // Initialize ultimate gauge
+    UltimateSystem.resetUltimateGauge();
+
+    // Initialize break data for all enemies
+    const currentFloor = GameState.current.currentFloor || 1;
+    enemies.forEach(enemy => {
+      BreakSystem.initializeEnemyBreakData(enemy, currentFloor);
+    });
 
     // Wave combat system: organize enemies into waves
     this.organizeWaves(enemies);
@@ -104,12 +116,29 @@ export class CombatSystem {
     const target = GameState.current.enemies.find(e => e.originalIndex === targetIndex);
     if (!target || !target.isAlive) return;
 
-    const dmg = this.calculateDamage(GameState.current.player, target);
+    // Basic attacks are always physical
+    const attackElement = 'physical';
+
+    // Calculate damage with elemental multipliers
+    let dmg = this.calculateDamageWithElements(GameState.current.player, target, 1.0, attackElement);
+
     target.stats.hp = Math.max(0, target.stats.hp - dmg);
-    this.onLog(t('combat.messages.youAttack', {target: target.level ? `Lv.${target.level} ${target.nameKey ? t(target.nameKey) : 'Enemy'}` : (target.nameKey ? t(target.nameKey) : 'Enemy'), damage: dmg}));
+
+    const targetName = target.level ? `Lv.${target.level} ${target.nameKey ? t(target.nameKey) : 'Enemy'}` : (target.nameKey ? t(target.nameKey) : 'Enemy');
+    this.onLog(t('combat.messages.youAttack', {target: targetName, damage: dmg}));
+
+    // Deal toughness damage
+    const breakResult = BreakSystem.dealToughnessDamage(target, attackElement, this.onLog.bind(this));
+    if (breakResult.broken) {
+      // Award bonus ultimate points for breaking
+      UltimateSystem.addUltimatePoints(UltimatePointGains.BREAK_ENEMY, 'breaking enemy', this.onLog.bind(this));
+    }
 
     // Process buff effects after dealing damage (e.g., vampiric)
     BuffSystem.processBuffEffects('damage_dealt', { damage: dmg, onLog: this.onLog.bind(this) });
+
+    // Gain ultimate points for basic attack
+    UltimateSystem.addUltimatePoints(UltimatePointGains.BASIC_ATTACK, 'basic attack', this.onLog.bind(this));
 
     if (target.stats.hp <= 0) this.killUnit(target);
     this.updateCallback(); // ← ADDED UI UPDATE
@@ -145,18 +174,29 @@ export class CombatSystem {
     const buffResult = BuffSystem.processBuffEffects('ability_used', { cost: skillData.cost, onLog: this.onLog.bind(this) });
 
     this.onLog(t('combat.messages.youUseSkill', {skill: skillName}));
-    
-    const targets = skillData.target === 'all' 
+
+    // Get ability element
+    const abilityElement = getAbilityElement(skillId);
+
+    const targets = skillData.target === 'all'
       ? GameState.current.enemies.filter(e => e.isAlive)
       : [GameState.current.enemies.find(e => e.originalIndex === targetIndex)].filter(Boolean);
-    
+
     targets.forEach(target => {
       if (skillData.damageMultiplier) {
-          const dmg = this.calculateDamage(player, target, skillData.damageMultiplier);
+          // Use elemental damage calculation
+          const dmg = this.calculateDamageWithElements(player, target, skillData.damageMultiplier, abilityElement);
           target.stats.hp = Math.max(0, target.stats.hp - dmg);
           const skillName = typeof skillData.name === 'object' ? (skillData.name[Localization.getCurrentLanguage()] || skillData.name.en) : skillData.name;
           const targetName = target.level ? `Lv.${target.level} ${target.nameKey ? t(target.nameKey) : 'Enemy'}` : (target.nameKey ? t(target.nameKey) : 'Enemy');
           this.onLog(t('combat.messages.skillHits', {skill: skillName, target: targetName, damage: dmg}));
+
+          // Deal toughness damage
+          const breakResult = BreakSystem.dealToughnessDamage(target, abilityElement, this.onLog.bind(this));
+          if (breakResult.broken) {
+            // Award bonus ultimate points for breaking
+            UltimateSystem.addUltimatePoints(UltimatePointGains.BREAK_ENEMY, 'breaking enemy', this.onLog.bind(this));
+          }
 
           // Process buff effects after skill damage (e.g., vampiric)
           BuffSystem.processBuffEffects('damage_dealt', { damage: dmg, onLog: this.onLog.bind(this) });
@@ -174,6 +214,10 @@ export class CombatSystem {
           this.onLog(t('combat.messages.targetAfflicted', {target: targetName, effect: skillData.effect.type}));
       }
     });
+
+    // Gain ultimate points for using ability
+    UltimateSystem.addUltimatePoints(UltimatePointGains.USE_ABILITY, 'using ability', this.onLog.bind(this));
+
     this.updateCallback(); // ← ADDED UI UPDATE
     this.nextTurn();
   }
@@ -184,6 +228,21 @@ export class CombatSystem {
     GameState.current.player.defending = true;
     this.updateCallback(); // ← ADDED UI UPDATE
     this.nextTurn();
+  }
+
+  playerUltimate(targetIndex) {
+    if (!this.isPlayerTurn()) return;
+
+    const characterId = GameState.current.player.characterId;
+    const focusedEnemy = GameState.current.enemies.find(e => e.originalIndex === targetIndex);
+    const targets = [focusedEnemy].filter(Boolean);
+
+    const success = UltimateSystem.useUltimate(characterId, targets, this, this.onLog.bind(this));
+
+    if (success) {
+      this.updateCallback();
+      this.nextTurn();
+    }
   }
 
   playerFlee() {
@@ -199,6 +258,14 @@ export class CombatSystem {
   }
 
   enemyAttack(enemy) {
+    // Check if enemy should skip turn due to being broken
+    if (BreakSystem.shouldSkipTurn(enemy)) {
+      const enemyName = enemy.level ? `Lv.${enemy.level} ${enemy.nameKey ? t(enemy.nameKey) : 'Enemy'}` : (enemy.nameKey ? t(enemy.nameKey) : 'Enemy');
+      this.onLog(`⚠️ ${enemyName} is STUNNED! Turn skipped!`);
+      this.updateCallback();
+      return; // Enemy loses turn
+    }
+
     const player = GameState.current.player;
     let dmg = this.calculateDamage(enemy, player);
     if (player.defending) {
@@ -208,6 +275,10 @@ export class CombatSystem {
     player.stats.hp = Math.max(0, player.stats.hp - dmg);
     const enemyName = enemy.level ? `Lv.${enemy.level} ${enemy.nameKey ? t(enemy.nameKey) : 'Enemy'}` : (enemy.nameKey ? t(enemy.nameKey) : 'Enemy');
     this.onLog(t('combat.messages.enemyAttacks', {enemy: enemyName, damage: dmg}));
+
+    // Gain ultimate points for taking damage
+    UltimateSystem.addUltimatePoints(UltimatePointGains.TAKE_DAMAGE, 'taking damage', this.onLog.bind(this));
+
     if (player.stats.hp <= 0) this.killUnit(player);
     this.updateCallback(); // ← ADDED UI UPDATE
   }
@@ -389,5 +460,37 @@ export class CombatSystem {
         this.onLog(t('combat.messages.criticalHit'));
     }
     return Math.max(1, finalDmg);
+  }
+
+  calculateDamageWithElements(attacker, defender, multiplier = 1.0, element = 'physical') {
+    // Calculate base damage
+    let baseDamage = this.calculateDamage(attacker, defender, multiplier);
+
+    // Apply elemental multiplier only if defender is an enemy with break data
+    if (defender.breakData) {
+      const elementalMultiplier = getElementalMultiplier(
+        element,
+        defender.breakData.weaknesses,
+        defender.breakData.resistances
+      );
+
+      baseDamage = Math.floor(baseDamage * elementalMultiplier);
+
+      // Log elemental effectiveness
+      if (elementalMultiplier > 1.0) {
+        this.onLog(`🔥 Weakness hit! (${elementalMultiplier}x damage)`);
+      } else if (elementalMultiplier < 1.0) {
+        this.onLog(`🛡️ Resisted! (${elementalMultiplier}x damage)`);
+      }
+    }
+
+    // Apply broken multiplier (50% bonus if enemy is broken)
+    const brokenMultiplier = BreakSystem.getBrokenMultiplier(defender);
+    if (brokenMultiplier > 1.0) {
+      baseDamage = Math.floor(baseDamage * brokenMultiplier);
+      this.onLog(`💥 BONUS DAMAGE! (Enemy is broken!)`);
+    }
+
+    return Math.max(1, baseDamage);
   }
 }
