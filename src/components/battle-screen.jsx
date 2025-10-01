@@ -9,6 +9,7 @@ import { PotionSystem } from '../systems/potions';
 
 export default function BattleScreen({ player, enemies: initialEnemies, combatSystem, combatLog }) {
     const [localLogs, setLocalLogs] = useState(combatLog || []);
+    const [feedbackMessages, setFeedbackMessages] = useState([]);
     const [focusedTargetId, setFocusedTargetId] = useState(() => {
         const firstAliveEnemy = initialEnemies.find(e => e.isAlive);
         return firstAliveEnemy ? firstAliveEnemy.originalIndex : null;
@@ -32,7 +33,32 @@ export default function BattleScreen({ player, enemies: initialEnemies, combatSy
     
     useEffect(() => {
         setLocalLogs(combatLog);
+
+        // Add new combat log message as fading feedback
+        if (combatLog && combatLog.length > 0) {
+            const latestMessage = combatLog[combatLog.length - 1];
+            if (latestMessage) {
+                addFeedbackMessage(latestMessage);
+            }
+        }
     }, [combatLog]);
+
+    // Add fading feedback message
+    const addFeedbackMessage = (text, duration = 2000) => {
+        const id = Date.now() + Math.random();
+        const newMessage = { id, text, timestamp: Date.now() };
+
+        setFeedbackMessages(prev => {
+            // Keep only last 3 messages to avoid clutter
+            const updated = [...prev, newMessage].slice(-3);
+            return updated;
+        });
+
+        // Auto-remove after duration
+        setTimeout(() => {
+            setFeedbackMessages(prev => prev.filter(m => m.id !== id));
+        }, duration);
+    };
 
     const handleAttack = () => {
         if (focusedTargetId !== null) combatSystem.playerAttack(focusedTargetId);
@@ -107,8 +133,22 @@ export default function BattleScreen({ player, enemies: initialEnemies, combatSy
     const currentLanguage = Localization.getCurrentLanguage();
 
     return (
-        <div className="h-full bg-rpg-radial text-rpg-text p-4 flex flex-col overflow-y-auto">
-            <div className="w-full max-w-3xl mx-auto flex flex-col flex-grow min-h-0">
+        <>
+            {/* Combat Feedback CSS Animation */}
+            <style>{`
+                @keyframes fadeInOut {
+                    0% { opacity: 0; transform: translateY(20px); }
+                    15% { opacity: 1; transform: translateY(0); }
+                    85% { opacity: 1; transform: translateY(0); }
+                    100% { opacity: 0; transform: translateY(-10px); }
+                }
+                .feedback-message {
+                    animation: fadeInOut 2s ease-in-out forwards;
+                }
+            `}</style>
+
+            <div className="h-full bg-rpg-radial text-rpg-text p-4 flex flex-col overflow-y-auto">
+                <div className="w-full max-w-3xl mx-auto flex flex-col flex-grow min-h-0">
                 <div className="text-center mb-4 flex-shrink-0">
                     <h1 className="text-2xl font-bold text-rpg-primary">⚔️ {t('combat.battle')} ⚔️</h1>
                     {/* Wave Combat Indicator */}
@@ -256,12 +296,30 @@ export default function BattleScreen({ player, enemies: initialEnemies, combatSy
                             🌟 Elixir ({GameState.current.potions?.elixir_of_vitality || 0})
                         </button>
                     </div>
-                    <div className="bg-rpg-bg-darkest bg-opacity-80 p-3 rounded border border-rpg-secondary h-24 overflow-y-auto text-sm backdrop-blur-sm">
-                        <h3 className="text-rpg-primary font-bold mb-2">{t('combat.log')}:</h3>
-                        {localLogs.length === 0 ? (<div className="text-rpg-text opacity-50 italic">Awaiting action...</div>) : ([...localLogs].reverse().map((log, i) => (<div key={i} className="mb-1 text-rpg-text">{log}</div>)))}
+
+                    {/* Combat Feedback Zone - Fading Messages (Replaces Scrolling Log) */}
+                    <div className="relative h-16 flex items-center justify-center overflow-hidden">
+                        {feedbackMessages.map((msg, index) => (
+                            <div
+                                key={msg.id}
+                                className="feedback-message absolute text-center text-base font-bold px-4 py-2 bg-black bg-opacity-60 rounded-lg backdrop-blur-sm border border-rpg-primary"
+                                style={{
+                                    zIndex: feedbackMessages.length - index,
+                                    color: '#f8e4c0'
+                                }}
+                            >
+                                {msg.text}
+                            </div>
+                        ))}
+                        {feedbackMessages.length === 0 && (
+                            <div className="text-rpg-text opacity-30 italic text-sm">
+                                {isPlayerTurn ? t('combat.chooseAction') : t('combat.enemyThinking')}
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
         </div>
+        </>
     );
 }
