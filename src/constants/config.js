@@ -102,7 +102,7 @@ export const GameConfig = {
         fleeChance: 0.6, // Increased flee chance for better escape options
         // Resource regeneration per turn
         resourceRegeneration: {
-            baseAmount: 8, // Base resource regen per turn
+            baseAmount: 4, // Reduced for strategic resource management (prevents full regen spam)
             levelScaling: 0.5 // Additional regen per level
         }
     },
