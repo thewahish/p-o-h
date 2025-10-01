@@ -6,6 +6,8 @@ import { GameConfig } from '../constants/config';
 import Logger from '../core/logger';
 import { t, Localization } from '../core/localization';
 import { PotionSystem } from '../systems/potions';
+import { UltimateSystem } from '../systems/ultimate-system';
+import { getElement } from '../constants/elements';
 
 export default function BattleScreen({ player, enemies: initialEnemies, combatSystem, combatLog }) {
     const [localLogs, setLocalLogs] = useState(combatLog || []);

@@ -11,7 +11,9 @@
       "Bash(git commit:*)",
       "Bash(npm run deploy:*)",
       "WebSearch",
-      "WebFetch(domain:gameuidatabase.com)"
+      "WebFetch(domain:gameuidatabase.com)",
+      "Bash(git log:*)",
+      "Bash(git tag:*)"
     ],
     "deny": []
   }
