@@ -95,8 +95,6 @@
     "log": "سجل المعركة",
     "playerTurn": "دور {player}",
     "enemyTurn": "دور العدو",
-    "chooseAction": "اختر إجراءك...",
-    "enemyThinking": "العدو يفكر...",
     "activeBuffs": "البركات النشطة",
     "victory": "انتصار!",
     "defeat": "لقد سقطت...",
