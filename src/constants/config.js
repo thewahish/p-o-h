@@ -100,10 +100,10 @@ export const GameConfig = {
     COMBAT: {
         baseCritMultiplier: 1.6, // Slightly increased crit multiplier
         fleeChance: 0.6, // Increased flee chance for better escape options
-        // Resource regeneration per turn
+        // Resource regeneration per turn - CLASSIC MODE
         resourceRegeneration: {
-            baseAmount: 4, // Reduced for strategic resource management (prevents full regen spam)
-            levelScaling: 0.5 // Additional regen per level
+            baseAmount: 0, // Classic Mode: No auto-regen, rely on potions and planning
+            levelScaling: 0 // No scaling - pure classic resource management
         }
     },
 
