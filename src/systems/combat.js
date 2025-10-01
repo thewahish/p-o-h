@@ -243,9 +243,8 @@ export class CombatSystem {
         if (actualRegen > 0) {
             this.onLog(`[Regen] +${actualRegen} ${resourceName} (${oldResource} → ${player.resource.current})`);
             Logger.log(`[COMBAT] Resource regeneration: +${actualRegen} (${oldResource} → ${player.resource.current})`, 'COMBAT');
-        } else {
-            this.onLog(`[Regen] ${resourceName} already full (${player.resource.current}/${player.resource.max})`);
         }
+        // Classic Mode: No resource regeneration - no message needed
 
         // Process buff effects at turn start
         BuffSystem.processBuffEffects('turn_start', { onLog: this.onLog.bind(this) });
