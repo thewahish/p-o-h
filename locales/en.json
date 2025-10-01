@@ -87,7 +87,7 @@
   "combat": {
     "battle": "Battle",
     "attack": "Attack",
-    "skill": "Skill",
+    "skill": "Skill", 
     "defend": "Defend",
     "potions": "Potions",
     "flee": "Flee",
@@ -95,8 +95,6 @@
     "log": "Combat Log",
     "playerTurn": "{player}'s Turn",
     "enemyTurn": "Enemy Turn",
-    "chooseAction": "Choose your action...",
-    "enemyThinking": "Enemy is thinking...",
     "activeBuffs": "Active Blessings",
     "victory": "Victory!",
     "defeat": "You Have Fallen...",
