@@ -24,6 +24,7 @@ import RewardPopup from "./components/reward-popup.jsx";
 import SaveSlotScreen from "./components/save-slot-screen.jsx";
 import EventInterimScreen from "./components/event-interim-screen.jsx";
 import BuffSelectionScreen from "./components/buff-selection-screen.jsx";
+import { InventoryScreen } from "./components/inventory-screen.jsx";
 
 Logger.log('App.jsx: Module loaded.', 'SYSTEM');
 
@@ -52,6 +53,7 @@ export default function App() {
     const [showSaveIndicator, setShowSaveIndicator] = useState(false);
     const [showBuffSelection, setShowBuffSelection] = useState(false);
     const [pendingBattle, setPendingBattle] = useState(null);
+    const [showInventory, setShowInventory] = useState(false);
     
     const forceUI = useCallback(() => {
         setGameState({ ...GameState.current });
@@ -656,7 +658,18 @@ export default function App() {
                     )}
                 </div>
             </div>
-                
+
+            {/* Inventory Button */}
+            <div className="shrink-0 mb-1">
+                <button
+                    onClick={() => setShowInventory(true)}
+                    className="w-full px-4 py-2 bg-gradient-to-r from-rpg-secondary to-rpg-primary text-black font-bold rounded-lg hover:from-rpg-primary hover:to-rpg-secondary transition-all flex items-center justify-center gap-2 border border-rpg-primary"
+                >
+                    <span className="text-xl">🎒</span>
+                    <span>Inventory</span>
+                </button>
+            </div>
+
                 {/* Dungeon Grid - Takes remaining space */}
                 <div className="bg-rpg-bg-darker bg-opacity-60 rounded-lg p-1.5 border border-rpg-secondary flex-1 flex flex-col min-h-0 backdrop-blur-sm">
                     <div className="grid grid-cols-5 gap-1 w-full max-w-md mx-auto" style={{ aspectRatio: '5/9', maxHeight: '100%' }}>
@@ -680,9 +693,10 @@ export default function App() {
                         {t('exploration.controls')}
                     </div>
                 </div>
-                
+
                 <PersistentDebugger />
                 {rewardPopup && <RewardPopup reward={rewardPopup} onClose={() => setRewardPopup(null)} />}
+                {showInventory && <InventoryScreen onClose={() => setShowInventory(false)} />}
         </div>
     );
 }
