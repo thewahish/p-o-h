@@ -321,6 +321,42 @@ export default function BattleScreen({ player, enemies: initialEnemies, combatSy
                                     </div>
                                     <div className="h-4 bg-health-empty rounded overflow-hidden mb-1"><div className="h-4 bg-health-full" style={{ width: `${getHpPercent(focusedEnemy)}%` }}></div></div>
                                     <p className="text-sm text-right text-rpg-text opacity-80">{t('stats.hpShort')}: {focusedEnemy.stats.hp} / {focusedEnemy.maxStats.hp}</p>
+
+                                    {/* Break Bar - Toughness */}
+                                    {focusedEnemy.breakData && (
+                                        <div className="mt-2">
+                                            <div className="flex justify-between items-center mb-1">
+                                                <div className="flex items-center gap-2">
+                                                    <span className="text-xs text-rpg-text opacity-70">🛡️ Toughness</span>
+                                                    {focusedEnemy.breakData.isBroken && (
+                                                        <span className="text-xs font-bold text-red-500 animate-pulse">⚠️ BROKEN!</span>
+                                                    )}
+                                                </div>
+                                                <span className="text-xs text-rpg-text opacity-70">
+                                                    {focusedEnemy.breakData.currentToughness}/{focusedEnemy.breakData.maxToughness}
+                                                </span>
+                                            </div>
+                                            <div className="h-2 bg-gray-700 rounded overflow-hidden">
+                                                <div
+                                                    className={`h-2 transition-all ${focusedEnemy.breakData.isBroken ? 'bg-red-500' : 'bg-blue-400'}`}
+                                                    style={{ width: `${(focusedEnemy.breakData.currentToughness / focusedEnemy.breakData.maxToughness) * 100}%` }}
+                                                ></div>
+                                            </div>
+                                            {/* Weakness Icons */}
+                                            <div className="flex gap-1 mt-1 items-center">
+                                                <span className="text-xs text-rpg-text opacity-70">Weak:</span>
+                                                {focusedEnemy.breakData.weaknesses.map(weakness => {
+                                                    const element = getElement(weakness);
+                                                    return (
+                                                        <span key={weakness} className="text-sm" title={typeof element.name === 'object' ? element.name.en : element.name}>
+                                                            {element.icon}
+                                                        </span>
+                                                    );
+                                                })}
+                                            </div>
+                                        </div>
+                                    )}
+
                                     <div className="flex justify-end gap-4 mt-2 text-sm text-rpg-text opacity-70">
                                         <span>⚔️ {focusedEnemy.stats.atk}</span> <span>🛡️ {focusedEnemy.stats.def}</span> <span>⚡ {focusedEnemy.stats.spd}</span> <span>💥 {focusedEnemy.stats.crit}%</span>
                                     </div>
@@ -331,8 +367,26 @@ export default function BattleScreen({ player, enemies: initialEnemies, combatSy
                 </div>
 
                 <div className="mt-auto flex-shrink-0 pt-4">
-                    {/* Main Combat Actions - Made smaller to fit potions */}
-                    <div className="grid grid-cols-4 gap-1 mb-2">
+                    {/* Ultimate Gauge */}
+                    {player.ultimate && (
+                        <div className="mb-3 bg-rpg-bg-darker bg-opacity-80 rounded-lg p-3 border border-rpg-primary">
+                            <div className="flex justify-between items-center mb-1">
+                                <span className="text-sm font-bold text-rpg-primary">⚡ ULTIMATE</span>
+                                <span className="text-sm font-bold text-rpg-primary">{player.ultimate.current}/{player.ultimate.max}</span>
+                            </div>
+                            <div className="h-3 bg-gray-700 rounded overflow-hidden">
+                                <div
+                                    className={`h-3 transition-all ${player.ultimate.ready ? 'bg-gradient-to-r from-yellow-400 via-orange-400 to-red-500 animate-pulse' : 'bg-gradient-to-r from-gray-600 to-blue-500'}`}
+                                    style={{ width: `${(player.ultimate.current / player.ultimate.max) * 100}%` }}
+                                ></div>
+                            </div>
+                            {player.ultimate.ready && (
+                                <p className="text-center text-xs text-yellow-400 font-bold mt-1 animate-pulse">💥 READY! 💥</p>
+                            )}
+                        </div>
+                    )}
+                    {/* Main Combat Actions */}
+                    <div className="grid grid-cols-5 gap-1 mb-2">
                         <button onClick={handleAttack} disabled={!isPlayerTurn || !focusedEnemy?.isAlive} className={`px-2 py-2 text-sm rounded font-bold transition-colors text-rpg-text ${ isPlayerTurn && focusedEnemy?.isAlive ? 'bg-rpg-primary hover:bg-legendary' : 'bg-rpg-secondary bg-opacity-50 opacity-50 cursor-not-allowed'}`}>⚔️ {t('combat.attack')}</button>
                         {playerSkillData ? (
                             <button onClick={handleSkill} disabled={!isPlayerTurn || player.resource.current < playerSkillData.cost || !focusedEnemy?.isAlive} className={`px-2 py-2 text-sm rounded font-bold transition-colors text-rpg-text ${ isPlayerTurn && player.resource.current >= playerSkillData.cost && focusedEnemy?.isAlive ? 'bg-epic hover:bg-mythic' : 'bg-rpg-secondary bg-opacity-50 opacity-50 cursor-not-allowed'}`}>
@@ -344,6 +398,17 @@ export default function BattleScreen({ player, enemies: initialEnemies, combatSy
                         ) : (
                             <button disabled className="px-2 py-2 text-sm rounded font-bold bg-rpg-secondary bg-opacity-50 text-rpg-text opacity-50 cursor-not-allowed">🔮 {t('combat.noSkill')}</button>
                         )}
+                        <button
+                            onClick={() => combatSystem.playerUltimate(focusedTargetId)}
+                            disabled={!isPlayerTurn || !player.ultimate?.ready || !focusedEnemy?.isAlive}
+                            className={`px-1 py-2 text-xs rounded font-bold transition-colors ${
+                                isPlayerTurn && player.ultimate?.ready && focusedEnemy?.isAlive
+                                    ? 'bg-gradient-to-r from-yellow-400 to-red-500 text-black hover:from-yellow-300 hover:to-red-400 animate-pulse'
+                                    : 'bg-rpg-secondary bg-opacity-50 opacity-50 cursor-not-allowed text-rpg-text'
+                            }`}
+                        >
+                            💥 ULT
+                        </button>
                         <button onClick={() => combatSystem.playerDefend()} disabled={!isPlayerTurn} className={`px-2 py-2 text-sm rounded font-bold transition-colors text-rpg-text ${ isPlayerTurn ? 'bg-rpg-secondary hover:bg-rpg-primary' : 'bg-rpg-secondary bg-opacity-50 cursor-not-allowed'}`}>🛡️ {t('combat.defend')}</button>
                         <button onClick={() => combatSystem.playerFlee()} disabled={!isPlayerTurn} className={`px-2 py-2 text-sm rounded font-bold transition-colors text-rpg-text ${ isPlayerTurn ? 'bg-health-full hover:bg-health-mid' : 'bg-rpg-secondary bg-opacity-50 cursor-not-allowed'}`}>🏃 {t('combat.flee')}</button>
                     </div>
