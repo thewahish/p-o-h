@@ -261,11 +261,11 @@ export default function App() {
 
     const handleRoomEvent = (room) => {
         Logger.log(`Handling event for room type: ${room.type}`, 'SYSTEM');
-        
+
         // Show intro screen before processing the event
         if (room.encounter && !room.completed) {
             // Battle encounter
-            const eventType = room.type === RoomTypes.BOSS ? 'boss' : 
+            const eventType = room.type === RoomTypes.BOSS ? 'boss' :
                              room.type === RoomTypes.ELITE ? 'elite' : 'battle';
             setInterimScreen({
                 type: 'intro',
@@ -273,7 +273,7 @@ export default function App() {
                 eventData: room.encounter,
                 onContinue: () => {
                     setInterimScreen(null);
-                    startBattle(room.encounter);
+                    startBattle(room.encounter, eventType); // Pass event type to determine buff eligibility
                 }
             });
             return;
@@ -335,10 +335,12 @@ export default function App() {
                 GameState.addGold(goldFound);
                 setRewardPopup({
                     type: 'gold',
-                    message: t('rewards.goldFoundAmount', {amount: goldFound})
+                    icon: '💎',
+                    title: t('events.treasure'),
+                    message: t('rewards.treasureChestFound', {amount: goldFound})
                 });
                 room.completed = true;
-                showEventOutro('treasure');
+                // No outro screen - popup closes and returns to game directly
                 break;
             case 'shrine':
                 if (GameState.current.player) {
@@ -355,14 +357,16 @@ export default function App() {
                     GameState.current.player.maxStats[blessing.effect] += blessing.bonus;
                     setRewardPopup({
                         type: 'blessing',
-                        message: t('rewards.blessingDetails', {
-                            blessing: t(blessing.nameKey), 
-                            bonus: blessing.bonus, 
-                            stat: t(`stats.${blessing.effect}`)
+                        icon: '⛩️',
+                        title: t('events.shrine'),
+                        message: t('rewards.shrineBlessing', {
+                            blessing: t(blessing.nameKey),
+                            stat: t(`stats.${blessing.effect}`),
+                            bonus: blessing.bonus
                         })
                     });
                     room.completed = true;
-                    showEventOutro('shrine');
+                    // No outro screen - popup closes and returns to game directly
                 }
                 break;
             case 'stairs':
@@ -405,10 +409,21 @@ export default function App() {
         });
     };
 
-    const startBattle = (enemies) => {
-        // Show buff selection screen before battle
-        setPendingBattle(enemies);
-        setShowBuffSelection(true);
+    const startBattle = (enemies, encounterType = 'battle') => {
+        // Only show buff selection for boss and elite encounters
+        const shouldShowBuffs = encounterType === 'boss' || encounterType === 'elite';
+
+        if (shouldShowBuffs) {
+            setPendingBattle(enemies);
+            setShowBuffSelection(true);
+        } else {
+            // Skip buff selection for regular battles
+            const liveEnemies = enemies.map(e => ({ ...e }));
+            setCombatLog([]);
+            GameState.current.onBattleEnd = endBattle;
+            GameState.update('currentScreen', 'battle');
+            combatSystem.startBattle(liveEnemies, { onLog: (msg) => setCombatLog((prev) => [...prev, msg]) });
+        }
     };
 
     const handleBuffSelected = (buffKey) => {

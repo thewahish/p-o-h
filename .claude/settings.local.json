@@ -13,7 +13,9 @@
       "WebSearch",
       "WebFetch(domain:gameuidatabase.com)",
       "Bash(git log:*)",
-      "Bash(git tag:*)"
+      "Bash(git tag:*)",
+      "Bash(git fetch:*)",
+      "Bash(git pull:*)"
     ],
     "deny": []
   }

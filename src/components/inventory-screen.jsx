@@ -37,7 +37,7 @@ export function InventoryScreen({ onClose }) {
         GameState.current.inventory = GameState.current.inventory.filter(i => i.id !== item.id);
 
         // Recalculate player stats
-        GameState.recalculatePlayerStats();
+        GameState.updatePlayerStats();
         GameState._notify();
     };
 
@@ -50,7 +50,7 @@ export function InventoryScreen({ onClose }) {
         delete GameState.current.equipped[slot];
 
         // Recalculate player stats
-        GameState.recalculatePlayerStats();
+        GameState.updatePlayerStats();
         GameState._notify();
     };
 

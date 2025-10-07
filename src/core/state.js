@@ -110,19 +110,20 @@ export const GameState = {
 
     createPlayerFromCharacter(characterData) {
         return {
-            id: characterData.id, 
+            id: characterData.id,
+            characterId: characterData.id, // Add characterId for ultimate system
             nameKey: characterData.nameKey,
             class: characterData.id,
             roleKey: characterData.roleKey,
-            sprite: '...', 
+            sprite: '...',
             stats: { ...characterData.baseStats },
             maxStats: { ...characterData.baseStats },
-            resource: { 
-                nameKey: characterData.resourceKey, 
-                current: characterData.baseStats.resource, 
-                max: characterData.baseStats.resource 
+            resource: {
+                nameKey: characterData.resourceKey,
+                current: characterData.baseStats.resource,
+                max: characterData.baseStats.resource
             },
-            abilities: [...characterData.abilities], 
+            abilities: [...characterData.abilities],
             statusEffects: []
         };
     },

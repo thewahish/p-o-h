@@ -341,8 +341,10 @@
   "rewards": {
     "goldFound": "Treasure Found!",
     "goldFoundAmount": "You found {amount} gold!",
+    "treasureChestFound": "You found a treasure chest with {amount} gold!",
     "blessingReceived": "Divine Blessing!",
     "blessingDetails": "✨ You receive the {blessing}! +{bonus} {stat}",
+    "shrineBlessing": "You receive the {blessing}! +{bonus} {stat}",
     "itemFound": "Item Found!",
     "reward": "Reward!",
     "continue": "Continue",
@@ -374,7 +376,9 @@
     "returning": "Returning to exploration...",
     "continue": "Continue",
     "autoAdvancing": "Auto-advancing",
-    "unknownEnemies": "Unknown Foes"
+    "unknownEnemies": "Unknown Foes",
+    "treasure": "Treasure Chest",
+    "shrine": "Ancient Shrine"
   },
   "saveSlots": {
     "selectSlot": "Select a save slot",

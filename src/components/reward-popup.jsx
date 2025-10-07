@@ -7,6 +7,9 @@ export default function RewardPopup({ reward, onClose }) {
     if (!reward) return null;
 
     const getRewardIcon = (type) => {
+        // Use custom icon if provided, otherwise use default based on type
+        if (reward.icon) return reward.icon;
+
         switch (type) {
             case 'gold': return '💰';
             case 'blessing': return '✨';
@@ -16,6 +19,9 @@ export default function RewardPopup({ reward, onClose }) {
     };
 
     const getRewardTitle = (type) => {
+        // Use custom title if provided, otherwise use default based on type
+        if (reward.title) return reward.title;
+
         switch (type) {
             case 'gold': return t('rewards.goldFound');
             case 'blessing': return t('rewards.blessingReceived');

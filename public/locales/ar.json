@@ -341,8 +341,10 @@
   "rewards": {
     "goldFound": "تم العثور على كنز!",
     "goldFoundAmount": "عثرت على {amount} ذهب!",
+    "treasureChestFound": "وجدت صندوق كنز يحتوي على {amount} ذهب!",
     "blessingReceived": "بركة إلهية!",
     "blessingDetails": "✨ تلقيت {blessing}! +{bonus} {stat}",
+    "shrineBlessing": "تلقيت {blessing}! +{bonus} {stat}",
     "itemFound": "تم العثور على عنصر!",
     "reward": "مكافأة!",
     "continue": "متابعة",
@@ -374,7 +376,9 @@
     "returning": "العودة للاستكشاف...",
     "continue": "متابعة",
     "autoAdvancing": "تقدم تلقائي",
-    "unknownEnemies": "أعداء مجهولون"
+    "unknownEnemies": "أعداء مجهولون",
+    "treasure": "صندوق كنز",
+    "shrine": "مقام قديم"
   },
   "saveSlots": {
     "selectSlot": "اختر خانة الحفظ",

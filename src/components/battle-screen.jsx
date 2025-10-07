@@ -206,13 +206,14 @@ export default function BattleScreen({ player, enemies: initialEnemies, combatSy
                 }
             `}</style>
 
-            <div className="h-full bg-rpg-radial text-rpg-text p-4 flex flex-col overflow-y-auto">
-                <div className="w-full max-w-3xl mx-auto flex flex-col flex-grow min-h-0">
-                <div className="text-center mb-4 flex-shrink-0">
-                    <h1 className="text-2xl font-bold text-rpg-primary">⚔️ {t('combat.battle')} ⚔️</h1>
+            <div className="h-full bg-rpg-radial text-rpg-text p-4 flex flex-col">
+                <div className="w-full max-w-3xl mx-auto flex flex-col h-full">
+                {/* Header */}
+                <div className="text-center mb-2 flex-shrink-0">
+                    <h1 className="text-xl font-bold text-rpg-primary">⚔️ {t('combat.battle')} ⚔️</h1>
                     {/* Wave Combat Indicator */}
                     {(combatSystem.totalWaves > 1 || enemies.length > 1) && (
-                        <div className="inline-block bg-rpg-secondary border border-rpg-primary rounded-full px-3 py-1 text-sm text-rpg-primary font-semibold mb-2">
+                        <div className="inline-block bg-rpg-secondary border border-rpg-primary rounded-full px-2 py-0.5 text-xs text-rpg-primary font-semibold mb-1">
                             {combatSystem.totalWaves > 1 ? (
                                 <>🌊 Wave {combatSystem.currentWave}/{combatSystem.totalWaves}</>
                             ) : (
@@ -220,68 +221,14 @@ export default function BattleScreen({ player, enemies: initialEnemies, combatSy
                             )}
                         </div>
                     )}
-                    <p className="text-lg text-rpg-text opacity-80">{isPlayerTurn ? t('combat.playerTurn', {player: player?.nameKey ? t(player.nameKey) : 'Player'}) : t('combat.enemyTurn')}</p>
+                    <p className="text-sm text-rpg-text opacity-80">{isPlayerTurn ? t('combat.playerTurn', {player: player?.nameKey ? t(player.nameKey) : 'Player'}) : t('combat.enemyTurn')}</p>
                 </div>
 
-                <div className="flex-grow overflow-y-auto pr-2 space-y-4">
-                    <div className="bg-rpg-bg-darker bg-opacity-80 p-4 rounded-lg border border-rpg-primary backdrop-blur-sm">
-                        <div className="flex gap-4 items-center">
-                            <div className="flex-shrink-0 w-24 h-24 bg-rpg-bg-darkest rounded-lg flex items-center justify-center text-5xl border-2 border-uncommon">👤</div>
-                            <div className="flex-grow min-w-0">
-                                <div className="flex justify-between items-center mb-2">
-                                    <h2 className="text-xl font-bold text-uncommon truncate">{player?.nameKey ? t(player.nameKey) : 'Player'} ({t('stats.level')} {GameState.current.level})</h2>
-                                    <div className="flex gap-2 flex-shrink-0">
-                                        {player?.defending && <div className="text-sm bg-rare bg-opacity-50 border border-rare rounded-full px-2 py-0.5">🛡️ Defending</div>}
-                                        {player?.statusEffects?.map((effect, i) => <div key={i} className="text-sm bg-health-dark bg-opacity-50 border border-health-mid rounded-full px-2 py-0.5">{effect.icon} {effect.duration}</div>)}
-                                    </div>
-                                </div>
-                                <div className="h-4 bg-health-empty rounded overflow-hidden mb-1"><div className="h-4 bg-health-full" style={{ width: `${getHpPercent(player)}%` }}></div></div>
-                                <div className="text-sm text-right text-rpg-text opacity-80 mb-2">{t('stats.hpShort')}: {player?.stats.hp} / {player?.maxStats.hp}</div>
-                                <div className={`h-4 rounded overflow-hidden mb-1 ${getResourceEmptyColor(player?.resource?.nameKey)}`}><div className={`h-4 ${getResourceColor(player?.resource?.nameKey)}`} style={{ width: `${getResourcePercent(player)}%` }}></div></div>
-                                <div className="text-sm text-right text-rpg-text opacity-80">{player?.resource?.nameKey ? t(player.resource.nameKey) : 'Resource'}: {player?.resource.current} / {player?.resource.max}</div>
-                                <div className="flex justify-end gap-4 mt-2 text-sm text-rpg-text opacity-70">
-                                    <span>⚔️ {player?.stats.atk}</span> <span>🛡️ {player?.stats.def}</span> <span>⚡ {player?.stats.spd}</span> <span>💥 {player?.stats.crit}%</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="mt-3">
-                            <div className="h-4 bg-rpg-bg-darkest rounded overflow-hidden mb-1"><div className="h-4 bg-mana-light" style={{ width: `${xpInfo.percentage}%` }}></div></div>
-                            <div className="text-sm text-right text-mana-light">{t('stats.xpShort')}: {xpInfo.current} / {xpInfo.required}</div>
-                        </div>
-
-                        {/* Active Buffs Display */}
-                        {GameState.current.battleBuffs && GameState.current.battleBuffs.length > 0 && (
-                            <div className="mt-3 pt-3 border-t border-rpg-secondary">
-                                <h3 className="text-sm font-bold text-rpg-primary mb-2">✨ {t('combat.activeBuffs')}</h3>
-                                <div className="flex flex-wrap gap-2">
-                                    {GameState.current.battleBuffs.map((buff, index) => (
-                                        <div
-                                            key={index}
-                                            className="bg-legendary bg-opacity-20 border border-legendary rounded-lg px-3 py-1.5 text-sm"
-                                            title={typeof buff.description === 'object' ? buff.description[Localization.getCurrentLanguage()] : buff.description}
-                                        >
-                                            <span className="text-lg mr-1">{buff.icon}</span>
-                                            <span className="font-bold text-legendary">
-                                                {typeof buff.name === 'object' ? buff.name[Localization.getCurrentLanguage()] : buff.name}
-                                            </span>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
-                    </div>
-
-                    {otherEnemies.map(enemy => (
-                        <button key={enemy.originalIndex} onClick={() => setFocusedTargetId(enemy.originalIndex)} className="w-full bg-rpg-secondary bg-opacity-30 hover:bg-rpg-secondary hover:bg-opacity-50 rounded-lg p-2 border border-rpg-secondary text-left flex items-center text-sm transition-all">
-                            <div className="w-8 h-8 rounded-full bg-rpg-bg-darkest flex items-center justify-center mr-3 text-lg">{enemy.isAlive ? '👹' : '💀'}</div>
-                            <div className="flex-grow text-rpg-text font-semibold">{enemy.prefixKey ? `${t(enemy.prefixKey)} ` : ''}{enemy.nameKey ? t(enemy.nameKey) : enemy.id || 'Enemy'} {enemy.level ? `(${t('stats.level')} ${enemy.level})` : ''}</div>
-                            <div className="w-1/3 h-3 bg-health-empty rounded-full overflow-hidden mr-2"><div className="h-3 bg-health-full" style={{ width: `${getHpPercent(enemy)}%` }}></div></div>
-                            <div className="text-rpg-text opacity-70 text-right w-20">{enemy.stats.hp} / {enemy.maxStats.hp}</div>
-                        </button>
-                    ))}
-
+                {/* Enemies Section - Top */}
+                <div className="flex-grow overflow-y-auto pr-2 space-y-2 mb-2">
+                    {/* Focused Enemy Card - Top Priority */}
                     {focusedEnemy && (
-                        <div className={`relative bg-rpg-bg-darker bg-opacity-80 p-4 rounded-lg border-2 backdrop-blur-sm ${focusedEnemy.isAlive ? 'border-legendary' : 'border-rpg-secondary opacity-60'}`}>
+                        <div className={`relative bg-rpg-bg-darker bg-opacity-80 p-2 rounded-lg border-2 backdrop-blur-sm ${focusedEnemy.isAlive ? 'border-legendary' : 'border-rpg-secondary opacity-60'}`}>
                              {/* Floating Damage Numbers */}
                              {floatingNumbers
                                 .filter(n => n.entityId === focusedEnemy.originalIndex)
@@ -289,13 +236,13 @@ export default function BattleScreen({ player, enemies: initialEnemies, combatSy
                                     const getNumberStyle = () => {
                                         switch (num.type) {
                                             case 'crit':
-                                                return { color: '#ffff00', fontSize: '2.5rem' };
+                                                return { color: '#ffff00', fontSize: '1.8rem' };
                                             case 'heal':
-                                                return { color: '#44ff44', fontSize: '2rem' };
+                                                return { color: '#44ff44', fontSize: '1.5rem' };
                                             case 'miss':
-                                                return { color: '#999999', fontSize: '1.5rem' };
+                                                return { color: '#999999', fontSize: '1.2rem' };
                                             default: // damage
-                                                return { color: '#ff4444', fontSize: '2rem' };
+                                                return { color: '#ff4444', fontSize: '1.5rem' };
                                         }
                                     };
 
@@ -310,98 +257,148 @@ export default function BattleScreen({ player, enemies: initialEnemies, combatSy
                                     );
                                 })}
 
-                             <div className="flex gap-4 items-center">
-                                <div className="flex-shrink-0 w-24 h-24 bg-rpg-bg-darkest rounded-lg flex items-center justify-center text-5xl border-2 border-health-dark">{focusedEnemy.isAlive ? '👹' : '💀'}</div>
+                             <div className="flex gap-2 items-center">
+                                <div className="flex-shrink-0 w-16 h-16 bg-rpg-bg-darkest rounded-lg flex items-center justify-center text-3xl border-2 border-health-dark">{focusedEnemy.isAlive ? '👹' : '💀'}</div>
                                 <div className="flex-grow min-w-0">
-                                    <div className="flex justify-between items-center mb-2">
-                                        <h2 className="text-xl font-bold text-health-mid truncate">{focusedEnemy.prefixKey ? `${t(focusedEnemy.prefixKey)} ` : ''}{focusedEnemy.nameKey ? t(focusedEnemy.nameKey) : focusedEnemy.id || 'Enemy'} {focusedEnemy.level ? `(${t('stats.level')} ${focusedEnemy.level})` : ''}</h2>
+                                    <div className="flex justify-between items-center mb-1">
+                                        <h2 className="text-base font-bold text-health-mid truncate">{focusedEnemy.prefixKey ? `${t(focusedEnemy.prefixKey)} ` : ''}{focusedEnemy.nameKey ? t(focusedEnemy.nameKey) : focusedEnemy.id || 'Enemy'} {focusedEnemy.level ? `(${t('stats.level')} ${focusedEnemy.level})` : ''}</h2>
                                         <div className="flex gap-2 flex-shrink-0">
                                             {focusedEnemy.statusEffects?.map((effect, i) => <div key={i} className="text-sm bg-epic bg-opacity-50 border border-epic rounded-full px-2 py-0.5">{effect.icon} {effect.duration}</div>)}
                                         </div>
                                     </div>
-                                    <div className="h-4 bg-health-empty rounded overflow-hidden mb-1"><div className="h-4 bg-health-full" style={{ width: `${getHpPercent(focusedEnemy)}%` }}></div></div>
-                                    <p className="text-sm text-right text-rpg-text opacity-80">{t('stats.hpShort')}: {focusedEnemy.stats.hp} / {focusedEnemy.maxStats.hp}</p>
+                                    <div className="h-2 bg-health-empty rounded overflow-hidden mb-1"><div className="h-2 bg-health-full" style={{ width: `${getHpPercent(focusedEnemy)}%` }}></div></div>
+                                    <p className="text-xs text-right text-rpg-text opacity-80">{t('stats.hpShort')}: {focusedEnemy.stats.hp} / {focusedEnemy.maxStats.hp}</p>
 
-                                    {/* Break Bar - Toughness */}
+                                    {/* Break Bar - Compact */}
                                     {focusedEnemy.breakData && (
-                                        <div className="mt-2">
-                                            <div className="flex justify-between items-center mb-1">
-                                                <div className="flex items-center gap-2">
-                                                    <span className="text-xs text-rpg-text opacity-70">🛡️ Toughness</span>
+                                        <div className="mt-1">
+                                            <div className="flex justify-between items-center">
+                                                <div className="flex items-center gap-1">
+                                                    <span className="text-xs text-rpg-text opacity-70">🛡️</span>
                                                     {focusedEnemy.breakData.isBroken && (
-                                                        <span className="text-xs font-bold text-red-500 animate-pulse">⚠️ BROKEN!</span>
+                                                        <span className="text-xs font-bold text-red-500 animate-pulse">BROKEN!</span>
                                                     )}
+                                                    {focusedEnemy.breakData.weaknesses.map(weakness => {
+                                                        const element = getElement(weakness);
+                                                        return (
+                                                            <span key={weakness} className="text-xs" title={typeof element.name === 'object' ? element.name.en : element.name}>
+                                                                {element.icon}
+                                                            </span>
+                                                        );
+                                                    })}
                                                 </div>
                                                 <span className="text-xs text-rpg-text opacity-70">
                                                     {focusedEnemy.breakData.currentToughness}/{focusedEnemy.breakData.maxToughness}
                                                 </span>
                                             </div>
-                                            <div className="h-2 bg-gray-700 rounded overflow-hidden">
+                                            <div className="h-1.5 bg-gray-700 rounded overflow-hidden mt-0.5">
                                                 <div
-                                                    className={`h-2 transition-all ${focusedEnemy.breakData.isBroken ? 'bg-red-500' : 'bg-blue-400'}`}
+                                                    className={`h-1.5 transition-all ${focusedEnemy.breakData.isBroken ? 'bg-red-500' : 'bg-blue-400'}`}
                                                     style={{ width: `${(focusedEnemy.breakData.currentToughness / focusedEnemy.breakData.maxToughness) * 100}%` }}
                                                 ></div>
-                                            </div>
-                                            {/* Weakness Icons */}
-                                            <div className="flex gap-1 mt-1 items-center">
-                                                <span className="text-xs text-rpg-text opacity-70">Weak:</span>
-                                                {focusedEnemy.breakData.weaknesses.map(weakness => {
-                                                    const element = getElement(weakness);
-                                                    return (
-                                                        <span key={weakness} className="text-sm" title={typeof element.name === 'object' ? element.name.en : element.name}>
-                                                            {element.icon}
-                                                        </span>
-                                                    );
-                                                })}
                                             </div>
                                         </div>
                                     )}
 
-                                    <div className="flex justify-end gap-4 mt-2 text-sm text-rpg-text opacity-70">
+                                    <div className="flex justify-end gap-2 mt-1 text-xs text-rpg-text opacity-70">
                                         <span>⚔️ {focusedEnemy.stats.atk}</span> <span>🛡️ {focusedEnemy.stats.def}</span> <span>⚡ {focusedEnemy.stats.spd}</span> <span>💥 {focusedEnemy.stats.crit}%</span>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     )}
+
+                    {/* Other Enemies List */}
+                    {otherEnemies.map(enemy => (
+                        <button key={enemy.originalIndex} onClick={() => setFocusedTargetId(enemy.originalIndex)} className="w-full bg-rpg-secondary bg-opacity-30 hover:bg-rpg-secondary hover:bg-opacity-50 rounded-lg p-2 border border-rpg-secondary text-left flex items-center text-sm transition-all">
+                            <div className="w-8 h-8 rounded-full bg-rpg-bg-darkest flex items-center justify-center mr-3 text-lg">{enemy.isAlive ? '👹' : '💀'}</div>
+                            <div className="flex-grow text-rpg-text font-semibold">{enemy.prefixKey ? `${t(enemy.prefixKey)} ` : ''}{enemy.nameKey ? t(enemy.nameKey) : enemy.id || 'Enemy'} {enemy.level ? `(${t('stats.level')} ${enemy.level})` : ''}</div>
+                            <div className="w-1/3 h-3 bg-health-empty rounded-full overflow-hidden mr-2"><div className="h-3 bg-health-full" style={{ width: `${getHpPercent(enemy)}%` }}></div></div>
+                            <div className="text-rpg-text opacity-70 text-right w-20">{enemy.stats.hp} / {enemy.maxStats.hp}</div>
+                        </button>
+                    ))}
+
+                    {/* Player Card - Bottom Before Controls */}
+                    <div className="flex gap-2 items-center">
+                        <div className="flex-shrink-0 w-16 h-16 bg-rpg-bg-darkest rounded-lg flex items-center justify-center text-3xl border-2 border-uncommon">👤</div>
+                        <div className="flex-grow min-w-0">
+                            <div className="flex justify-between items-center mb-1">
+                                <h2 className="text-base font-bold text-uncommon truncate">{player?.nameKey ? t(player.nameKey) : 'Player'} ({t('stats.level')} {GameState.current.level})</h2>
+                                <div className="flex gap-2 flex-shrink-0">
+                                    {player?.defending && <div className="text-sm bg-rare bg-opacity-50 border border-rare rounded-full px-2 py-0.5">🛡️ Defending</div>}
+                                    {player?.statusEffects?.map((effect, i) => <div key={i} className="text-sm bg-health-dark bg-opacity-50 border border-health-mid rounded-full px-2 py-0.5">{effect.icon} {effect.duration}</div>)}
+                                </div>
+                            </div>
+                            <div className="h-2 bg-health-empty rounded overflow-hidden mb-1"><div className="h-2 bg-health-full" style={{ width: `${getHpPercent(player)}%` }}></div></div>
+                            <div className="text-xs text-right text-rpg-text opacity-80 mb-1">{t('stats.hpShort')}: {player?.stats.hp} / {player?.maxStats.hp}</div>
+                            <div className={`h-2 rounded overflow-hidden mb-1 ${getResourceEmptyColor(player?.resource?.nameKey)}`}><div className={`h-2 ${getResourceColor(player?.resource?.nameKey)}`} style={{ width: `${getResourcePercent(player)}%` }}></div></div>
+                            <div className="text-xs text-right text-rpg-text opacity-80">{player?.resource?.nameKey ? t(player.resource.nameKey) : 'Resource'}: {player?.resource.current} / {player?.resource.max}</div>
+                            <div className="flex justify-end gap-2 mt-1 text-xs text-rpg-text opacity-70">
+                                <span>⚔️ {player?.stats.atk}</span> <span>🛡️ {player?.stats.def}</span> <span>⚡ {player?.stats.spd}</span> <span>💥 {player?.stats.crit}%</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="mt-2">
+                        <div className="h-2 bg-rpg-bg-darkest rounded overflow-hidden mb-1"><div className="h-2 bg-mana-light" style={{ width: `${xpInfo.percentage}%` }}></div></div>
+                        <div className="text-xs text-right text-mana-light">{t('stats.xpShort')}: {xpInfo.current} / {xpInfo.required}</div>
+                    </div>
+
+                    {/* Active Buffs Display - Compact */}
+                    {GameState.current.battleBuffs && GameState.current.battleBuffs.length > 0 && (
+                        <div className="mt-2 pt-2 border-t border-rpg-secondary">
+                            <div className="flex flex-wrap gap-1">
+                                {GameState.current.battleBuffs.map((buff, index) => (
+                                    <div
+                                        key={index}
+                                        className="bg-legendary bg-opacity-20 border border-legendary rounded px-2 py-0.5 text-xs"
+                                        title={typeof buff.description === 'object' ? buff.description[Localization.getCurrentLanguage()] : buff.description}
+                                    >
+                                        <span className="text-sm mr-0.5">{buff.icon}</span>
+                                        <span className="font-bold text-legendary text-xs">
+                                            {typeof buff.name === 'object' ? buff.name[Localization.getCurrentLanguage()] : buff.name}
+                                        </span>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
                 </div>
 
-                <div className="mt-auto flex-shrink-0 pt-4">
-                    {/* Ultimate Gauge */}
+                <div className="mt-auto flex-shrink-0 pt-2">
+                    {/* Ultimate Gauge - Compact */}
                     {player.ultimate && (
-                        <div className="mb-3 bg-rpg-bg-darker bg-opacity-80 rounded-lg p-3 border border-rpg-primary">
-                            <div className="flex justify-between items-center mb-1">
-                                <span className="text-sm font-bold text-rpg-primary">⚡ ULTIMATE</span>
-                                <span className="text-sm font-bold text-rpg-primary">{player.ultimate.current}/{player.ultimate.max}</span>
+                        <div className="mb-2 bg-rpg-bg-darker bg-opacity-80 rounded-lg p-2 border border-rpg-primary">
+                            <div className="flex justify-between items-center mb-0.5">
+                                <span className="text-xs font-bold text-rpg-primary">⚡ ULT</span>
+                                <span className="text-xs font-bold text-rpg-primary">{player.ultimate.current}/{player.ultimate.max}</span>
                             </div>
-                            <div className="h-3 bg-gray-700 rounded overflow-hidden">
+                            <div className="h-2 bg-gray-700 rounded overflow-hidden">
                                 <div
-                                    className={`h-3 transition-all ${player.ultimate.ready ? 'bg-gradient-to-r from-yellow-400 via-orange-400 to-red-500 animate-pulse' : 'bg-gradient-to-r from-gray-600 to-blue-500'}`}
+                                    className={`h-2 transition-all ${player.ultimate.ready ? 'bg-gradient-to-r from-yellow-400 via-orange-400 to-red-500 animate-pulse' : 'bg-gradient-to-r from-gray-600 to-blue-500'}`}
                                     style={{ width: `${(player.ultimate.current / player.ultimate.max) * 100}%` }}
                                 ></div>
                             </div>
                             {player.ultimate.ready && (
-                                <p className="text-center text-xs text-yellow-400 font-bold mt-1 animate-pulse">💥 READY! 💥</p>
+                                <p className="text-center text-xs text-yellow-400 font-bold animate-pulse">READY!</p>
                             )}
                         </div>
                     )}
                     {/* Main Combat Actions */}
-                    <div className="grid grid-cols-5 gap-1 mb-2">
-                        <button onClick={handleAttack} disabled={!isPlayerTurn || !focusedEnemy?.isAlive} className={`px-2 py-2 text-sm rounded font-bold transition-colors text-rpg-text ${ isPlayerTurn && focusedEnemy?.isAlive ? 'bg-rpg-primary hover:bg-legendary' : 'bg-rpg-secondary bg-opacity-50 opacity-50 cursor-not-allowed'}`}>⚔️ {t('combat.attack')}</button>
+                    <div className="grid grid-cols-5 gap-1 mb-1">
+                        <button onClick={handleAttack} disabled={!isPlayerTurn || !focusedEnemy?.isAlive} className={`px-1 py-1.5 text-xs rounded font-bold transition-colors text-rpg-text ${ isPlayerTurn && focusedEnemy?.isAlive ? 'bg-rpg-primary hover:bg-legendary' : 'bg-rpg-secondary bg-opacity-50 opacity-50 cursor-not-allowed'}`}>⚔️ {t('combat.attack')}</button>
                         {playerSkillData ? (
-                            <button onClick={handleSkill} disabled={!isPlayerTurn || player.resource.current < playerSkillData.cost || !focusedEnemy?.isAlive} className={`px-2 py-2 text-sm rounded font-bold transition-colors text-rpg-text ${ isPlayerTurn && player.resource.current >= playerSkillData.cost && focusedEnemy?.isAlive ? 'bg-epic hover:bg-mythic' : 'bg-rpg-secondary bg-opacity-50 opacity-50 cursor-not-allowed'}`}>
-                                <div className="flex flex-col items-center">
-                                    <span>{playerSkillData.name ? (typeof playerSkillData.name === 'object' ? (playerSkillData.name[currentLanguage] || playerSkillData.name.en) : playerSkillData.name) : t('combat.skill')}</span>
-                                    <span className="text-xs opacity-75">Cost: {playerSkillData.cost}</span>
+                            <button onClick={handleSkill} disabled={!isPlayerTurn || player.resource.current < playerSkillData.cost || !focusedEnemy?.isAlive} className={`px-1 py-1.5 text-xs rounded font-bold transition-colors text-rpg-text ${ isPlayerTurn && player.resource.current >= playerSkillData.cost && focusedEnemy?.isAlive ? 'bg-epic hover:bg-mythic' : 'bg-rpg-secondary bg-opacity-50 opacity-50 cursor-not-allowed'}`}>
+                                <div className="flex flex-col items-center leading-tight">
+                                    <span className="text-xs">{playerSkillData.name ? (typeof playerSkillData.name === 'object' ? (playerSkillData.name[currentLanguage] || playerSkillData.name.en) : playerSkillData.name) : t('combat.skill')}</span>
                                 </div>
                             </button>
                         ) : (
-                            <button disabled className="px-2 py-2 text-sm rounded font-bold bg-rpg-secondary bg-opacity-50 text-rpg-text opacity-50 cursor-not-allowed">🔮 {t('combat.noSkill')}</button>
+                            <button disabled className="px-1 py-1.5 text-xs rounded font-bold bg-rpg-secondary bg-opacity-50 text-rpg-text opacity-50 cursor-not-allowed">🔮 {t('combat.noSkill')}</button>
                         )}
                         <button
                             onClick={() => combatSystem.playerUltimate(focusedTargetId)}
                             disabled={!isPlayerTurn || !player.ultimate?.ready || !focusedEnemy?.isAlive}
-                            className={`px-1 py-2 text-xs rounded font-bold transition-colors ${
+                            className={`px-1 py-1.5 text-xs rounded font-bold transition-colors ${
                                 isPlayerTurn && player.ultimate?.ready && focusedEnemy?.isAlive
                                     ? 'bg-gradient-to-r from-yellow-400 to-red-500 text-black hover:from-yellow-300 hover:to-red-400 animate-pulse'
                                     : 'bg-rpg-secondary bg-opacity-50 opacity-50 cursor-not-allowed text-rpg-text'
@@ -409,43 +406,43 @@ export default function BattleScreen({ player, enemies: initialEnemies, combatSy
                         >
                             💥 ULT
                         </button>
-                        <button onClick={() => combatSystem.playerDefend()} disabled={!isPlayerTurn} className={`px-2 py-2 text-sm rounded font-bold transition-colors text-rpg-text ${ isPlayerTurn ? 'bg-rpg-secondary hover:bg-rpg-primary' : 'bg-rpg-secondary bg-opacity-50 cursor-not-allowed'}`}>🛡️ {t('combat.defend')}</button>
-                        <button onClick={() => combatSystem.playerFlee()} disabled={!isPlayerTurn} className={`px-2 py-2 text-sm rounded font-bold transition-colors text-rpg-text ${ isPlayerTurn ? 'bg-health-full hover:bg-health-mid' : 'bg-rpg-secondary bg-opacity-50 cursor-not-allowed'}`}>🏃 {t('combat.flee')}</button>
+                        <button onClick={() => combatSystem.playerDefend()} disabled={!isPlayerTurn} className={`px-1 py-1.5 text-xs rounded font-bold transition-colors text-rpg-text ${ isPlayerTurn ? 'bg-rpg-secondary hover:bg-rpg-primary' : 'bg-rpg-secondary bg-opacity-50 cursor-not-allowed'}`}>🛡️ {t('combat.defend')}</button>
+                        <button onClick={() => combatSystem.playerFlee()} disabled={!isPlayerTurn} className={`px-1 py-1.5 text-xs rounded font-bold transition-colors text-rpg-text ${ isPlayerTurn ? 'bg-health-full hover:bg-health-mid' : 'bg-rpg-secondary bg-opacity-50 cursor-not-allowed'}`}>🏃 {t('combat.flee')}</button>
                     </div>
-                    
-                    {/* Potions Row */}
-                    <div className="grid grid-cols-4 gap-1 mb-4">
+
+                    {/* Potions Row - Compact */}
+                    <div className="grid grid-cols-4 gap-1 mb-2">
                         <button
                             onClick={() => handleUsePotion('hp_potion')}
                             disabled={!isPlayerTurn || !GameState.current.potions?.hp_potion || GameState.current.potions.hp_potion <= 0}
-                            className={`px-2 py-2 text-sm rounded font-bold transition-colors text-rpg-text ${
+                            className={`px-1 py-1.5 text-xs rounded font-bold transition-colors text-rpg-text ${
                                 isPlayerTurn && GameState.current.potions?.hp_potion > 0 ? 'bg-health-full hover:bg-health-mid' : 'bg-rpg-secondary bg-opacity-50 opacity-50 cursor-not-allowed'
                             }`}>
-                            ❤️‍🩹 HP ({GameState.current.potions?.hp_potion || 0})
+                            ❤️‍🩹 ({GameState.current.potions?.hp_potion || 0})
                         </button>
                         <button
                             onClick={() => handleUsePotion('resource_potion')}
                             disabled={!isPlayerTurn || !GameState.current.potions?.resource_potion || GameState.current.potions.resource_potion <= 0}
-                            className={`px-2 py-2 text-sm rounded font-bold transition-colors text-rpg-text ${
+                            className={`px-1 py-1.5 text-xs rounded font-bold transition-colors text-rpg-text ${
                                 isPlayerTurn && GameState.current.potions?.resource_potion > 0 ? 'bg-mana-full hover:bg-mana-light' : 'bg-rpg-secondary bg-opacity-50 opacity-50 cursor-not-allowed'
                             }`}>
-                            🧪 MP ({GameState.current.potions?.resource_potion || 0})
+                            🧪 ({GameState.current.potions?.resource_potion || 0})
                         </button>
                         <button
                             onClick={() => handleUsePotion('greater_hp_potion')}
                             disabled={!isPlayerTurn || !GameState.current.potions?.greater_hp_potion || GameState.current.potions.greater_hp_potion <= 0}
-                            className={`px-2 py-2 text-sm rounded font-bold transition-colors text-rpg-text ${
+                            className={`px-1 py-1.5 text-xs rounded font-bold transition-colors text-rpg-text ${
                                 isPlayerTurn && GameState.current.potions?.greater_hp_potion > 0 ? 'bg-legendary hover:bg-mythic' : 'bg-rpg-secondary bg-opacity-50 opacity-50 cursor-not-allowed'
                             }`}>
-                            💖 G.HP ({GameState.current.potions?.greater_hp_potion || 0})
+                            💖 ({GameState.current.potions?.greater_hp_potion || 0})
                         </button>
                         <button
                             onClick={() => handleUsePotion('elixir_of_vitality')}
                             disabled={!isPlayerTurn || !GameState.current.potions?.elixir_of_vitality || GameState.current.potions.elixir_of_vitality <= 0}
-                            className={`px-2 py-2 text-sm rounded font-bold transition-colors text-rpg-text ${
+                            className={`px-1 py-1.5 text-xs rounded font-bold transition-colors text-rpg-text ${
                                 isPlayerTurn && GameState.current.potions?.elixir_of_vitality > 0 ? 'bg-epic hover:bg-legendary' : 'bg-rpg-secondary bg-opacity-50 opacity-50 cursor-not-allowed'
                             }`}>
-                            🌟 Elixir ({GameState.current.potions?.elixir_of_vitality || 0})
+                            🌟 ({GameState.current.potions?.elixir_of_vitality || 0})
                         </button>
                     </div>
 
