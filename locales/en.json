@@ -28,10 +28,10 @@
   },
   "characters": {
     "warrior": {
-      "name": "Taha",
-      "nameArabic": "طه",
+      "name": "Omar",
+      "nameArabic": "عمر",
       "role": "Tank/Warrior",
-      "description": "A formidable warrior, Taha leads with unyielding defense and immense vitality. He excels in direct combat, soaking up damage while delivering powerful strikes.",
+      "description": "A formidable warrior, Omar leads with unyielding defense and immense vitality. He excels in direct combat, soaking up damage while delivering powerful strikes.",
       "traits": {
         "highDefense": "High Defense",
         "areaStrikes": "Area Strikes", 
@@ -39,10 +39,10 @@
       }
     },
     "sorceress": {
-      "name": "Mais",
-      "nameArabic": "ميس",
+      "name": "Salma",
+      "nameArabic": "سلمى",
       "role": "Ranged Mage",
-      "description": "Mais commands elemental forces, unleashing devastating area-of-effect spells and freezing foes in their tracks. Though fragile, her magic can turn the tide of any battle.",
+      "description": "Salma commands elemental forces, unleashing devastating area-of-effect spells and freezing foes in their tracks. Though fragile, her magic can turn the tide of any battle.",
       "traits": {
         "elementalMagic": "Elemental Magic",
         "ancientKnowledge": "Ancient Knowledge",
@@ -50,10 +50,10 @@
       }
     },
     "rogue": {
-      "name": "Ibrahim", 
-      "nameArabic": "إبراهيم",
+      "name": "Shadi", 
+      "nameArabic": "شادي",
       "role": "Assassin/DoT Specialist",
-      "description": "Swift and deadly, Ibrahim strikes from the shadows with unparalleled speed and precision. His critical hits can dispatch even the toughest enemies before they know what hit them.",
+      "description": "Swift and deadly, Shadi strikes from the shadows with unparalleled speed and precision. His critical hits can dispatch even the toughest enemies before they know what hit them.",
       "traits": {
         "berserkerRage": "Berserker Rage",
         "rawStrength": "Raw Strength",
