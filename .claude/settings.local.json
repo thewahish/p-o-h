@@ -15,7 +15,9 @@
       "Bash(git log:*)",
       "Bash(git tag:*)",
       "Bash(git fetch:*)",
-      "Bash(git pull:*)"
+      "Bash(git pull:*)",
+      "Bash(rm:*)",
+      "Bash(curl:*)"
     ],
     "deny": []
   }

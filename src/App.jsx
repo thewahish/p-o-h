@@ -735,7 +735,6 @@ function MainMenu({ onCharacterSelect, currentLanguage }) {
                 </button>
             </div>
             
-            
             <div className="flex flex-wrap justify-center gap-4 max-w-lg">
                 {Object.values(Characters).map((char) => (
                     <button key={char.id} onClick={() => onCharacterSelect(char.id)} className="px-6 py-4 bg-rpg-bg-darker bg-opacity-80 hover:bg-rpg-secondary text-lg rounded-lg border border-rpg-primary shadow-md transition-all duration-200 backdrop-blur-sm">

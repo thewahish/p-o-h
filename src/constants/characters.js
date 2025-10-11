@@ -13,12 +13,12 @@ export const Characters = {
         descriptionKey: 'characters.warrior.description',
         traits: ['characters.warrior.traits.highDefense', 'characters.warrior.traits.resolute', 'characters.warrior.traits.areaStrikes'],
         baseStats: {
-            hp: 115, // Increased from 100 for better survivability
-            resource: 55, // Increased from 50 for more ability usage
-            atk: 13, // Increased from 12 for better damage
-            def: 11, // Increased from 10 for better defense
+            hp: 100, // Balanced survivability 
+            resource: 50, // Vigor for Shield Bash usage
+            atk: 12, // Solid damage
+            def: 10, // Strong defense
             spd: 6,
-            crit: 12 // Increased from 10 for better burst
+            crit: 10 // Moderate burst
         },
         growthRates: { 
             hp: 6, // Higher HP growth
@@ -52,12 +52,12 @@ export const Characters = {
         descriptionKey: 'characters.sorceress.description',
         traits: ['characters.sorceress.traits.elementalMagic', 'characters.sorceress.traits.spellMastery', 'characters.sorceress.traits.ancientKnowledge'],
         baseStats: {
-            hp: 95, // Increased from 80 for better survivability
-            resource: 80, // Increased from 70 for more spell casts
-            atk: 15, // Increased from 14 for better damage
-            def: 7, // Increased from 6 for better defense
+            hp: 80, // Balanced survivability
+            resource: 70, // Mana for multiple Fireball casts
+            atk: 14, // Strong magical damage
+            def: 6, // Light defense
             spd: 7,
-            crit: 14 // Increased from 12 for better burst
+            crit: 12 // Good burst potential
         },
         growthRates: { 
             hp: 4, // Better HP growth
@@ -93,10 +93,10 @@ export const Characters = {
         baseStats: {
             hp: 90,
             resource: 60,
-            atk: 13, // Reduced from 15 for balance
+            atk: 15, // High damage potential
             def: 7,
-            spd: 9, // Reduced from 10 for balance
-            crit: 14 // Reduced from 18 for balance
+            spd: 10, // Fastest character
+            crit: 18 // Excellent critical hit chance
         },
         growthRates: { 
             hp: 5, // Good HP growth

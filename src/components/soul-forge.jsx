@@ -48,12 +48,12 @@ export default function SoulForge({ characterId, slotNumber, onClose }) {
 
     return (
         <div className="fixed inset-0 bg-rpg-bg-darkest/90 flex items-center justify-center z-[100] p-4">
-            <div className="bg-rpg-bg-darker border-2 border-epic rounded-lg p-6 max-w-lg w-full shadow-2xl backdrop-blur-sm">
-                <div className="flex justify-between items-start mb-6">
-                    <h1 className="text-3xl font-bold text-epic">⚡ {t('souls.forge')}</h1>
+            <div className="bg-rpg-bg-darker border-2 border-epic rounded-lg p-4 max-w-md w-full max-h-[80vh] overflow-y-auto shadow-2xl backdrop-blur-sm">
+                <div className="flex justify-between items-start mb-4">
+                    <h1 className="text-2xl font-bold text-epic">⚡ {t('souls.forge')}</h1>
                     <div className="text-center">
-                        <p className="text-lg text-epic">{t(`characters.${characterId}.name`)}</p>
-                        <p className="text-sm text-epic opacity-80">{t('saveSlots.slot')} {slotNumber}</p>
+                        <p className="text-sm text-epic">{t(`characters.${characterId}.name`)}</p>
+                        <p className="text-xs text-epic opacity-80">{t('saveSlots.slot')} {slotNumber}</p>
                     </div>
                     <button 
                         onClick={onClose}
@@ -63,52 +63,52 @@ export default function SoulForge({ characterId, slotNumber, onClose }) {
                     </button>
                 </div>
 
-                <div className="mb-6 text-center">
-                    <div className="text-2xl font-bold text-epic">
+                <div className="mb-4 text-center">
+                    <div className="text-xl font-bold text-epic">
                         👻 {totalSouls} {t('souls.heroSouls')}
                     </div>
-                    <div className="text-sm text-rpg-text opacity-70 mt-1">
+                    <div className="text-xs text-rpg-text opacity-70 mt-1">
                         {t('souls.permanentUpgrades')}
                     </div>
                 </div>
 
-                <div className="space-y-4">
+                <div className="space-y-3">
                     {Object.entries(upgrades).map(([upgradeId, upgrade]) => {
                         const status = getUpgradeStatus(upgradeId);
                         const isOwned = status === 'owned';
                         const canAfford = status === 'available';
                         
                         return (
-                            <div key={upgradeId} className="bg-rpg-bg-darker bg-opacity-60 rounded-lg p-4 border border-rpg-secondary backdrop-blur-sm">
-                                <div className="flex justify-between items-start mb-2">
-                                    <h3 className="text-lg font-bold text-rpg-text">{t(`upgrades.${upgradeId}.name`)}</h3>
-                                    <div className="text-epic font-bold">
-                                        {isOwned ? `✓ ${t('souls.owned')}` : `${upgrade.cost} 👻`}
+                            <div key={upgradeId} className="bg-rpg-bg-darker bg-opacity-60 rounded-lg p-3 border border-rpg-secondary backdrop-blur-sm">
+                                <div className="flex justify-between items-start mb-1">
+                                    <h3 className="text-sm font-bold text-rpg-text">{t(`upgrades.${upgradeId}.name`)}</h3>
+                                    <div className="text-epic font-bold text-sm">
+                                        {isOwned ? `✓` : `${upgrade.cost} 👻`}
                                     </div>
                                 </div>
-                                <p className="text-rpg-text opacity-80 text-sm mb-3">{t(`upgrades.${upgradeId}.description`)}</p>
+                                <p className="text-rpg-text opacity-80 text-xs mb-2">{t(`upgrades.${upgradeId}.description`)}</p>
                                 <button
                                     onClick={() => canAfford && handlePurchase(upgradeId)}
                                     disabled={!canAfford}
-                                    className={`w-full py-2 px-4 rounded font-bold transition-colors ${getUpgradeButtonClass(status)}`}
+                                    className={`w-full py-1 px-3 rounded font-bold text-sm transition-colors ${getUpgradeButtonClass(status)}`}
                                 >
-                                    {isOwned ? t('souls.purchased') : canAfford ? t('souls.purchaseCost', {cost: upgrade.cost}) : t('souls.needSouls', {cost: upgrade.cost})}
+                                    {isOwned ? t('souls.owned') : canAfford ? t('souls.purchase') : t('souls.needSouls', {cost: upgrade.cost})}
                                 </button>
                             </div>
                         );
                     })}
                 </div>
 
-                <div className="mt-6 text-center">
+                <div className="mt-4 text-center">
                     <button
                         onClick={onClose}
-                        className="bg-gray-600 hover:bg-gray-500 text-white font-bold py-2 px-6 rounded-lg transition-colors"
+                        className="bg-gray-600 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-lg transition-colors text-sm"
                     >
-                        {t('souls.closeForge')}
+                        {t('saveSlots.back')}
                     </button>
                 </div>
 
-                <div className="mt-4 text-xs text-gray-500 text-center">
+                <div className="mt-3 text-xs text-gray-500 text-center">
                     {t('souls.earnDescription')}
                 </div>
             </div>

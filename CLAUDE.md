@@ -163,20 +163,20 @@ Characters now regenerate resources each turn for sustainable combat:
 ### Balanced Character Stats
 Enhanced starting stats for better survivability and gameplay:
 
-#### Warrior (Taha)
-- **HP**: 70 → 100 (+30 survivability)
-- **Vigor**: 35 → 50 (+15 for more Shield Bash usage)
-- **Shield Bash Cost**: 15 → 12 (-20% cost reduction)
+#### Warrior (Omar)
+- **HP**: 100 (balanced survivability)
+- **Vigor**: 50 (for Shield Bash usage)
+- **Shield Bash Cost**: 12 (reduced cost)
 
-#### Sorceress (Mais) 
-- **HP**: 50 → 80 (+30 survivability) 
-- **Mana**: 50 → 70 (+20 for multiple Fireball casts)
-- **Fireball Cost**: 30 → 20 (-33% cost reduction)
+#### Sorceress (Salma) 
+- **HP**: 80 (balanced survivability) 
+- **Mana**: 70 (for multiple Fireball casts)
+- **Fireball Cost**: 20 (reduced cost)
 
-#### Rogue (Ibrahim)
-- **HP**: 60 → 90 (+30 survivability)
-- **Energy**: 40 → 60 (+20 for more Venom Strike usage) 
-- **Venom Strike Cost**: 20 → 15 (-25% cost reduction)
+#### Rogue (Shadi)
+- **HP**: 90 (balanced survivability)
+- **Energy**: 60 (for Venom Strike usage) 
+- **Venom Strike Cost**: 15 (reduced cost)
 
 ### Battle UI Enhancements
 Redesigned battle interface for new systems:
@@ -212,19 +212,19 @@ Redesigned battle interface for new systems:
 ### Character Progression Paths
 Each character has unique progression characteristics defined in `src/constants/characters.js`:
 
-#### Taha (Warrior)
+#### Omar (Warrior)
 - **Progression Path**: `defensive_tank`
 - **Boss Scaling**: 1.0x (same difficulty as all characters)
 - **Preferred Enemy Types**: `brute`, `physical`
 - **Unique Rewards**: `heavy_armor`, `shields`
 
-#### Mais (Sorceress)  
+#### Salma (Sorceress)  
 - **Progression Path**: `elemental_mage`
 - **Boss Scaling**: 1.0x (same difficulty as all characters)
 - **Preferred Enemy Types**: `magical`, `undead`
 - **Unique Rewards**: `staves`, `mana_crystals`
 
-#### Ibrahim (Rogue)
+#### Shadi (Rogue)
 - **Progression Path**: `assassin_berserker`
 - **Boss Scaling**: 1.0x (same difficulty as all characters)
 - **Preferred Enemy Types**: `fast`, `elite`

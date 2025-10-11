@@ -433,7 +433,11 @@ export const GameState = {
         Object.keys(availableUpgrades).forEach(key => {
             const upgrade = availableUpgrades[key];
             if (upgrade.tier <= maxTier) {
-                filteredUpgrades[key] = upgrade;
+                // Convert baseCost to cost if it exists
+                filteredUpgrades[key] = {
+                    ...upgrade,
+                    cost: upgrade.cost || upgrade.baseCost || 10
+                };
             }
         });
         

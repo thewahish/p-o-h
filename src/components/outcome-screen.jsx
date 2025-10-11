@@ -6,7 +6,10 @@ import Logger from '../core/logger';
 import { t } from '../core/localization.js';
 
 export default function OutcomeScreen({ victory, results, onContinue }) {
-    Logger.log(`Rendering OutcomeScreen. Victory: ${victory}`, 'UI');
+    // Move logging to useEffect to avoid setState during render
+    React.useEffect(() => {
+        Logger.log(`Rendering OutcomeScreen. Victory: ${victory}`, 'UI');
+    }, [victory]);
     
     // Using global localization system
     const soulsEarned = GameState.current.currentRunSouls;

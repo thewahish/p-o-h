@@ -16,7 +16,8 @@ export default function PersistentDebugger() {
 
     useEffect(() => {
         const unsubscribe = Logger.subscribe(newLogs => {
-            setLogs(newLogs);
+            // Use setTimeout to avoid setState during render warning
+            setTimeout(() => setLogs(newLogs), 0);
         });
         return unsubscribe;
     }, []);
