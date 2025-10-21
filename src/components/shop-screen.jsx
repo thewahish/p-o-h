@@ -5,6 +5,17 @@ import { GameState } from '../core/state';
 import Logger from '../core/logger';
 import { t } from '../core/localization';
 import rewardService from '../services/reward-service.js';
+import {
+    Modal,
+    ModalContent,
+    ScreenTitle,
+    BodyText,
+    SmallText,
+    PrimaryButton,
+    SecondaryButton,
+    Card,
+    CardTitle
+} from '../design-system/components';
 
 const rarityColors = {
     common: 'text-common',
@@ -58,23 +69,25 @@ export default function ShopScreen({ inventorySystem, onLeave }) {
     };
 
     return (
-        <div className="fixed inset-0 bg-rpg-bg-darkest/90 flex items-center justify-center z-[100] p-2">
-            <div className="bg-rpg-bg-darker border-2 border-rpg-primary rounded-lg p-3 max-w-md w-full max-h-[95vh] flex flex-col justify-between text-center shadow-2xl backdrop-blur-sm overflow-y-auto">
-                <h1 className="text-xl font-bold mb-2 text-rpg-primary flex-shrink-0">🏪 {t('shop.title')}</h1>
-                <div className="mb-2 bg-rpg-secondary rounded-lg p-2 border border-rpg-primary flex-shrink-0">
-                    <div className="text-base font-bold text-legendary">💰 {GameState.current.gold} {t('stats.gold')}</div>
-                </div>
-                <p className="text-rpg-text opacity-70 mb-2 text-xs flex-shrink-0">{t('shop.onePurchaseOnly')}</p>
+        <Modal>
+            <ModalContent className="flex flex-col justify-between text-center space-y-3">
+                <ScreenTitle>🏪 {t('shop.title')}</ScreenTitle>
 
-                <div className="space-y-2 mb-3 flex-shrink-0">
+                <div className="bg-rpg-secondary rounded-lg p-2 border border-rpg-primary">
+                    <BodyText large className="text-legendary">💰 {GameState.current.gold} {t('stats.gold')}</BodyText>
+                </div>
+
+                <SmallText>{t('shop.onePurchaseOnly')}</SmallText>
+
+                <div className="space-y-2 flex-shrink-0">
                     {items.map(item => (
-                        <div key={item.id} className="bg-rpg-bg-darkest bg-opacity-80 p-2 rounded-lg text-left backdrop-blur-sm">
-                            <h2 className={`font-bold text-sm ${rarityColors[item.rarity]}`}>
+                        <Card key={item.id} className="text-left">
+                            <CardTitle className={rarityColors[item.rarity]}>
                                 {item.prefixKey ? `${t(item.prefixKey)} ` : ''}{t(item.nameKey || 'items.sword')}
-                            </h2>
-                            <p className="text-[10px] text-rpg-text opacity-60 capitalize">{t(`rarities.${item.rarity}`)} {item.slot}</p>
-                            <div className="flex justify-between items-center mt-1">
-                                <div className="text-rpg-text opacity-80 text-[10px]">
+                            </CardTitle>
+                            <SmallText className="capitalize">{t(`rarities.${item.rarity}`)} {item.slot}</SmallText>
+                            <div className="flex justify-between items-center mt-2">
+                                <div className="text-rpg-text opacity-80 text-xs">
                                     {Object.entries(item.stats).map(([stat, value]) => (
                                         <span key={stat} className="mr-2">{stat.toUpperCase()}: +{value}</span>
                                     ))}
@@ -92,21 +105,18 @@ export default function ShopScreen({ inventorySystem, onLeave }) {
                                     {errorMessages[item.id] || `${item.price} G`}
                                 </button>
                             </div>
-                        </div>
+                        </Card>
                     ))}
                 </div>
 
                 {purchased ? (
-                     <p className="text-uncommon text-sm flex-shrink-0">{t('shop.thankYou')}</p>
+                     <BodyText className="text-uncommon">{t('shop.thankYou')}</BodyText>
                 ) : (
-                    <button
-                        onClick={onLeave}
-                        className="w-full bg-health-full hover:bg-health-mid text-rpg-text font-bold py-2 px-4 rounded-lg flex-shrink-0"
-                    >
+                    <PrimaryButton onClick={onLeave} className="w-full bg-health-full hover:bg-health-mid">
                         {t('shop.leave')}
-                    </button>
+                    </PrimaryButton>
                 )}
-            </div>
-        </div>
+            </ModalContent>
+        </Modal>
     );
 }

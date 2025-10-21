@@ -2,6 +2,14 @@
 
 import React, { useEffect } from 'react';
 import { t } from '../core/localization.js';
+import {
+    ScreenContainer,
+    ScreenTitle,
+    BodyText,
+    SmallText,
+    PrimaryButton,
+    LargeIcon
+} from '../design-system/components';
 
 export default function EventInterimScreen({ 
     type, // 'intro' or 'outro'
@@ -93,48 +101,37 @@ export default function EventInterimScreen({
     };
 
     return (
-        <div className={`min-h-screen max-h-screen text-white flex items-center justify-center p-4 overflow-hidden ${getBackgroundClass()}`}>
-            <div className="text-center max-w-md mx-auto">
+        <ScreenContainer className={`${getBackgroundClass()} justify-center items-center`}>
+            <div className="text-center max-w-md mx-auto space-y-4">
                 {/* Event Icon */}
-                <div className="text-6xl mb-4 animate-pulse">
+                <LargeIcon className="animate-pulse">
                     {getEventIcon()}
-                </div>
+                </LargeIcon>
 
                 {/* Event Message */}
-                <h1 className="text-2xl font-bold text-white mb-4">
+                <ScreenTitle className="text-white">
                     {getEventMessage()}
-                </h1>
+                </ScreenTitle>
 
                 {/* Visual Indicator */}
-                <div className="mb-4">
-                    {type === 'intro' ? (
-                        <div className="text-base text-gray-300">
-                            {t('events.preparing')}
-                        </div>
-                    ) : (
-                        <div className="text-base text-gray-300">
-                            {t('events.returning')}
-                        </div>
-                    )}
-                </div>
+                <BodyText className="text-gray-300">
+                    {type === 'intro' ? t('events.preparing') : t('events.returning')}
+                </BodyText>
 
                 {/* Manual Continue Button (optional) */}
                 {!autoAdvance && onContinue && (
-                    <button
-                        onClick={onContinue}
-                        className="bg-amber-600 hover:bg-amber-500 text-white font-bold py-2 px-4 rounded-lg transition-colors"
-                    >
+                    <PrimaryButton onClick={onContinue} className="bg-amber-600 hover:bg-amber-500">
                         {t('events.continue')}
-                    </button>
+                    </PrimaryButton>
                 )}
 
                 {/* Auto-advance indicator */}
                 {autoAdvance && (
-                    <div className="text-sm text-gray-400 mt-3">
+                    <SmallText className="text-gray-400">
                         {t('events.autoAdvancing')}...
-                    </div>
+                    </SmallText>
                 )}
             </div>
-        </div>
+        </ScreenContainer>
     );
 }
