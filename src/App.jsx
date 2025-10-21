@@ -15,6 +15,7 @@ import LanguageSelection from "./components/language-selection.jsx";
 import { GameConfig } from "./constants/config.js";
 import autoSaveService, { SaveTriggers } from "./services/autosave.js";
 import { AnalyticsSystem } from "./systems/analytics.js";
+import { PerformanceMonitor } from "./utils/performance-monitor.js";
 
 // === Import UI screens ===
 import BattleScreen from "./components/battle-screen.jsx";
@@ -27,6 +28,7 @@ import EventInterimScreen from "./components/event-interim-screen.jsx";
 import BuffSelectionScreen from "./components/buff-selection-screen.jsx";
 import { InventoryScreen } from "./components/inventory-screen.jsx";
 import AnalyticsDashboard from "./components/analytics-dashboard.jsx";
+import PerformanceHUD from "./components/performance-hud.jsx";
 
 Logger.log('App.jsx: Module loaded.', 'SYSTEM');
 
@@ -424,6 +426,7 @@ export default function App() {
             setCombatLog([]);
             GameState.current.onBattleEnd = endBattle;
             GameState.update('currentScreen', 'battle');
+            PerformanceMonitor.startBattleTimer(); // Start tracking battle duration
             combatSystem.startBattle(liveEnemies, { onLog: (msg) => setCombatLog((prev) => [...prev, msg]) });
         }
     };
@@ -436,6 +439,7 @@ export default function App() {
             setCombatLog([]);
             GameState.current.onBattleEnd = endBattle;
             GameState.update('currentScreen', 'battle');
+            PerformanceMonitor.startBattleTimer(); // Start tracking battle duration
             combatSystem.startBattle(liveEnemies, { onLog: (msg) => setCombatLog((prev) => [...prev, msg]) });
             setPendingBattle(null);
         }
@@ -444,11 +448,14 @@ export default function App() {
     const endBattle = (victory, rewards) => {
         Logger.log(`Battle ended. Victory: ${victory}`, 'SYSTEM');
 
+        // End performance tracking
+        const battleDuration = PerformanceMonitor.endBattleTimer();
+
         // Track battle analytics
         const totalGold = victory ? rewards.reduce((sum, r) => sum + (r.gold || 0), 0) : 0;
         const goldLost = victory ? 0 : (GameState.current.gold * 0.1); // 10% penalty on defeat
 
-        // Track the battle (damage tracking can be enhanced later)
+        // Track the battle with actual duration
         AnalyticsSystem.trackBattle({
             victory,
             characterId: GameState.current.selectedCharacter,
@@ -457,7 +464,7 @@ export default function App() {
             goldLost: goldLost,
             damageDealt: 0, // TODO: Track from combat log
             damageTaken: 0, // TODO: Track from combat log
-            duration: 0 // TODO: Track battle duration
+            duration: battleDuration || 0
         });
 
         if (victory) {
@@ -547,13 +554,13 @@ export default function App() {
         return <><OutcomeScreen victory={gameState.player && gameState.player.stats && gameState.player.stats.hp > 0} results={battleResults} onContinue={handleOutcomeContinue} /><PersistentDebugger /></>;
     }
     if (gameState.currentScreen === "battle") {
-        return <><BattleScreen player={gameState.player} enemies={gameState.enemies} combatSystem={combatSystem} combatLog={combatLog} /><PersistentDebugger /></>;
+        return <><BattleScreen player={gameState.player} enemies={gameState.enemies} combatSystem={combatSystem} combatLog={combatLog} /><PersistentDebugger /><PerformanceHUD /></>;
     }
     if (gameState.currentScreen === "shop") {
-        return <><ShopScreen inventorySystem={inventorySystem} onLeave={() => showEventOutro('shop')} /><PersistentDebugger /></>;
+        return <><ShopScreen inventorySystem={inventorySystem} onLeave={() => showEventOutro('shop')} /><PersistentDebugger /><PerformanceHUD /></>;
     }
     if (gameState.currentScreen === "analytics") {
-        return <><AnalyticsDashboard /><PersistentDebugger /></>;
+        return <><AnalyticsDashboard /><PersistentDebugger /><PerformanceHUD /></>;
     }
     // Handle save-slots screen state (when returning from death)
     if (gameState.currentScreen === 'save-slots') {
