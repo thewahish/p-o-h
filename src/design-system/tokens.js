@@ -86,10 +86,23 @@ export const DesignTokens = {
         modal: 'fixed inset-0 flex items-center justify-center z-[100] p-3',
         modalContent: 'bg-rpg-bg-darker border-2 border-rpg-primary rounded-lg shadow-2xl backdrop-blur-sm max-w-md w-full max-h-[95vh] overflow-y-auto',
 
-        // Grid layouts
+        // LANDSCAPE: Split layouts
+        landscapeSplit: 'flex flex-row h-screen overflow-hidden',
+        landscapeHalf: 'w-1/2 flex flex-col overflow-y-auto',
+        landscapeTwoThirds: 'w-2/3 flex flex-col overflow-y-auto',
+        landscapeOneThird: 'w-1/3 flex flex-col overflow-y-auto',
+
+        // LANDSCAPE: Sidebar layouts
+        landscapeSidebar: 'w-1/4 flex flex-col overflow-y-auto bg-rpg-bg-darker border-r-2 border-rpg-secondary',
+        landscapeMain: 'w-3/4 flex flex-col overflow-y-auto',
+
+        // Grid layouts (extended for landscape)
         grid: {
             cols2: 'grid grid-cols-2 gap-3',
             cols3: 'grid grid-cols-3 gap-3',
+            cols4: 'grid grid-cols-4 gap-3',  // Landscape: Shop items
+            cols5: 'grid grid-cols-5 gap-3',  // Landscape: Inventory grid
+            cols6: 'grid grid-cols-6 gap-3',  // Landscape: Dense grids
         },
     },
 

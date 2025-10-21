@@ -188,3 +188,41 @@ export function TwoColumnGrid({ children, className = '' }) {
 export function ThreeColumnGrid({ children, className = '' }) {
     return <div className={`${DT.layout.grid.cols3} ${className}`}>{children}</div>;
 }
+
+export function FourColumnGrid({ children, className = '' }) {
+    return <div className={`${DT.layout.grid.cols4} ${className}`}>{children}</div>;
+}
+
+export function FiveColumnGrid({ children, className = '' }) {
+    return <div className={`${DT.layout.grid.cols5} ${className}`}>{children}</div>;
+}
+
+export function SixColumnGrid({ children, className = '' }) {
+    return <div className={`${DT.layout.grid.cols6} ${className}`}>{children}</div>;
+}
+
+// === LANDSCAPE LAYOUT COMPONENTS ===
+
+export function LandscapeSplit({ children, className = '' }) {
+    return <div className={`${DT.layout.landscapeSplit} ${className}`}>{children}</div>;
+}
+
+export function LandscapeHalf({ children, className = '' }) {
+    return <div className={`${DT.layout.landscapeHalf} ${className}`}>{children}</div>;
+}
+
+export function LandscapeTwoThirds({ children, className = '' }) {
+    return <div className={`${DT.layout.landscapeTwoThirds} ${className}`}>{children}</div>;
+}
+
+export function LandscapeOneThird({ children, className = '' }) {
+    return <div className={`${DT.layout.landscapeOneThird} ${className}`}>{children}</div>;
+}
+
+export function LandscapeSidebar({ children, className = '' }) {
+    return <div className={`${DT.layout.landscapeSidebar} ${className}`}>{children}</div>;
+}
+
+export function LandscapeMain({ children, className = '' }) {
+    return <div className={`${DT.layout.landscapeMain} ${className}`}>{children}</div>;
+}
