@@ -666,7 +666,7 @@ export default function App() {
     }
 
     return (
-        <div className="w-full max-w-2xl h-full bg-rpg-radial text-rpg-text p-1 flex flex-col overflow-hidden">
+        <div className="w-full max-w-2xl h-[90vh] bg-rpg-radial text-rpg-text p-1 flex flex-col overflow-hidden mx-auto">
             {/* Auto-save indicator */}
             {showSaveIndicator && (
                 <div className="fixed top-4 right-4 z-50 bg-uncommon text-white px-4 py-2 rounded-lg shadow-lg flex items-center gap-2 animate-fade-in">
@@ -676,9 +676,9 @@ export default function App() {
             )}
 
             {/* Compact Top Stats Panel */}
-            <div className="bg-rpg-bg-darker bg-opacity-80 rounded-lg px-2 py-1.5 mb-1 border border-rpg-primary shrink-0 backdrop-blur-sm">
+            <div className="bg-rpg-bg-darker bg-opacity-80 rounded-lg px-2 py-1 mb-0.5 border border-rpg-primary shrink-0 backdrop-blur-sm">
                 {/* First Row - Core Stats */}
-                <div className="grid grid-cols-4 gap-2 text-center text-xs mb-1.5">
+                <div className="grid grid-cols-4 gap-1.5 text-center text-xs mb-1">
                     <div>
                         <div className="text-rpg-text opacity-70 text-xs leading-none">{t('stats.floor')}</div>
                         <div className="text-rpg-primary font-bold text-sm leading-none">{gameState.currentFloor}</div>
@@ -698,23 +698,23 @@ export default function App() {
                 </div>
                 
                 {/* Second Row - XP Progress and Player Stats */}
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1.5">
                     {/* XP Bar */}
                     <div className="flex-1">
-                        <div className="flex justify-between text-xs text-rpg-text opacity-70 leading-none mb-0.5">
+                        <div className="flex justify-between text-[10px] text-rpg-text opacity-70 leading-none mb-0.5">
                             <span>XP: {gameState.experience}/{nextLevelXP}</span>
                             <span>{Math.floor(xpPercent)}%</span>
                         </div>
-                        <div className="h-1.5 bg-rpg-bg-darkest bg-opacity-80 rounded-full overflow-hidden">
-                            <div className="h-1.5 bg-mana-light transition-all duration-300" style={{width: `${Math.min(100, Math.max(0, xpPercent))}%`}}></div>
+                        <div className="h-1 bg-rpg-bg-darkest bg-opacity-80 rounded-full overflow-hidden">
+                            <div className="h-1 bg-mana-light transition-all duration-300" style={{width: `${Math.min(100, Math.max(0, xpPercent))}%`}}></div>
                         </div>
                     </div>
-                    
+
                     {/* Player HP */}
                     {player && (
                         <div className="text-xs text-center">
-                            <div className="text-rpg-text opacity-70 text-xs leading-none">HP</div>
-                            <div className="text-health-mid font-bold text-sm leading-none">
+                            <div className="text-rpg-text opacity-70 text-[10px] leading-none">HP</div>
+                            <div className="text-health-mid font-bold text-xs leading-none">
                                 {player.stats.hp}/{player.maxStats.hp}
                             </div>
                         </div>
@@ -723,26 +723,26 @@ export default function App() {
             </div>
 
             {/* Inventory Button */}
-            <div className="shrink-0 mb-1">
+            <div className="shrink-0 mb-0.5">
                 <button
                     onClick={() => setShowInventory(true)}
-                    className="w-full px-4 py-2 bg-gradient-to-r from-rpg-secondary to-rpg-primary text-black font-bold rounded-lg hover:from-rpg-primary hover:to-rpg-secondary transition-all flex items-center justify-center gap-2 border border-rpg-primary"
+                    className="w-full px-3 py-1 bg-gradient-to-r from-rpg-secondary to-rpg-primary text-black font-bold text-sm rounded-lg hover:from-rpg-primary hover:to-rpg-secondary transition-all flex items-center justify-center gap-1.5 border border-rpg-primary"
                 >
-                    <span className="text-xl">🎒</span>
+                    <span className="text-base">🎒</span>
                     <span>Inventory</span>
                 </button>
             </div>
 
                 {/* Dungeon Grid - Takes remaining space */}
-                <div className="bg-rpg-bg-darker bg-opacity-60 rounded-lg p-1.5 border border-rpg-secondary flex-1 flex flex-col min-h-0 backdrop-blur-sm">
-                    <div className="grid grid-cols-5 gap-1 w-full max-w-md mx-auto" style={{ aspectRatio: '5/9', maxHeight: '100%' }}>
+                <div className="bg-rpg-bg-darker bg-opacity-60 rounded-lg p-1 border border-rpg-secondary flex-1 flex flex-col justify-center min-h-0 backdrop-blur-sm">
+                    <div className="grid grid-cols-5 gap-0.5 w-full h-full max-h-full">
                         {dungeon.map((row, y) =>
                             row.map((room, x) => {
                                 const isPlayerHere = playerPos && playerPos.x === x && playerPos.y === y;
                                 return (
                                     <div
                                         key={`${x},${y}`}
-                                        className={`aspect-square flex items-center justify-center text-xl rounded transition-colors ${ room.revealed && room.type !== RoomTypes.WALL ? 'cursor-pointer' : 'cursor-default' } ${getRoomBackgroundColor(room, isPlayerHere)}`}
+                                        className={`flex items-center justify-center text-base sm:text-lg rounded transition-colors ${ room.revealed && room.type !== RoomTypes.WALL ? 'cursor-pointer' : 'cursor-default' } ${getRoomBackgroundColor(room, isPlayerHere)}`}
                                         onClick={() => { if ( room.revealed && room.type !== RoomTypes.WALL && playerPos && Math.abs(x - playerPos.x) + Math.abs(y - playerPos.y) === 1 ) { movePlayer(x - playerPos.x, y - playerPos.y); } }}
                                     >
                                         {isPlayerHere ? "🧍" : room.revealed ? getRoomIcon(room) : ""}
@@ -752,7 +752,7 @@ export default function App() {
                         )}
                     </div>
 
-                    <div className="text-center text-xs text-rpg-text opacity-60 mt-1 px-1 leading-tight">
+                    <div className="text-center text-[10px] text-rpg-text opacity-60 mt-0.5 px-1 leading-tight shrink-0">
                         {t('exploration.controls')}
                     </div>
                 </div>

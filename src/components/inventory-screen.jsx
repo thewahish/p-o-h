@@ -151,8 +151,8 @@ export function InventoryScreen({ onClose }) {
     const renderConsumables = () => {
         return (
             <div className="space-y-3">
-                <h3 className="text-xl font-bold text-rpg-primary mb-4">Potions & Consumables</h3>
-                <div className="grid grid-cols-2 gap-3">
+                <h3 className="text-base sm:text-xl font-bold text-rpg-primary mb-3 sm:mb-4">Potions & Consumables</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     {Object.entries(potions).map(([potionType, quantity]) => {
                         const potionConfig = GameConfig.ITEM_TYPES[potionType];
                         if (!potionConfig) return null;
@@ -188,24 +188,24 @@ export function InventoryScreen({ onClose }) {
         const resource = player.resource;
 
         return (
-            <div className="space-y-4">
-                <h3 className="text-xl font-bold text-rpg-primary mb-4">Character Stats</h3>
+            <div className="space-y-3 sm:space-y-4">
+                <h3 className="text-base sm:text-xl font-bold text-rpg-primary mb-3 sm:mb-4">Character Stats</h3>
 
                 {/* Character Info */}
-                <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-lg p-4 border border-gray-700">
-                    <div className="flex items-center gap-4 mb-4">
-                        <div className="text-5xl">{player.icon}</div>
+                <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-lg p-3 sm:p-4 border border-gray-700">
+                    <div className="flex items-center gap-3 sm:gap-4 mb-3 sm:mb-4">
+                        <div className="text-4xl sm:text-5xl">{player.icon}</div>
                         <div>
-                            <div className="text-2xl font-bold text-rpg-primary">{t(player.nameKey)}</div>
-                            <div className="text-rpg-text">Level {GameState.current.level}</div>
+                            <div className="text-xl sm:text-2xl font-bold text-rpg-primary">{t(player.nameKey)}</div>
+                            <div className="text-sm sm:text-base text-rpg-text">Level {GameState.current.level}</div>
                         </div>
                     </div>
                 </div>
 
                 {/* Primary Stats */}
-                <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-lg p-4 border border-gray-700">
-                    <h4 className="text-lg font-semibold text-rpg-text mb-3">Combat Stats</h4>
-                    <div className="grid grid-cols-2 gap-3">
+                <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-lg p-3 sm:p-4 border border-gray-700">
+                    <h4 className="text-base sm:text-lg font-semibold text-rpg-text mb-3">Combat Stats</h4>
+                    <div className="grid grid-cols-2 gap-2 sm:gap-3">
                         <StatDisplay label="HP" value={stats.hp} icon="❤️" />
                         <StatDisplay label={t(resource.nameKey)} value={`${resource.current}/${resource.max}`} icon={resource.icon} />
                         <StatDisplay label="ATK" value={stats.atk} icon="⚔️" />
@@ -238,77 +238,77 @@ export function InventoryScreen({ onClose }) {
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-90 p-4">
-            <div className="w-full max-w-4xl max-h-[90vh] bg-gradient-to-br from-rpg-bg via-gray-900 to-black rounded-lg shadow-2xl border-2 border-rpg-primary overflow-hidden flex flex-col">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-90 p-2 sm:p-4">
+            <div className="w-full h-full sm:max-w-4xl sm:max-h-[90vh] bg-gradient-to-br from-rpg-bg via-gray-900 to-black rounded-lg shadow-2xl border-2 border-rpg-primary overflow-hidden flex flex-col">
 
                 {/* Header */}
-                <div className="bg-gradient-to-r from-rpg-secondary to-rpg-primary p-4 flex items-center justify-between">
-                    <h2 className="text-2xl font-bold text-black">🎒 Inventory</h2>
+                <div className="bg-gradient-to-r from-rpg-secondary to-rpg-primary p-3 sm:p-4 flex items-center justify-between flex-shrink-0">
+                    <h2 className="text-lg sm:text-2xl font-bold text-black">🎒 Inventory</h2>
                     <button
                         onClick={onClose}
-                        className="text-2xl font-bold text-black hover:text-red-600 transition-colors"
+                        className="text-xl sm:text-2xl font-bold text-black hover:text-red-600 transition-colors"
                     >
                         ✕
                     </button>
                 </div>
 
                 {/* Tab Navigation */}
-                <div className="flex bg-gray-900 border-b border-gray-700">
+                <div className="flex bg-gray-900 border-b border-gray-700 flex-shrink-0">
                     <button
                         onClick={() => setActiveTab('equipment')}
-                        className={`flex-1 py-3 font-semibold transition-colors ${
+                        className={`flex-1 py-2 sm:py-3 text-xs sm:text-base font-semibold transition-colors ${
                             activeTab === 'equipment'
                                 ? 'bg-rpg-primary text-black'
                                 : 'text-rpg-text hover:bg-gray-800'
                         }`}
                     >
-                        ⚔️ Equipment
+                        ⚔️ <span className="hidden sm:inline">Equipment</span>
                     </button>
                     <button
                         onClick={() => setActiveTab('consumables')}
-                        className={`flex-1 py-3 font-semibold transition-colors ${
+                        className={`flex-1 py-2 sm:py-3 text-xs sm:text-base font-semibold transition-colors ${
                             activeTab === 'consumables'
                                 ? 'bg-rpg-primary text-black'
                                 : 'text-rpg-text hover:bg-gray-800'
                         }`}
                     >
-                        🧪 Consumables
+                        🧪 <span className="hidden sm:inline">Consumables</span>
                     </button>
                     <button
                         onClick={() => setActiveTab('stats')}
-                        className={`flex-1 py-3 font-semibold transition-colors ${
+                        className={`flex-1 py-2 sm:py-3 text-xs sm:text-base font-semibold transition-colors ${
                             activeTab === 'stats'
                                 ? 'bg-rpg-primary text-black'
                                 : 'text-rpg-text hover:bg-gray-800'
                         }`}
                     >
-                        📊 Stats
+                        📊 <span className="hidden sm:inline">Stats</span>
                     </button>
                 </div>
 
                 {/* Content Area */}
-                <div className="flex-1 overflow-y-auto p-6">
+                <div className="flex-1 overflow-y-auto p-3 sm:p-6">
                     {activeTab === 'equipment' && (
-                        <div className="space-y-6">
+                        <div className="space-y-4 sm:space-y-6">
                             {/* Equipped Items */}
                             <div>
-                                <h3 className="text-xl font-bold text-rpg-primary mb-4">Equipped</h3>
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <h3 className="text-base sm:text-xl font-bold text-rpg-primary mb-3 sm:mb-4">Equipped</h3>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
                                     {Object.keys(GameConfig.EQUIPMENT_SLOTS).map(slot => renderEquipmentSlot(slot))}
                                 </div>
                             </div>
 
                             {/* Inventory Items */}
                             <div>
-                                <h3 className="text-xl font-bold text-rpg-primary mb-4">
+                                <h3 className="text-base sm:text-xl font-bold text-rpg-primary mb-3 sm:mb-4">
                                     Inventory ({inventory.length}/{GameConfig.INVENTORY.maxSlots})
                                 </h3>
                                 {inventory.length > 0 ? (
-                                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                                         {inventory.map(item => renderInventoryItem(item))}
                                     </div>
                                 ) : (
-                                    <div className="text-center text-gray-500 italic py-8">
+                                    <div className="text-center text-gray-500 italic py-6 sm:py-8 text-sm sm:text-base">
                                         No items in inventory. Visit shops to purchase equipment!
                                     </div>
                                 )}
@@ -321,13 +321,13 @@ export function InventoryScreen({ onClose }) {
                 </div>
 
                 {/* Footer */}
-                <div className="bg-gray-900 border-t border-gray-700 p-4 flex justify-between items-center">
-                    <div className="text-rpg-text text-sm">
+                <div className="bg-gray-900 border-t border-gray-700 p-2 sm:p-4 flex justify-between items-center gap-2 flex-shrink-0">
+                    <div className="text-rpg-text text-xs sm:text-sm">
                         Floor {GameState.current.currentFloor} • {t(player.nameKey)} • Lv.{GameState.current.level}
                     </div>
                     <button
                         onClick={onClose}
-                        className="px-6 py-2 bg-rpg-primary hover:bg-rpg-secondary text-black font-bold rounded transition-colors"
+                        className="px-4 sm:px-6 py-1.5 sm:py-2 bg-rpg-primary hover:bg-rpg-secondary text-black font-bold rounded transition-colors text-sm sm:text-base"
                     >
                         Close
                     </button>
@@ -382,11 +382,11 @@ export function InventoryScreen({ onClose }) {
 function StatDisplay({ label, value, icon }) {
     return (
         <div className="bg-black bg-opacity-40 rounded p-2">
-            <div className="flex items-center gap-2">
-                <span className="text-xl">{icon}</span>
-                <div className="flex-1">
-                    <div className="text-xs text-gray-400">{label}</div>
-                    <div className="text-lg font-bold text-rpg-primary">{value}</div>
+            <div className="flex items-center gap-1.5 sm:gap-2">
+                <span className="text-base sm:text-xl">{icon}</span>
+                <div className="flex-1 min-w-0">
+                    <div className="text-xs text-gray-400 truncate">{label}</div>
+                    <div className="text-sm sm:text-lg font-bold text-rpg-primary truncate">{value}</div>
                 </div>
             </div>
         </div>
