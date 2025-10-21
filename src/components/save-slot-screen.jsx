@@ -8,6 +8,7 @@ import Logger from '../core/logger.js';
 import SoulForge from './soul-forge.jsx';
 import characterService from '../services/character-service.js';
 import rewardService from '../services/reward-service.js';
+import { SaveExporter } from '../utils/save-exporter.js';
 
 export default function SaveSlotScreen({ characterId, onBack, onGameStart }) {
     const [saveSlots, setSaveSlots] = useState([]);
@@ -200,14 +201,23 @@ export default function SaveSlotScreen({ characterId, onBack, onGameStart }) {
                                 <p className="text-rpg-text opacity-50 mb-4">{t('saveSlots.empty')}</p>
                             )}
 
-                            <div className="flex gap-2">
+                            <div className="flex gap-2 flex-wrap">
                                 {slot.exists && (
-                                    <button
-                                        onClick={() => handleLoadGame(slot.slotNumber)}
-                                        className="flex-1 bg-uncommon hover:bg-rare text-rpg-text font-bold py-2 px-4 rounded-lg"
-                                    >
-                                        {t('saveSlots.load')}
-                                    </button>
+                                    <>
+                                        <button
+                                            onClick={() => handleLoadGame(slot.slotNumber)}
+                                            className="flex-1 bg-uncommon hover:bg-rare text-rpg-text font-bold py-2 px-4 rounded-lg"
+                                        >
+                                            {t('saveSlots.load')}
+                                        </button>
+                                        <button
+                                            onClick={() => SaveExporter.exportSaveToExcel(characterId, slot.slotNumber)}
+                                            className="bg-green-600 hover:bg-green-700 text-rpg-text font-bold py-2 px-4 rounded-lg flex items-center gap-1"
+                                            title="Export save to Excel"
+                                        >
+                                            📊 Export
+                                        </button>
+                                    </>
                                 )}
                                 <button
                                     onClick={() => handleNewGame(slot.slotNumber)}

@@ -8,6 +8,7 @@ import {
 import { AnalyticsSystem } from '../systems/analytics.js';
 import { GameState } from '../core/state.js';
 import { t } from '../core/localization.js';
+import { SaveExporter } from '../utils/save-exporter.js';
 
 export default function AnalyticsDashboard() {
   const [chartData, setChartData] = useState(AnalyticsSystem.getChartData());
@@ -68,12 +69,21 @@ export default function AnalyticsDashboard() {
         <h1 className="text-3xl font-bold text-[#d4a656] flex items-center gap-2">
           📊 Player Analytics
         </h1>
-        <button
-          onClick={handleBack}
-          className="px-4 py-2 bg-[#5c4423] hover:bg-[#7d5f36] text-[#f8e4c0] rounded-lg border border-[#d4a656]/30 transition-all"
-        >
-          ← Back
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={() => SaveExporter.exportAnalyticsToExcel()}
+            className="px-4 py-2 bg-green-600 hover:bg-green-700 text-[#f8e4c0] rounded-lg border border-[#d4a656]/30 transition-all"
+            title="Export all analytics to Excel"
+          >
+            📊 Export
+          </button>
+          <button
+            onClick={handleBack}
+            className="px-4 py-2 bg-[#5c4423] hover:bg-[#7d5f36] text-[#f8e4c0] rounded-lg border border-[#d4a656]/30 transition-all"
+          >
+            ← Back
+          </button>
+        </div>
       </div>
 
       {/* Tab Navigation */}
