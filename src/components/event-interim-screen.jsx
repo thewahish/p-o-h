@@ -93,44 +93,44 @@ export default function EventInterimScreen({
     };
 
     return (
-        <div className={`h-full text-white flex items-center justify-center p-4 overflow-y-auto ${getBackgroundClass()}`}>
+        <div className={`h-[90vh] text-white flex items-center justify-center p-2 overflow-hidden ${getBackgroundClass()}`}>
             <div className="text-center max-w-md mx-auto">
                 {/* Event Icon */}
-                <div className="text-8xl mb-6 animate-pulse">
+                <div className="text-6xl mb-4 animate-pulse">
                     {getEventIcon()}
                 </div>
-                
+
                 {/* Event Message */}
-                <h1 className="text-3xl font-bold text-white mb-6">
+                <h1 className="text-2xl font-bold text-white mb-4">
                     {getEventMessage()}
                 </h1>
-                
+
                 {/* Visual Indicator */}
-                <div className="mb-6">
+                <div className="mb-4">
                     {type === 'intro' ? (
-                        <div className="text-lg text-gray-300">
+                        <div className="text-base text-gray-300">
                             {t('events.preparing')}
                         </div>
                     ) : (
-                        <div className="text-lg text-gray-300">
+                        <div className="text-base text-gray-300">
                             {t('events.returning')}
                         </div>
                     )}
                 </div>
-                
+
                 {/* Manual Continue Button (optional) */}
                 {!autoAdvance && onContinue && (
-                    <button 
+                    <button
                         onClick={onContinue}
-                        className="bg-amber-600 hover:bg-amber-500 text-white font-bold py-3 px-6 rounded-lg transition-colors"
+                        className="bg-amber-600 hover:bg-amber-500 text-white font-bold py-2 px-4 rounded-lg transition-colors"
                     >
                         {t('events.continue')}
                     </button>
                 )}
-                
+
                 {/* Auto-advance indicator */}
                 {autoAdvance && (
-                    <div className="text-sm text-gray-400 mt-4">
+                    <div className="text-sm text-gray-400 mt-3">
                         {t('events.autoAdvancing')}...
                     </div>
                 )}
