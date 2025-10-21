@@ -237,10 +237,10 @@ export default function BattleScreen({ player, enemies: initialEnemies, combatSy
                 <div className="w-full max-w-3xl mx-auto flex flex-col h-full">
                 {/* Header */}
                 <div className="text-center mb-1 flex-shrink-0">
-                    <h1 className="text-base font-bold text-rpg-primary">⚔️ {t('combat.battle')} ⚔️</h1>
+                    <h1 className="text-lg font-bold text-rpg-primary">⚔️ {t('combat.battle')} ⚔️</h1>
                     {/* Wave Combat Indicator */}
                     {(combatSystem.totalWaves > 1 || enemies.length > 1) && (
-                        <div className="inline-block bg-rpg-secondary border border-rpg-primary rounded-full px-2 py-0.5 text-[10px] text-rpg-primary font-semibold">
+                        <div className="inline-block bg-rpg-secondary border border-rpg-primary rounded-full px-2 py-0.5 text-xs text-rpg-primary font-semibold">
                             {combatSystem.totalWaves > 1 ? (
                                 <>🌊 Wave {combatSystem.currentWave}/{combatSystem.totalWaves}</>
                             ) : (
@@ -248,20 +248,20 @@ export default function BattleScreen({ player, enemies: initialEnemies, combatSy
                             )}
                         </div>
                     )}
-                    <p className="text-[10px] text-rpg-text opacity-80">{isPlayerTurn ? t('combat.playerTurn', {player: player?.nameKey ? t(player.nameKey) : 'Player'}) : t('combat.enemyTurn')}</p>
+                    <p className="text-xs text-rpg-text opacity-80">{isPlayerTurn ? t('combat.playerTurn', {player: player?.nameKey ? t(player.nameKey) : 'Player'}) : t('combat.enemyTurn')}</p>
                 </div>
 
                 {/* Battle Intro Flavor Text - Compact */}
                 {battleIntro && (
                     <div className="mb-1 flex-shrink-0">
-                        <p className="text-[10px] italic text-[#d4a656] text-center opacity-80">
+                        <p className="text-xs italic text-[#d4a656] text-center opacity-80">
                             {battleIntro}
                         </p>
                     </div>
                 )}
 
                 {/* Enemies Section - Top */}
-                <div className="flex-1 min-h-0 space-y-1 mb-1">
+                <div className="flex-1 min-h-0 space-y-2 mb-2 overflow-y-auto">
                     {/* Focused Enemy Card - Top Priority */}
                     {focusedEnemy && (
                         <div className={`relative bg-rpg-bg-darker bg-opacity-80 p-1.5 rounded-lg border-2 backdrop-blur-sm ${focusedEnemy.isAlive ? 'border-legendary' : 'border-rpg-secondary opacity-60'}`}>
@@ -294,16 +294,16 @@ export default function BattleScreen({ player, enemies: initialEnemies, combatSy
                                 })}
 
                              <div className="flex gap-2 items-center">
-                                <div className="flex-shrink-0 w-12 h-12 bg-rpg-bg-darkest rounded-lg flex items-center justify-center text-2xl border-2 border-health-dark">{focusedEnemy.isAlive ? '👹' : '💀'}</div>
+                                <div className="flex-shrink-0 w-14 h-14 bg-rpg-bg-darkest rounded-lg flex items-center justify-center text-3xl border-2 border-health-dark">{focusedEnemy.isAlive ? '👹' : '💀'}</div>
                                 <div className="flex-grow min-w-0">
-                                    <div className="flex justify-between items-center mb-0.5">
-                                        <h2 className="text-sm font-bold text-health-mid truncate">{focusedEnemy.prefixKey ? `${t(focusedEnemy.prefixKey)} ` : ''}{focusedEnemy.nameKey ? t(focusedEnemy.nameKey) : focusedEnemy.id || 'Enemy'} {focusedEnemy.level ? `(${t('stats.level')} ${focusedEnemy.level})` : ''}</h2>
+                                    <div className="flex justify-between items-center mb-1">
+                                        <h2 className="text-base font-bold text-health-mid truncate">{focusedEnemy.prefixKey ? `${t(focusedEnemy.prefixKey)} ` : ''}{focusedEnemy.nameKey ? t(focusedEnemy.nameKey) : focusedEnemy.id || 'Enemy'} {focusedEnemy.level ? `(${t('stats.level')} ${focusedEnemy.level})` : ''}</h2>
                                         <div className="flex gap-1 flex-shrink-0">
-                                            {focusedEnemy.statusEffects?.map((effect, i) => <div key={i} className="text-[10px] bg-epic bg-opacity-50 border border-epic rounded-full px-1 py-0.5">{effect.icon} {effect.duration}</div>)}
+                                            {focusedEnemy.statusEffects?.map((effect, i) => <div key={i} className="text-xs bg-epic bg-opacity-50 border border-epic rounded-full px-2 py-0.5">{effect.icon} {effect.duration}</div>)}
                                         </div>
                                     </div>
-                                    <div className="h-1.5 bg-health-empty rounded overflow-hidden mb-0.5"><div className="h-1.5 bg-health-full" style={{ width: `${getHpPercent(focusedEnemy)}%` }}></div></div>
-                                    <p className="text-[10px] text-right text-rpg-text opacity-80">{t('stats.hpShort')}: {focusedEnemy.stats.hp} / {focusedEnemy.maxStats.hp}</p>
+                                    <div className="h-2 bg-health-empty rounded overflow-hidden mb-1"><div className="h-2 bg-health-full" style={{ width: `${getHpPercent(focusedEnemy)}%` }}></div></div>
+                                    <p className="text-xs text-right text-rpg-text opacity-80">{t('stats.hpShort')}: {focusedEnemy.stats.hp} / {focusedEnemy.maxStats.hp}</p>
 
                                     {/* Break Bar - Compact */}
                                     {focusedEnemy.breakData && (
@@ -336,7 +336,7 @@ export default function BattleScreen({ player, enemies: initialEnemies, combatSy
                                         </div>
                                     )}
 
-                                    <div className="flex justify-end gap-2 mt-0.5 text-[10px] text-rpg-text opacity-70">
+                                    <div className="flex justify-end gap-2 mt-1 text-xs text-rpg-text opacity-70">
                                         <span>⚔️ {focusedEnemy.stats.atk}</span> <span>🛡️ {focusedEnemy.stats.def}</span> <span>⚡ {focusedEnemy.stats.spd}</span> <span>💥 {focusedEnemy.stats.crit}%</span>
                                     </div>
                                 </div>
@@ -346,37 +346,37 @@ export default function BattleScreen({ player, enemies: initialEnemies, combatSy
 
                     {/* Other Enemies List */}
                     {otherEnemies.map(enemy => (
-                        <button key={enemy.originalIndex} onClick={() => setFocusedTargetId(enemy.originalIndex)} className="w-full bg-rpg-secondary bg-opacity-30 hover:bg-rpg-secondary hover:bg-opacity-50 rounded-lg p-1 border border-rpg-secondary text-left flex items-center text-xs transition-all">
-                            <div className="w-6 h-6 rounded-full bg-rpg-bg-darkest flex items-center justify-center mr-2 text-sm">{enemy.isAlive ? '👹' : '💀'}</div>
-                            <div className="flex-grow text-rpg-text font-semibold text-[10px]">{enemy.prefixKey ? `${t(enemy.prefixKey)} ` : ''}{enemy.nameKey ? t(enemy.nameKey) : enemy.id || 'Enemy'} {enemy.level ? `(${t('stats.level')} ${enemy.level})` : ''}</div>
-                            <div className="w-1/3 h-2 bg-health-empty rounded-full overflow-hidden mr-1"><div className="h-2 bg-health-full" style={{ width: `${getHpPercent(enemy)}%` }}></div></div>
-                            <div className="text-rpg-text opacity-70 text-right w-16 text-[10px]">{enemy.stats.hp} / {enemy.maxStats.hp}</div>
+                        <button key={enemy.originalIndex} onClick={() => setFocusedTargetId(enemy.originalIndex)} className="w-full bg-rpg-secondary bg-opacity-30 hover:bg-rpg-secondary hover:bg-opacity-50 rounded-lg p-2 border border-rpg-secondary text-left flex items-center text-sm transition-all">
+                            <div className="w-8 h-8 rounded-full bg-rpg-bg-darkest flex items-center justify-center mr-2 text-lg">{enemy.isAlive ? '👹' : '💀'}</div>
+                            <div className="flex-grow text-rpg-text font-semibold text-xs">{enemy.prefixKey ? `${t(enemy.prefixKey)} ` : ''}{enemy.nameKey ? t(enemy.nameKey) : enemy.id || 'Enemy'} {enemy.level ? `(${t('stats.level')} ${enemy.level})` : ''}</div>
+                            <div className="w-1/3 h-2 bg-health-empty rounded-full overflow-hidden mr-2"><div className="h-2 bg-health-full" style={{ width: `${getHpPercent(enemy)}%` }}></div></div>
+                            <div className="text-rpg-text opacity-70 text-right w-20 text-xs">{enemy.stats.hp} / {enemy.maxStats.hp}</div>
                         </button>
                     ))}
 
                     {/* Player Card - Bottom Before Controls */}
                     <div className="flex gap-2 items-center">
-                        <div className="flex-shrink-0 w-12 h-12 bg-rpg-bg-darkest rounded-lg flex items-center justify-center text-2xl border-2 border-uncommon">👤</div>
+                        <div className="flex-shrink-0 w-14 h-14 bg-rpg-bg-darkest rounded-lg flex items-center justify-center text-3xl border-2 border-uncommon">👤</div>
                         <div className="flex-grow min-w-0">
-                            <div className="flex justify-between items-center mb-0.5">
-                                <h2 className="text-sm font-bold text-uncommon truncate">{player?.nameKey ? t(player.nameKey) : 'Player'} ({t('stats.level')} {GameState.current.level})</h2>
+                            <div className="flex justify-between items-center mb-1">
+                                <h2 className="text-base font-bold text-uncommon truncate">{player?.nameKey ? t(player.nameKey) : 'Player'} ({t('stats.level')} {GameState.current.level})</h2>
                                 <div className="flex gap-1 flex-shrink-0">
-                                    {player?.defending && <div className="text-[10px] bg-rare bg-opacity-50 border border-rare rounded-full px-1 py-0.5">🛡️</div>}
-                                    {player?.statusEffects?.map((effect, i) => <div key={i} className="text-[10px] bg-health-dark bg-opacity-50 border border-health-mid rounded-full px-1 py-0.5">{effect.icon}</div>)}
+                                    {player?.defending && <div className="text-xs bg-rare bg-opacity-50 border border-rare rounded-full px-2 py-0.5">🛡️</div>}
+                                    {player?.statusEffects?.map((effect, i) => <div key={i} className="text-xs bg-health-dark bg-opacity-50 border border-health-mid rounded-full px-2 py-0.5">{effect.icon}</div>)}
                                 </div>
                             </div>
-                            <div className="h-1.5 bg-health-empty rounded overflow-hidden mb-0.5"><div className="h-1.5 bg-health-full" style={{ width: `${getHpPercent(player)}%` }}></div></div>
-                            <div className="text-[10px] text-right text-rpg-text opacity-80 mb-0.5">{t('stats.hpShort')}: {player?.stats.hp} / {player?.maxStats.hp}</div>
-                            <div className={`h-1.5 rounded overflow-hidden mb-0.5 ${getResourceEmptyColor(player?.resource?.nameKey)}`}><div className={`h-1.5 ${getResourceColor(player?.resource?.nameKey)}`} style={{ width: `${getResourcePercent(player)}%` }}></div></div>
-                            <div className="text-[10px] text-right text-rpg-text opacity-80">{player?.resource?.nameKey ? t(player.resource.nameKey) : 'Resource'}: {player?.resource.current} / {player?.resource.max}</div>
-                            <div className="flex justify-end gap-2 mt-0.5 text-[10px] text-rpg-text opacity-70">
+                            <div className="h-2 bg-health-empty rounded overflow-hidden mb-1"><div className="h-2 bg-health-full" style={{ width: `${getHpPercent(player)}%` }}></div></div>
+                            <div className="text-xs text-right text-rpg-text opacity-80 mb-1">{t('stats.hpShort')}: {player?.stats.hp} / {player?.maxStats.hp}</div>
+                            <div className={`h-2 rounded overflow-hidden mb-1 ${getResourceEmptyColor(player?.resource?.nameKey)}`}><div className={`h-2 ${getResourceColor(player?.resource?.nameKey)}`} style={{ width: `${getResourcePercent(player)}%` }}></div></div>
+                            <div className="text-xs text-right text-rpg-text opacity-80">{player?.resource?.nameKey ? t(player.resource.nameKey) : 'Resource'}: {player?.resource.current} / {player?.resource.max}</div>
+                            <div className="flex justify-end gap-2 mt-1 text-xs text-rpg-text opacity-70">
                                 <span>⚔️ {player?.stats.atk}</span> <span>🛡️ {player?.stats.def}</span> <span>⚡ {player?.stats.spd}</span> <span>💥 {player?.stats.crit}%</span>
                             </div>
                         </div>
                     </div>
                     <div className="mt-1">
-                        <div className="h-1.5 bg-rpg-bg-darkest rounded overflow-hidden mb-0.5"><div className="h-1.5 bg-mana-light" style={{ width: `${xpInfo.percentage}%` }}></div></div>
-                        <div className="text-[10px] text-right text-mana-light">{t('stats.xpShort')}: {xpInfo.current} / {xpInfo.required}</div>
+                        <div className="h-2 bg-rpg-bg-darkest rounded overflow-hidden mb-1"><div className="h-2 bg-mana-light" style={{ width: `${xpInfo.percentage}%` }}></div></div>
+                        <div className="text-xs text-right text-mana-light">{t('stats.xpShort')}: {xpInfo.current} / {xpInfo.required}</div>
                     </div>
 
                     {/* Active Buffs Display - Compact */}
@@ -386,11 +386,11 @@ export default function BattleScreen({ player, enemies: initialEnemies, combatSy
                                 {GameState.current.battleBuffs.map((buff, index) => (
                                     <div
                                         key={index}
-                                        className="bg-legendary bg-opacity-20 border border-legendary rounded px-1 py-0.5 text-[10px]"
+                                        className="bg-legendary bg-opacity-20 border border-legendary rounded px-2 py-0.5 text-xs"
                                         title={typeof buff.description === 'object' ? buff.description[Localization.getCurrentLanguage()] : buff.description}
                                     >
-                                        <span className="text-xs mr-0.5">{buff.icon}</span>
-                                        <span className="font-bold text-legendary text-[10px]">
+                                        <span className="text-sm mr-0.5">{buff.icon}</span>
+                                        <span className="font-bold text-legendary text-xs">
                                             {typeof buff.name === 'object' ? buff.name[Localization.getCurrentLanguage()] : buff.name}
                                         </span>
                                     </div>
@@ -403,19 +403,19 @@ export default function BattleScreen({ player, enemies: initialEnemies, combatSy
                 <div className="mt-auto flex-shrink-0 pt-1">
                     {/* Ultimate Gauge - Compact */}
                     {player.ultimate && (
-                        <div className="mb-1 bg-rpg-bg-darker bg-opacity-80 rounded-lg p-1.5 border border-rpg-primary">
+                        <div className="mb-1 bg-rpg-bg-darker bg-opacity-80 rounded-lg p-2 border border-rpg-primary">
                             <div className="flex justify-between items-center mb-0.5">
-                                <span className="text-[10px] font-bold text-rpg-primary">⚡ ULT</span>
-                                <span className="text-[10px] font-bold text-rpg-primary">{player.ultimate.current}/{player.ultimate.max}</span>
+                                <span className="text-xs font-bold text-rpg-primary">⚡ ULT</span>
+                                <span className="text-xs font-bold text-rpg-primary">{player.ultimate.current}/{player.ultimate.max}</span>
                             </div>
-                            <div className="h-1.5 bg-gray-700 rounded overflow-hidden">
+                            <div className="h-2 bg-gray-700 rounded overflow-hidden">
                                 <div
-                                    className={`h-1.5 transition-all ${player.ultimate.ready ? 'bg-gradient-to-r from-yellow-400 via-orange-400 to-red-500 animate-pulse' : 'bg-gradient-to-r from-gray-600 to-blue-500'}`}
+                                    className={`h-2 transition-all ${player.ultimate.ready ? 'bg-gradient-to-r from-yellow-400 via-orange-400 to-red-500 animate-pulse' : 'bg-gradient-to-r from-gray-600 to-blue-500'}`}
                                     style={{ width: `${(player.ultimate.current / player.ultimate.max) * 100}%` }}
                                 ></div>
                             </div>
                             {player.ultimate.ready && (
-                                <p className="text-center text-[10px] text-yellow-400 font-bold animate-pulse">READY!</p>
+                                <p className="text-center text-xs text-yellow-400 font-bold animate-pulse">READY!</p>
                             )}
                         </div>
                     )}
@@ -483,11 +483,11 @@ export default function BattleScreen({ player, enemies: initialEnemies, combatSy
                     </div>
 
                     {/* Combat Feedback Zone - Fading Messages (Replaces Scrolling Log) */}
-                    <div className="relative h-10 flex items-center justify-center overflow-hidden">
+                    <div className="relative h-12 flex items-center justify-center overflow-hidden">
                         {feedbackMessages.map((msg, index) => (
                             <div
                                 key={msg.id}
-                                className="feedback-message absolute text-center text-xs font-bold px-2 py-1 bg-black bg-opacity-60 rounded-lg backdrop-blur-sm border border-rpg-primary"
+                                className="feedback-message absolute text-center text-sm font-bold px-3 py-1.5 bg-black bg-opacity-60 rounded-lg backdrop-blur-sm border border-rpg-primary"
                                 style={{
                                     zIndex: feedbackMessages.length - index,
                                     color: '#f8e4c0'
@@ -497,7 +497,7 @@ export default function BattleScreen({ player, enemies: initialEnemies, combatSy
                             </div>
                         ))}
                         {feedbackMessages.length === 0 && (
-                            <div className="text-rpg-text opacity-30 italic text-[10px]">
+                            <div className="text-rpg-text opacity-30 italic text-xs">
                                 {isPlayerTurn ? t('combat.chooseAction') : t('combat.enemyThinking')}
                             </div>
                         )}

@@ -771,7 +771,7 @@ function MainMenu({ onCharacterSelect, currentLanguage }) {
             <p className="text-lg text-rpg-text opacity-80 mb-6 text-center">{t('game.subtitle')}</p>
 
             {/* Language Toggle Button */}
-            <div className="mb-4 flex gap-2">
+            <div className="mb-4">
                 <button
                     onClick={() => {
                         const newLang = currentLanguage === 'en' ? 'ar' : 'en';
@@ -780,14 +780,6 @@ function MainMenu({ onCharacterSelect, currentLanguage }) {
                     className="px-4 py-2 bg-rpg-secondary hover:bg-rpg-primary text-sm rounded-lg border border-rpg-primary transition-all duration-200"
                 >
                     🌍 {currentLanguage === 'en' ? 'العربية' : 'English'}
-                </button>
-
-                {/* Analytics Button */}
-                <button
-                    onClick={() => GameState.update('currentScreen', 'analytics')}
-                    className="px-4 py-2 bg-rpg-secondary hover:bg-rpg-primary text-sm rounded-lg border border-rpg-primary transition-all duration-200"
-                >
-                    📊 Analytics
                 </button>
             </div>
 
