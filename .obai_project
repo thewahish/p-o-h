@@ -1,0 +1,4 @@
+PROJECT_NAME=p-o-h
+DEFAULT_MODEL=hero-coder
+MODULES=llm,images
+CONTEXT_FILE=hero_context.txt
