@@ -14,6 +14,7 @@ export default function SaveSlotScreen({ characterId, onBack, onGameStart }) {
     const [saveSlots, setSaveSlots] = useState([]);
     const [showConfirmDialog, setShowConfirmDialog] = useState(null);
     const [showSoulForge, setShowSoulForge] = useState(null); // null or { characterId, slotNumber }
+    const [expandedSlot, setExpandedSlot] = useState(1); // Which slot is currently expanded
 
     useEffect(() => {
         // Load save slot information
@@ -165,75 +166,119 @@ export default function SaveSlotScreen({ characterId, onBack, onGameStart }) {
                     <p className="text-rpg-text opacity-70 text-xs">{t('saveSlots.selectSlot')}</p>
                 </div>
 
-                <div className="space-y-1.5 flex-1 overflow-y-auto min-h-0">
-                    {saveSlots.map((slot) => (
-                        <div key={slot.slotNumber} className="bg-rpg-bg-darker bg-opacity-80 border border-rpg-secondary rounded-lg p-2 backdrop-blur-sm">
-                            <div className="flex justify-between items-start mb-1">
-                                <h3 className="text-sm font-bold text-rpg-primary">
-                                    {t('saveSlots.slot')} {slot.slotNumber}
-                                </h3>
-                                {slot.exists && (
-                                    <button
-                                        onClick={() => handleDeleteSave(slot.slotNumber)}
-                                        className="text-health-mid hover:text-health-full text-[10px]"
-                                    >
-                                        🗑️ {t('saveSlots.delete')}
-                                    </button>
-                                )}
-                            </div>
+                <div className="space-y-2 flex-1 overflow-y-auto min-h-0">
+                    {saveSlots.map((slot) => {
+                        const isExpanded = expandedSlot === slot.slotNumber;
 
-                            {slot.exists ? (
-                                <div className="mb-1.5">
-                                    <p className="text-rpg-text opacity-80 text-xs">
-                                        {t('saveSlots.level')}: {slot.level} | {t('saveSlots.floor')}: {slot.floor}
-                                    </p>
-                                    <p className="text-rpg-text opacity-80 text-xs">
-                                        {t('saveSlots.gold')}: {slot.gold}
-                                    </p>
-                                    <p className="text-epic text-xs">
-                                        👻 {GameState.getCharacterSouls(characterId, slot.slotNumber)} {t('souls.heroSouls')}
-                                    </p>
-                                    <p className="text-rpg-text opacity-50 text-[10px]">
-                                        {formatDate(slot.timestamp)}
-                                    </p>
-                                </div>
-                            ) : (
-                                <p className="text-rpg-text opacity-50 mb-1.5 text-xs">{t('saveSlots.empty')}</p>
-                            )}
-
-                            <div className="flex gap-1 flex-wrap">
-                                {slot.exists && (
+                        return (
+                            <div
+                                key={slot.slotNumber}
+                                className={`bg-rpg-bg-darker bg-opacity-80 border-2 rounded-lg backdrop-blur-sm transition-all ${
+                                    isExpanded ? 'border-rpg-primary p-4' : 'border-rpg-secondary p-2 cursor-pointer hover:border-rpg-primary'
+                                }`}
+                                onClick={() => !isExpanded && setExpandedSlot(slot.slotNumber)}
+                            >
+                                {isExpanded ? (
+                                    // EXPANDED VIEW - Full details
                                     <>
-                                        <button
-                                            onClick={() => handleLoadGame(slot.slotNumber)}
-                                            className="flex-1 bg-uncommon hover:bg-rare text-rpg-text font-bold py-1 px-2 rounded-lg text-xs"
-                                        >
-                                            {t('saveSlots.load')}
-                                        </button>
-                                        <button
-                                            onClick={() => SaveExporter.exportSaveToExcel(characterId, slot.slotNumber)}
-                                            className="bg-green-600 hover:bg-green-700 text-rpg-text font-bold py-1 px-2 rounded-lg flex items-center gap-1 text-xs"
-                                            title="Export save to Excel"
-                                        >
-                                            📊
-                                        </button>
+                                        <div className="flex justify-between items-start mb-3">
+                                            <h3 className="text-xl font-bold text-rpg-primary">
+                                                {t('saveSlots.slot')} {slot.slotNumber}
+                                            </h3>
+                                            {slot.exists && (
+                                                <button
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        handleDeleteSave(slot.slotNumber);
+                                                    }}
+                                                    className="text-health-mid hover:text-health-full text-sm"
+                                                >
+                                                    🗑️ {t('saveSlots.delete')}
+                                                </button>
+                                            )}
+                                        </div>
+
+                                        {slot.exists ? (
+                                            <div className="mb-4">
+                                                <p className="text-rpg-text opacity-80 text-base mb-1">
+                                                    {t('saveSlots.level')}: {slot.level} | {t('saveSlots.floor')}: {slot.floor}
+                                                </p>
+                                                <p className="text-rpg-text opacity-80 text-base mb-1">
+                                                    {t('saveSlots.gold')}: {slot.gold}
+                                                </p>
+                                                <p className="text-epic text-base mb-1">
+                                                    👻 {GameState.getCharacterSouls(characterId, slot.slotNumber)} {t('souls.heroSouls')}
+                                                </p>
+                                                <p className="text-rpg-text opacity-50 text-sm">
+                                                    {formatDate(slot.timestamp)}
+                                                </p>
+                                            </div>
+                                        ) : (
+                                            <p className="text-rpg-text opacity-50 mb-4 text-base">{t('saveSlots.empty')}</p>
+                                        )}
+
+                                        <div className="flex gap-2 flex-wrap">
+                                            {slot.exists && (
+                                                <>
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            handleLoadGame(slot.slotNumber);
+                                                        }}
+                                                        className="flex-1 bg-uncommon hover:bg-rare text-rpg-text font-bold py-2 px-4 rounded-lg text-sm"
+                                                    >
+                                                        {t('saveSlots.load')}
+                                                    </button>
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            SaveExporter.exportSaveToExcel(characterId, slot.slotNumber);
+                                                        }}
+                                                        className="bg-green-600 hover:bg-green-700 text-rpg-text font-bold py-2 px-3 rounded-lg flex items-center gap-1 text-sm"
+                                                        title="Export save to Excel"
+                                                    >
+                                                        📊
+                                                    </button>
+                                                </>
+                                            )}
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleNewGame(slot.slotNumber);
+                                                }}
+                                                className="flex-1 bg-rpg-primary hover:bg-rpg-secondary text-rpg-text font-bold py-2 px-4 rounded-lg text-sm"
+                                            >
+                                                {t('saveSlots.newGame')}
+                                            </button>
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    setShowSoulForge({ characterId, slotNumber: slot.slotNumber });
+                                                }}
+                                                className="bg-rpg-secondary hover:bg-rpg-primary text-rpg-text font-bold py-2 px-4 rounded-lg flex items-center gap-1 text-sm"
+                                            >
+                                                ⚡ {t('souls.forge')}
+                                            </button>
+                                        </div>
                                     </>
+                                ) : (
+                                    // COLLAPSED VIEW - One line summary
+                                    <div className="flex items-center justify-between">
+                                        <h3 className="text-sm font-bold text-rpg-primary">
+                                            {t('saveSlots.slot')} {slot.slotNumber}
+                                        </h3>
+                                        {slot.exists ? (
+                                            <p className="text-rpg-text opacity-80 text-xs">
+                                                Lv.{slot.level} | Floor {slot.floor}
+                                            </p>
+                                        ) : (
+                                            <p className="text-rpg-text opacity-50 text-xs italic">{t('saveSlots.empty')}</p>
+                                        )}
+                                    </div>
                                 )}
-                                <button
-                                    onClick={() => handleNewGame(slot.slotNumber)}
-                                    className="flex-1 bg-rpg-primary hover:bg-rpg-secondary text-rpg-text font-bold py-1 px-2 rounded-lg text-xs"
-                                >
-                                    {t('saveSlots.newGame')}
-                                </button>
-                                <button
-                                    onClick={() => setShowSoulForge({ characterId, slotNumber: slot.slotNumber })}
-                                    className="bg-rpg-secondary hover:bg-rpg-primary text-rpg-text font-bold py-1 px-2 rounded-lg flex items-center gap-1 text-xs"
-                                >
-                                    ⚡ {t('souls.forge')}
-                                </button>
                             </div>
-                        </div>
-                    ))}
+                        );
+                    })}
                 </div>
             </div>
         </div>
