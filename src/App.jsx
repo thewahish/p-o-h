@@ -767,8 +767,8 @@ export default function App() {
 function MainMenu({ onCharacterSelect, currentLanguage }) {
     return (
         <div className="h-full flex flex-col items-center justify-center bg-rpg-radial text-rpg-text px-4">
-            <h1 className="text-5xl font-extrabold text-rpg-primary mb-3 drop-shadow-lg">{t('game.title')}</h1>
-            <p className="text-lg text-rpg-text opacity-80 mb-6">{t('game.subtitle')}</p>
+            <h1 className="text-5xl font-extrabold text-rpg-primary mb-3 drop-shadow-lg text-center">{t('game.title')}</h1>
+            <p className="text-lg text-rpg-text opacity-80 mb-6 text-center">{t('game.subtitle')}</p>
 
             {/* Language Toggle Button */}
             <div className="mb-4 flex gap-2">
@@ -791,9 +791,9 @@ function MainMenu({ onCharacterSelect, currentLanguage }) {
                 </button>
             </div>
 
-            <div className="flex flex-wrap justify-center gap-4 max-w-lg">
+            <div className="flex flex-col gap-4 w-full max-w-md">
                 {Object.values(Characters).map((char) => (
-                    <button key={char.id} onClick={() => onCharacterSelect(char.id)} className="px-6 py-4 bg-rpg-bg-darker bg-opacity-80 hover:bg-rpg-secondary text-lg rounded-lg border border-rpg-primary shadow-md transition-all duration-200 backdrop-blur-sm">
+                    <button key={char.id} onClick={() => onCharacterSelect(char.id)} className="w-full px-6 py-4 bg-rpg-bg-darker bg-opacity-80 hover:bg-rpg-secondary text-lg rounded-lg border border-rpg-primary shadow-md transition-all duration-200 backdrop-blur-sm text-left">
                         {t(char.nameKey)}{" "}
                         <span className="text-sm text-rpg-text opacity-70">({t(char.roleKey)})</span>
                     </button>

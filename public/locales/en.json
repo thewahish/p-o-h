@@ -30,7 +30,7 @@
     "warrior": {
       "name": "Omar",
       "nameArabic": "عمر",
-      "role": "Tank/Warrior",
+      "role": "Warrior",
       "description": "A formidable warrior, Omar leads with unyielding defense and immense vitality. He excels in direct combat, soaking up damage while delivering powerful strikes.",
       "traits": {
         "highDefense": "High Defense",
@@ -50,9 +50,9 @@
       }
     },
     "rogue": {
-      "name": "Shadi", 
+      "name": "Shadi",
       "nameArabic": "شادي",
-      "role": "Assassin/DoT Specialist",
+      "role": "Assassin",
       "description": "Swift and deadly, Shadi strikes from the shadows with unparalleled speed and precision. His critical hits can dispatch even the toughest enemies before they know what hit them.",
       "traits": {
         "berserkerRage": "Berserker Rage",
