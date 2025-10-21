@@ -30,7 +30,7 @@ export default function OutcomeScreen({ victory, results, battleContext, onConti
 
     return (
         <div className="fixed inset-0 bg-rpg-bg-darkest/90 flex items-center justify-center z-[100] p-2">
-            <div className="bg-rpg-bg-darker border-2 border-rpg-primary rounded-lg p-4 max-w-sm w-full h-[90vh] flex flex-col text-center shadow-2xl backdrop-blur-sm overflow-y-auto">
+            <div className="bg-rpg-bg-darker border-2 border-rpg-primary rounded-lg p-4 max-w-sm w-full max-h-[95vh] flex flex-col justify-between text-center shadow-2xl backdrop-blur-sm overflow-y-auto">
                 <h1 className={`text-2xl font-bold mb-3 flex-shrink-0 ${titleColor}`}>{title}</h1>
 
                 {/* Dynamic flavor text */}
@@ -64,7 +64,7 @@ export default function OutcomeScreen({ victory, results, battleContext, onConti
 
                 <button
                     onClick={onContinue}
-                    className="w-full bg-rpg-primary hover:bg-rpg-secondary text-rpg-text font-bold py-2 px-4 rounded-lg text-base transition-transform transform hover:scale-105 flex-shrink-0 mt-auto"
+                    className="w-full bg-rpg-primary hover:bg-rpg-secondary text-rpg-text font-bold py-2 px-4 rounded-lg text-base transition-transform transform hover:scale-105 flex-shrink-0"
                 >
                     {victory ? t('combat.continue') : t('combat.returnToMenu')}
                 </button>

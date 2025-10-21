@@ -59,14 +59,14 @@ export default function ShopScreen({ inventorySystem, onLeave }) {
 
     return (
         <div className="fixed inset-0 bg-rpg-bg-darkest/90 flex items-center justify-center z-[100] p-2">
-            <div className="bg-rpg-bg-darker border-2 border-rpg-primary rounded-lg p-3 max-w-md w-full h-[90vh] flex flex-col text-center shadow-2xl backdrop-blur-sm">
+            <div className="bg-rpg-bg-darker border-2 border-rpg-primary rounded-lg p-3 max-w-md w-full max-h-[95vh] flex flex-col justify-between text-center shadow-2xl backdrop-blur-sm overflow-y-auto">
                 <h1 className="text-xl font-bold mb-2 text-rpg-primary flex-shrink-0">🏪 {t('shop.title')}</h1>
                 <div className="mb-2 bg-rpg-secondary rounded-lg p-2 border border-rpg-primary flex-shrink-0">
                     <div className="text-base font-bold text-legendary">💰 {GameState.current.gold} {t('stats.gold')}</div>
                 </div>
                 <p className="text-rpg-text opacity-70 mb-2 text-xs flex-shrink-0">{t('shop.onePurchaseOnly')}</p>
 
-                <div className="space-y-2 mb-3 flex-1 overflow-y-auto min-h-0">
+                <div className="space-y-2 mb-3 flex-shrink-0">
                     {items.map(item => (
                         <div key={item.id} className="bg-rpg-bg-darkest bg-opacity-80 p-2 rounded-lg text-left backdrop-blur-sm">
                             <h2 className={`font-bold text-sm ${rarityColors[item.rarity]}`}>

@@ -93,7 +93,7 @@ export default function EventInterimScreen({
     };
 
     return (
-        <div className={`h-[90vh] text-white flex items-center justify-center p-2 overflow-hidden ${getBackgroundClass()}`}>
+        <div className={`min-h-screen max-h-screen text-white flex items-center justify-center p-4 overflow-hidden ${getBackgroundClass()}`}>
             <div className="text-center max-w-md mx-auto">
                 {/* Event Icon */}
                 <div className="text-6xl mb-4 animate-pulse">

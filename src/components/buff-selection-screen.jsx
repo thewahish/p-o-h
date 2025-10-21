@@ -37,14 +37,14 @@ export default function BuffSelectionScreen({ onBuffSelected }) {
     };
 
     return (
-        <div className="h-[90vh] bg-rpg-radial text-rpg-text flex items-center justify-center p-2">
-            <div className="max-w-2xl w-full h-full flex flex-col py-2">
+        <div className="min-h-screen max-h-screen bg-rpg-radial text-rpg-text flex items-center justify-center p-2 overflow-y-auto">
+            <div className="max-w-2xl w-full flex flex-col py-4 justify-between flex-1">
                 <div className="text-center mb-3 flex-shrink-0">
                     <h1 className="text-2xl font-bold text-rpg-primary mb-1">✨ {t('buffs.chooseYourBlessing')} ✨</h1>
                     <p className="text-sm text-rpg-text opacity-80">{t('buffs.selectOneBuffForBattle')}</p>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-3 flex-1 min-h-0 overflow-y-auto">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4 flex-shrink-0">
                     {buffChoices.map((buff) => (
                         <button
                             key={buff.key}

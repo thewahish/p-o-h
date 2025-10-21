@@ -233,10 +233,10 @@ export default function BattleScreen({ player, enemies: initialEnemies, combatSy
                 }
             `}</style>
 
-            <div className="h-[90vh] bg-rpg-radial text-rpg-text p-2 flex flex-col">
-                <div className="w-full max-w-3xl mx-auto flex flex-col h-full">
+            <div className="min-h-screen max-h-screen bg-rpg-radial text-rpg-text p-2 flex flex-col overflow-y-auto">
+                <div className="w-full max-w-3xl mx-auto flex flex-col justify-between flex-1">
                 {/* Header */}
-                <div className="text-center mb-1 flex-shrink-0">
+                <div className="text-center mb-2 flex-shrink-0">
                     <h1 className="text-lg font-bold text-rpg-primary">⚔️ {t('combat.battle')} ⚔️</h1>
                     {/* Wave Combat Indicator */}
                     {(combatSystem.totalWaves > 1 || enemies.length > 1) && (
@@ -253,7 +253,7 @@ export default function BattleScreen({ player, enemies: initialEnemies, combatSy
 
                 {/* Battle Intro Flavor Text - Compact */}
                 {battleIntro && (
-                    <div className="mb-1 flex-shrink-0">
+                    <div className="mb-2 flex-shrink-0">
                         <p className="text-xs italic text-[#d4a656] text-center opacity-80">
                             {battleIntro}
                         </p>
@@ -261,7 +261,7 @@ export default function BattleScreen({ player, enemies: initialEnemies, combatSy
                 )}
 
                 {/* Enemies Section - Top */}
-                <div className="flex-1 min-h-0 space-y-2 mb-2 overflow-y-auto">
+                <div className="space-y-2 mb-3 flex-shrink-0 max-h-[40vh] overflow-y-auto">
                     {/* Focused Enemy Card - Top Priority */}
                     {focusedEnemy && (
                         <div className={`relative bg-rpg-bg-darker bg-opacity-80 p-1.5 rounded-lg border-2 backdrop-blur-sm ${focusedEnemy.isAlive ? 'border-legendary' : 'border-rpg-secondary opacity-60'}`}>
@@ -400,7 +400,7 @@ export default function BattleScreen({ player, enemies: initialEnemies, combatSy
                     )}
                 </div>
 
-                <div className="mt-auto flex-shrink-0 pt-1">
+                <div className="flex-shrink-0 pt-2">
                     {/* Ultimate Gauge - Compact */}
                     {player.ultimate && (
                         <div className="mb-1 bg-rpg-bg-darker bg-opacity-80 rounded-lg p-2 border border-rpg-primary">
