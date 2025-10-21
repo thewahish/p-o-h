@@ -47,6 +47,7 @@ export default function App() {
     const [gameState, setGameState] = useState(GameState.current);
     const [combatLog, setCombatLog] = useState([]);
     const [battleResults, setBattleResults] = useState(null);
+    const [battleContext, setBattleContext] = useState(null); // { duration, isBoss, floor }
     const [showLanguageSelection, setShowLanguageSelection] = useState(false);
     const [localizationReady, setLocalizationReady] = useState(false);
     const [currentLanguage, setCurrentLanguage] = useState('en');
@@ -477,7 +478,8 @@ export default function App() {
             GameState.addExperience(totalXp);
 
             // Check if this was a boss fight and spawn stairs
-            if (currentRoom.type === RoomTypes.BOSS) {
+            const isBoss = currentRoom.type === RoomTypes.BOSS;
+            if (isBoss) {
                 spawnStairs();
                 Logger.log('Boss defeated! Stairs to next floor have appeared!', 'SYSTEM');
 
@@ -489,15 +491,30 @@ export default function App() {
             }
 
             setBattleResults({ gold: totalGold, xp: totalXp });
+
+            // Set battle context for dynamic flavor text
+            setBattleContext({
+                duration: battleDuration || 30,
+                isBoss: isBoss,
+                floor: GameState.current.currentFloor
+            });
         } else {
             const penalty = GameState.applyDeathPenalty();
             setBattleResults(penalty);
+
+            // Set battle context for defeat flavor text
+            setBattleContext({
+                duration: battleDuration || 30,
+                isBoss: false,
+                floor: GameState.current.currentFloor
+            });
         }
         GameState.update('currentScreen', 'outcome');
     };
 
     const handleOutcomeContinue = () => {
         setBattleResults(null);
+        setBattleContext(null);
         if (GameState.current.player && GameState.current.player.stats && GameState.current.player.stats.hp > 0) {
             // Show battle outro screen before returning to exploration
             const { x, y } = GameState.current.playerPos;
@@ -551,7 +568,7 @@ export default function App() {
         return <><EventInterimScreen {...interimScreen} /><PersistentDebugger /></>;
     }
     if (gameState.currentScreen === 'outcome') {
-        return <><OutcomeScreen victory={gameState.player && gameState.player.stats && gameState.player.stats.hp > 0} results={battleResults} onContinue={handleOutcomeContinue} /><PersistentDebugger /></>;
+        return <><OutcomeScreen victory={gameState.player && gameState.player.stats && gameState.player.stats.hp > 0} results={battleResults} battleContext={battleContext} onContinue={handleOutcomeContinue} /><PersistentDebugger /></>;
     }
     if (gameState.currentScreen === "battle") {
         return <><BattleScreen player={gameState.player} enemies={gameState.enemies} combatSystem={combatSystem} combatLog={combatLog} /><PersistentDebugger /><PerformanceHUD /></>;

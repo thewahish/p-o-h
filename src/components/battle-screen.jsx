@@ -8,6 +8,7 @@ import { t, Localization } from '../core/localization';
 import { PotionSystem } from '../systems/potions';
 import { UltimateSystem } from '../systems/ultimate-system';
 import { getElement } from '../constants/elements';
+import { ContentGenerator } from '../systems/content-generator';
 
 export default function BattleScreen({ player, enemies: initialEnemies, combatSystem, combatLog }) {
     const [localLogs, setLocalLogs] = useState(combatLog || []);
@@ -16,6 +17,32 @@ export default function BattleScreen({ player, enemies: initialEnemies, combatSy
     const [focusedTargetId, setFocusedTargetId] = useState(() => {
         const firstAliveEnemy = initialEnemies.find(e => e.isAlive);
         return firstAliveEnemy ? firstAliveEnemy.originalIndex : null;
+    });
+
+    // Generate battle intro flavor text
+    const [battleIntro] = useState(() => {
+        const floor = GameState.current.currentFloor || 1;
+        const characterPath = GameState.current.player?.progressionPath || 'defensive_tank';
+
+        // Check if this is a boss or elite battle
+        const isBoss = initialEnemies.some(e => e.isBoss);
+        const isElite = initialEnemies.some(e => e.isElite || e.prefixKey?.includes('elite'));
+
+        if (isBoss) {
+            return ContentGenerator.generateBossIntro(floor, characterPath);
+        } else if (isElite) {
+            const enemyType = initialEnemies[0]?.type || 'elite';
+            return ContentGenerator.generateEliteIntro(enemyType);
+        } else {
+            // Regular battle - short flavor
+            const flavorTexts = [
+                "Steel meets flesh. Battle begins!",
+                "Your enemies stand ready. Show no mercy.",
+                "Another fight. Another chance to prove yourself.",
+                "They block your path. Cut them down."
+            ];
+            return flavorTexts[Math.floor(Math.random() * flavorTexts.length)];
+        }
     });
 
     // --- FIX: This effect now correctly detects when an enemy dies and retargets ---
@@ -223,6 +250,17 @@ export default function BattleScreen({ player, enemies: initialEnemies, combatSy
                     )}
                     <p className="text-sm text-rpg-text opacity-80">{isPlayerTurn ? t('combat.playerTurn', {player: player?.nameKey ? t(player.nameKey) : 'Player'}) : t('combat.enemyTurn')}</p>
                 </div>
+
+                {/* Battle Intro Flavor Text */}
+                {battleIntro && (
+                    <div className="mb-3 flex-shrink-0 animate-fade-in">
+                        <div className="bg-gradient-to-r from-transparent via-[#d4a656]/20 to-transparent p-3 rounded-lg border-l-4 border-r-4 border-[#d4a656]">
+                            <p className="text-sm italic text-[#d4a656] text-center">
+                                {battleIntro}
+                            </p>
+                        </div>
+                    </div>
+                )}
 
                 {/* Enemies Section - Top */}
                 <div className="flex-grow overflow-y-auto pr-2 space-y-2 mb-2">
