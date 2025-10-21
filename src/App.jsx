@@ -14,6 +14,7 @@ import { Localization, t } from "./core/localization.js";
 import LanguageSelection from "./components/language-selection.jsx";
 import { GameConfig } from "./constants/config.js";
 import autoSaveService, { SaveTriggers } from "./services/autosave.js";
+import { AnalyticsSystem } from "./systems/analytics.js";
 
 // === Import UI screens ===
 import BattleScreen from "./components/battle-screen.jsx";
@@ -25,6 +26,7 @@ import SaveSlotScreen from "./components/save-slot-screen.jsx";
 import EventInterimScreen from "./components/event-interim-screen.jsx";
 import BuffSelectionScreen from "./components/buff-selection-screen.jsx";
 import { InventoryScreen } from "./components/inventory-screen.jsx";
+import AnalyticsDashboard from "./components/analytics-dashboard.jsx";
 
 Logger.log('App.jsx: Module loaded.', 'SYSTEM');
 
@@ -441,16 +443,32 @@ export default function App() {
 
     const endBattle = (victory, rewards) => {
         Logger.log(`Battle ended. Victory: ${victory}`, 'SYSTEM');
+
+        // Track battle analytics
+        const totalGold = victory ? rewards.reduce((sum, r) => sum + (r.gold || 0), 0) : 0;
+        const goldLost = victory ? 0 : (GameState.current.gold * 0.1); // 10% penalty on defeat
+
+        // Track the battle (damage tracking can be enhanced later)
+        AnalyticsSystem.trackBattle({
+            victory,
+            characterId: GameState.current.selectedCharacter,
+            floor: GameState.current.currentFloor,
+            goldGained: totalGold,
+            goldLost: goldLost,
+            damageDealt: 0, // TODO: Track from combat log
+            damageTaken: 0, // TODO: Track from combat log
+            duration: 0 // TODO: Track battle duration
+        });
+
         if (victory) {
             const { x, y } = GameState.current.playerPos;
             const currentRoom = GameState.current.dungeon[y][x];
             currentRoom.completed = true;
-            
-            const totalGold = rewards.reduce((sum, r) => sum + (r.gold || 0), 0);
+
             const totalXp = rewards.reduce((sum, r) => sum + (r.xp || 0), 0);
             GameState.addGold(totalGold);
             GameState.addExperience(totalXp);
-            
+
             // Check if this was a boss fight and spawn stairs
             if (currentRoom.type === RoomTypes.BOSS) {
                 spawnStairs();
@@ -458,6 +476,9 @@ export default function App() {
 
                 // AUTO-SAVE: Boss defeat
                 autoSaveService.performAutoSave(SaveTriggers.BOSS_DEFEAT);
+
+                // Track floor completion
+                AnalyticsSystem.trackFloorComplete(GameState.current.currentFloor, GameState.current.selectedCharacter);
             }
 
             setBattleResults({ gold: totalGold, xp: totalXp });
@@ -530,6 +551,9 @@ export default function App() {
     }
     if (gameState.currentScreen === "shop") {
         return <><ShopScreen inventorySystem={inventorySystem} onLeave={() => showEventOutro('shop')} /><PersistentDebugger /></>;
+    }
+    if (gameState.currentScreen === "analytics") {
+        return <><AnalyticsDashboard /><PersistentDebugger /></>;
     }
     // Handle save-slots screen state (when returning from death)
     if (gameState.currentScreen === 'save-slots') {
@@ -721,10 +745,10 @@ function MainMenu({ onCharacterSelect, currentLanguage }) {
         <div className="h-full flex flex-col items-center justify-center bg-rpg-radial text-rpg-text px-4">
             <h1 className="text-5xl font-extrabold text-rpg-primary mb-3 drop-shadow-lg">{t('game.title')}</h1>
             <p className="text-lg text-rpg-text opacity-80 mb-6">{t('game.subtitle')}</p>
-            
+
             {/* Language Toggle Button */}
-            <div className="mb-4">
-                <button 
+            <div className="mb-4 flex gap-2">
+                <button
                     onClick={() => {
                         const newLang = currentLanguage === 'en' ? 'ar' : 'en';
                         Localization.setLanguage(newLang);
@@ -733,8 +757,16 @@ function MainMenu({ onCharacterSelect, currentLanguage }) {
                 >
                     🌍 {currentLanguage === 'en' ? 'العربية' : 'English'}
                 </button>
+
+                {/* Analytics Button */}
+                <button
+                    onClick={() => GameState.update('currentScreen', 'analytics')}
+                    className="px-4 py-2 bg-rpg-secondary hover:bg-rpg-primary text-sm rounded-lg border border-rpg-primary transition-all duration-200"
+                >
+                    📊 Analytics
+                </button>
             </div>
-            
+
             <div className="flex flex-wrap justify-center gap-4 max-w-lg">
                 {Object.values(Characters).map((char) => (
                     <button key={char.id} onClick={() => onCharacterSelect(char.id)} className="px-6 py-4 bg-rpg-bg-darker bg-opacity-80 hover:bg-rpg-secondary text-lg rounded-lg border border-rpg-primary shadow-md transition-all duration-200 backdrop-blur-sm">
