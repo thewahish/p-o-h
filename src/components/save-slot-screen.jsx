@@ -166,15 +166,15 @@ export default function SaveSlotScreen({ characterId, onBack, onGameStart }) {
                     <p className="text-rpg-text opacity-70 text-xs">{t('saveSlots.selectSlot')}</p>
                 </div>
 
-                <div className="space-y-2 flex-1 overflow-y-auto min-h-0">
+                <div className="flex flex-col gap-2 flex-1 min-h-0">
                     {saveSlots.map((slot) => {
                         const isExpanded = expandedSlot === slot.slotNumber;
 
                         return (
                             <div
                                 key={slot.slotNumber}
-                                className={`bg-rpg-bg-darker bg-opacity-80 border-2 rounded-lg backdrop-blur-sm transition-all ${
-                                    isExpanded ? 'border-rpg-primary p-4' : 'border-rpg-secondary p-2 cursor-pointer hover:border-rpg-primary'
+                                className={`flex-1 bg-rpg-bg-darker bg-opacity-80 border-2 rounded-lg backdrop-blur-sm transition-all flex flex-col ${
+                                    isExpanded ? 'border-rpg-primary p-4' : 'border-rpg-secondary p-3 cursor-pointer hover:border-rpg-primary justify-center'
                                 }`}
                                 onClick={() => !isExpanded && setExpandedSlot(slot.slotNumber)}
                             >
@@ -262,17 +262,17 @@ export default function SaveSlotScreen({ characterId, onBack, onGameStart }) {
                                         </div>
                                     </>
                                 ) : (
-                                    // COLLAPSED VIEW - One line summary
+                                    // COLLAPSED VIEW - Summary centered
                                     <div className="flex items-center justify-between">
-                                        <h3 className="text-sm font-bold text-rpg-primary">
+                                        <h3 className="text-lg font-bold text-rpg-primary">
                                             {t('saveSlots.slot')} {slot.slotNumber}
                                         </h3>
                                         {slot.exists ? (
-                                            <p className="text-rpg-text opacity-80 text-xs">
+                                            <p className="text-rpg-text opacity-80 text-sm">
                                                 Lv.{slot.level} | Floor {slot.floor}
                                             </p>
                                         ) : (
-                                            <p className="text-rpg-text opacity-50 text-xs italic">{t('saveSlots.empty')}</p>
+                                            <p className="text-rpg-text opacity-50 text-sm italic">{t('saveSlots.empty')}</p>
                                         )}
                                     </div>
                                 )}
