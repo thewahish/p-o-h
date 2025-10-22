@@ -1,8 +1,32 @@
 # Design System Migration Status
 
-## ✅ Completed (4/12 screens)
+## ✅ Completed (6/12 screens)
 
-### 1. **Outcome Screen** ✅
+### 1. **Main Menu** ✅
+- **File**: `src/App.jsx` (MainMenu component)
+- **Components Used**:
+  - `ScreenContainer` + `ScreenContent` - Layout structure
+  - `ScreenTitle` - Game title
+  - `BodyText` - Subtitle
+  - `PrimaryButton` - Character selection buttons
+  - `SecondaryButton` - Language toggle
+  - `SmallText` - Character roles
+- **Before/After**:
+  - Before: text-5xl title, text-lg subtitle, custom button classes
+  - After: Standardized text-2xl title, text-base subtitle, design system buttons
+
+### 2. **Exploration Screen** ✅
+- **File**: `src/App.jsx` (Exploration view)
+- **Components Used**:
+  - `StatBar` - XP progress bar
+  - `SmallText` - HP label
+  - `PrimaryButton` - Inventory button
+- **Before/After**:
+  - Before: Custom div for XP bar, custom button for inventory
+  - After: StatBar component for XP, PrimaryButton for inventory
+- **Notes**: Most of the exploration screen remains custom due to unique layout (stats panel, dungeon grid)
+
+### 3. **Outcome Screen** ✅
 - **File**: `src/components/outcome-screen.jsx`
 - **Components Used**:
   - `Modal` + `ModalContent` - Overlay structure
@@ -14,7 +38,7 @@
   - Before: Mixed sizes (text-4xl title, text-lg body, py-3 button)
   - After: Standardized (text-2xl title, text-base body, py-2 button)
 
-### 2. **Shop Screen** ✅
+### 4. **Shop Screen** ✅
 - **File**: `src/components/shop-screen.jsx`
 - **Components Used**:
   - `Modal` + `ModalContent`
@@ -27,7 +51,7 @@
   - Before: text-xl title, text-sm items, py-2 buttons
   - After: text-2xl title, text-base items, standardized buttons
 
-### 3. **Buff Selection Screen** ✅
+### 5. **Buff Selection Screen** ✅
 - **File**: `src/components/buff-selection-screen.jsx`
 - **Components Used**:
   - `ScreenContainer` + `ScreenContent`
@@ -41,7 +65,7 @@
   - Before: text-2xl title, text-4xl icons, text-base names
   - After: Consistent text-2xl title, text-5xl icons, text-base names
 
-### 4. **Event Interim Screen** ✅
+### 6. **Event Interim Screen** ✅
 - **File**: `src/components/event-interim-screen.jsx`
 - **Components Used**:
   - `ScreenContainer`
@@ -62,9 +86,9 @@ None currently
 
 ---
 
-## ⏳ Pending (8/12 screens)
+## ⏳ Pending (6/12 screens)
 
-### 5. **Inventory Screen** ⏳
+### 7. **Inventory Screen** ⏳
 - **File**: `src/components/inventory-screen.jsx`
 - **Estimated Effort**: Medium
 - **Components Needed**:
@@ -74,7 +98,7 @@ None currently
   - `PrimaryButton` + `SecondaryButton`
   - Filter tabs (custom implementation)
 
-### 6. **Save Slot Screen** ⏳
+### 8. **Save Slot Screen** ⏳
 - **File**: `src/components/save-slot-screen.jsx`
 - **Estimated Effort**: Medium
 - **Components Needed**:
@@ -84,7 +108,7 @@ None currently
   - `BodyText` for save data
   - `PrimaryButton` + `SecondaryButton`
 
-### 7. **Battle Screen** ⏳
+### 9. **Battle Screen** ⏳
 - **File**: `src/components/battle-screen.jsx`
 - **Estimated Effort**: High (most complex)
 - **Components Needed**:
@@ -96,15 +120,7 @@ None currently
   - `StatDisplay` for stats
   - `PrimaryButton` + `SecondaryButton` for actions
 
-### 8. **Main Menu** ⏳
-- **File**: `src/App.jsx` (MainMenu component)
-- **Estimated Effort**: Low
-- **Components Needed**:
-  - `ScreenContainer` + `ScreenContent`
-  - `ScreenTitle` + subtitle
-  - `PrimaryButton` for menu items
-
-### 9. **Character Selection** ⏳
+### 10. **Character Selection** ⏳
 - **File**: `src/App.jsx` (Character selection section)
 - **Estimated Effort**: Medium
 - **Components Needed**:
@@ -113,15 +129,6 @@ None currently
   - `Card` + `CardTitle` for characters
   - `LargeIcon` for character icons
   - `StatDisplay` for base stats
-
-### 10. **Exploration Screen** ⏳
-- **File**: `src/App.jsx` (Exploration view)
-- **Estimated Effort**: Low
-- **Components Needed**:
-  - `ScreenContainer`
-  - `BodyText` for stats
-  - `StatBar` for XP
-  - `PrimaryButton` for inventory
 
 ### 11. **Soul Forge** ⏳
 - **File**: `src/components/soul-forge.jsx`
@@ -148,18 +155,18 @@ None currently
 ## 📊 Progress Summary
 
 - **Total Screens**: 12
-- **Completed**: 4 (33%)
-- **Remaining**: 8 (67%)
+- **Completed**: 6 (50%)
+- **Remaining**: 6 (50%)
 
 ### Completion by Complexity:
-- **Simple Screens** (1-2 hours): 4/5 completed (80%)
+- **Simple Screens** (1-2 hours): 5/5 completed (100%)
   - ✅ Outcome
   - ✅ Event Interim
-  - ⏳ Main Menu
-  - ⏳ Exploration
+  - ✅ Main Menu
+  - ✅ Exploration
   - ✅ Shop
 
-- **Medium Screens** (2-4 hours): 1/5 completed (20%)
+- **Medium Screens** (2-4 hours): 1/6 completed (17%)
   - ⏳ Inventory
   - ⏳ Save Slots
   - ⏳ Character Selection
@@ -174,25 +181,26 @@ None currently
 
 ## 🎯 Next Steps
 
-### Immediate (Session 1 - Remaining Time)
-1. Test currently migrated screens
-2. Fix any visual regressions
-3. Document any design token adjustments needed
+### Immediate (Session 1 - COMPLETED ✅)
+1. ✅ Migrated Main Menu
+2. ✅ Migrated Exploration Screen
+3. ✅ Tested build successfully
+4. ✅ Updated migration documentation
 
-### Short Term (Session 2)
+### Short Term (Session 2 - NEXT)
 1. Migrate Inventory Screen
 2. Migrate Save Slot Screen
-3. Migrate Main Menu
+3. Migrate Character Selection
 
 ### Medium Term (Session 3)
-1. Migrate Character Selection
-2. Migrate Exploration Screen
-3. Migrate Soul Forge
+1. Migrate Soul Forge
+2. Migrate Analytics Dashboard
+3. Polish and test all medium complexity screens
 
 ### Long Term (Session 4)
-1. Migrate Battle Screen (most complex)
-2. Migrate Analytics Dashboard
-3. Final testing and polish
+1. Migrate Battle Screen (most complex, 170+ lines)
+2. Final testing across all screens
+3. Visual consistency polish and mobile testing
 
 ---
 
@@ -286,5 +294,5 @@ Based on user feedback after mockup generation:
 
 ---
 
-*Last Updated: 2025-01-XX*
-*Migration Progress: 33% Complete*
+*Last Updated: 2025-10-21*
+*Migration Progress: 50% Complete* 🎉

@@ -30,6 +30,12 @@ import { InventoryScreen } from "./components/inventory-screen.jsx";
 import AnalyticsDashboard from "./components/analytics-dashboard.jsx";
 import PerformanceHUD from "./components/performance-hud.jsx";
 
+// === Import Design System ===
+import {
+    ScreenContainer, ScreenContent, ScreenTitle, BodyText, SmallText,
+    PrimaryButton, SecondaryButton, StatBar
+} from "./design-system/components.jsx";
+
 Logger.log('App.jsx: Module loaded.', 'SYSTEM');
 
 // --- TOP-LEVEL INITIALIZATIONS ---
@@ -705,15 +711,18 @@ export default function App() {
                             <span>XP: {gameState.experience}/{nextLevelXP}</span>
                             <span>{Math.floor(xpPercent)}%</span>
                         </div>
-                        <div className="h-1 bg-rpg-bg-darkest bg-opacity-80 rounded-full overflow-hidden">
-                            <div className="h-1 bg-mana-light transition-all duration-300" style={{width: `${Math.min(100, Math.max(0, xpPercent))}%`}}></div>
-                        </div>
+                        <StatBar
+                            current={xpProgressInLevel}
+                            max={xpRequiredForLevel}
+                            color="bg-mana-light"
+                            showNumbers={false}
+                        />
                     </div>
 
                     {/* Player HP */}
                     {player && (
                         <div className="text-xs text-center">
-                            <div className="text-rpg-text opacity-70 text-[10px] leading-none">HP</div>
+                            <SmallText className="leading-none mb-0.5">HP</SmallText>
                             <div className="text-health-mid font-bold text-xs leading-none">
                                 {player.stats.hp}/{player.maxStats.hp}
                             </div>
@@ -724,13 +733,13 @@ export default function App() {
 
             {/* Inventory Button */}
             <div className="shrink-0 mb-0.5">
-                <button
+                <PrimaryButton
                     onClick={() => setShowInventory(true)}
-                    className="w-full px-3 py-1 bg-gradient-to-r from-rpg-secondary to-rpg-primary text-black font-bold text-sm rounded-lg hover:from-rpg-primary hover:to-rpg-secondary transition-all flex items-center justify-center gap-1.5 border border-rpg-primary"
+                    className="w-full bg-gradient-to-r from-rpg-secondary to-rpg-primary hover:from-rpg-primary hover:to-rpg-secondary text-black flex items-center justify-center gap-1.5"
                 >
                     <span className="text-base">🎒</span>
                     <span>Inventory</span>
-                </button>
+                </PrimaryButton>
             </div>
 
                 {/* Dungeon Grid - Takes remaining space */}
@@ -766,31 +775,35 @@ export default function App() {
 
 function MainMenu({ onCharacterSelect, currentLanguage }) {
     return (
-        <div className="h-full flex flex-col items-center justify-center bg-rpg-radial text-rpg-text px-4">
-            <h1 className="text-5xl font-extrabold text-rpg-primary mb-3 drop-shadow-lg text-center">{t('game.title')}</h1>
-            <p className="text-lg text-rpg-text opacity-80 mb-6 text-center">{t('game.subtitle')}</p>
+        <ScreenContainer className="justify-center items-center">
+            <ScreenContent className="items-center max-w-md w-full">
+                <ScreenTitle className="mb-2">{t('game.title')}</ScreenTitle>
+                <BodyText className="text-center opacity-80 mb-4" large>{t('game.subtitle')}</BodyText>
 
-            {/* Language Toggle Button */}
-            <div className="mb-4">
-                <button
+                {/* Language Toggle Button */}
+                <SecondaryButton
                     onClick={() => {
                         const newLang = currentLanguage === 'en' ? 'ar' : 'en';
                         Localization.setLanguage(newLang);
                     }}
-                    className="px-4 py-2 bg-rpg-secondary hover:bg-rpg-primary text-sm rounded-lg border border-rpg-primary transition-all duration-200"
+                    className="mb-4"
                 >
                     🌍 {currentLanguage === 'en' ? 'العربية' : 'English'}
-                </button>
-            </div>
+                </SecondaryButton>
 
-            <div className="flex flex-col gap-4 w-full max-w-md">
-                {Object.values(Characters).map((char) => (
-                    <button key={char.id} onClick={() => onCharacterSelect(char.id)} className="w-full px-6 py-4 bg-rpg-bg-darker bg-opacity-80 hover:bg-rpg-secondary text-lg rounded-lg border border-rpg-primary shadow-md transition-all duration-200 backdrop-blur-sm text-left">
-                        {t(char.nameKey)}{" "}
-                        <span className="text-sm text-rpg-text opacity-70">({t(char.roleKey)})</span>
-                    </button>
-                ))}
-            </div>
-        </div>
+                <div className="flex flex-col gap-3 w-full">
+                    {Object.values(Characters).map((char) => (
+                        <PrimaryButton
+                            key={char.id}
+                            onClick={() => onCharacterSelect(char.id)}
+                            className="w-full text-left backdrop-blur-sm py-3"
+                        >
+                            {t(char.nameKey)}{" "}
+                            <SmallText className="inline opacity-70">({t(char.roleKey)})</SmallText>
+                        </PrimaryButton>
+                    ))}
+                </div>
+            </ScreenContent>
+        </ScreenContainer>
     );
 }
