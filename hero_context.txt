@@ -1,0 +1,5 @@
+PROJECT: Path of Heroes
+GENRE: Roguelike RPG
+RULE: Every UI element must use stationary, fixed-size rectangular or square blocks (no flex growth).
+FOCUS: Local reasoning, clean modular code, level logic, progression systems.
+DO NOT: invent lore unless asked.

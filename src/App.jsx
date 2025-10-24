@@ -14,6 +14,8 @@ import { Localization, t } from "./core/localization.js";
 import LanguageSelection from "./components/language-selection.jsx";
 import { GameConfig } from "./constants/config.js";
 import autoSaveService, { SaveTriggers } from "./services/autosave.js";
+import { AnalyticsSystem } from "./systems/analytics.js";
+import { PerformanceMonitor } from "./utils/performance-monitor.js";
 
 // === Import UI screens ===
 import BattleScreen from "./components/battle-screen.jsx";
@@ -25,6 +27,14 @@ import SaveSlotScreen from "./components/save-slot-screen.jsx";
 import EventInterimScreen from "./components/event-interim-screen.jsx";
 import BuffSelectionScreen from "./components/buff-selection-screen.jsx";
 import { InventoryScreen } from "./components/inventory-screen.jsx";
+import AnalyticsDashboard from "./components/analytics-dashboard.jsx";
+import PerformanceHUD from "./components/performance-hud.jsx";
+
+// === Import Design System ===
+import {
+    ScreenContainer, ScreenContent, ScreenTitle, BodyText, SmallText,
+    PrimaryButton, SecondaryButton, StatBar
+} from "./design-system/components.jsx";
 
 Logger.log('App.jsx: Module loaded.', 'SYSTEM');
 
@@ -43,6 +53,7 @@ export default function App() {
     const [gameState, setGameState] = useState(GameState.current);
     const [combatLog, setCombatLog] = useState([]);
     const [battleResults, setBattleResults] = useState(null);
+    const [battleContext, setBattleContext] = useState(null); // { duration, isBoss, floor }
     const [showLanguageSelection, setShowLanguageSelection] = useState(false);
     const [localizationReady, setLocalizationReady] = useState(false);
     const [currentLanguage, setCurrentLanguage] = useState('en');
@@ -422,6 +433,7 @@ export default function App() {
             setCombatLog([]);
             GameState.current.onBattleEnd = endBattle;
             GameState.update('currentScreen', 'battle');
+            PerformanceMonitor.startBattleTimer(); // Start tracking battle duration
             combatSystem.startBattle(liveEnemies, { onLog: (msg) => setCombatLog((prev) => [...prev, msg]) });
         }
     };
@@ -434,6 +446,7 @@ export default function App() {
             setCombatLog([]);
             GameState.current.onBattleEnd = endBattle;
             GameState.update('currentScreen', 'battle');
+            PerformanceMonitor.startBattleTimer(); // Start tracking battle duration
             combatSystem.startBattle(liveEnemies, { onLog: (msg) => setCombatLog((prev) => [...prev, msg]) });
             setPendingBattle(null);
         }
@@ -441,35 +454,73 @@ export default function App() {
 
     const endBattle = (victory, rewards) => {
         Logger.log(`Battle ended. Victory: ${victory}`, 'SYSTEM');
+
+        // End performance tracking
+        const battleDuration = PerformanceMonitor.endBattleTimer();
+
+        // Track battle analytics
+        const totalGold = victory ? rewards.reduce((sum, r) => sum + (r.gold || 0), 0) : 0;
+        const goldLost = victory ? 0 : (GameState.current.gold * 0.1); // 10% penalty on defeat
+
+        // Track the battle with actual duration
+        AnalyticsSystem.trackBattle({
+            victory,
+            characterId: GameState.current.selectedCharacter,
+            floor: GameState.current.currentFloor,
+            goldGained: totalGold,
+            goldLost: goldLost,
+            damageDealt: 0, // TODO: Track from combat log
+            damageTaken: 0, // TODO: Track from combat log
+            duration: battleDuration || 0
+        });
+
         if (victory) {
             const { x, y } = GameState.current.playerPos;
             const currentRoom = GameState.current.dungeon[y][x];
             currentRoom.completed = true;
-            
-            const totalGold = rewards.reduce((sum, r) => sum + (r.gold || 0), 0);
+
             const totalXp = rewards.reduce((sum, r) => sum + (r.xp || 0), 0);
             GameState.addGold(totalGold);
             GameState.addExperience(totalXp);
-            
+
             // Check if this was a boss fight and spawn stairs
-            if (currentRoom.type === RoomTypes.BOSS) {
+            const isBoss = currentRoom.type === RoomTypes.BOSS;
+            if (isBoss) {
                 spawnStairs();
                 Logger.log('Boss defeated! Stairs to next floor have appeared!', 'SYSTEM');
 
                 // AUTO-SAVE: Boss defeat
                 autoSaveService.performAutoSave(SaveTriggers.BOSS_DEFEAT);
+
+                // Track floor completion
+                AnalyticsSystem.trackFloorComplete(GameState.current.currentFloor, GameState.current.selectedCharacter);
             }
 
             setBattleResults({ gold: totalGold, xp: totalXp });
+
+            // Set battle context for dynamic flavor text
+            setBattleContext({
+                duration: battleDuration || 30,
+                isBoss: isBoss,
+                floor: GameState.current.currentFloor
+            });
         } else {
             const penalty = GameState.applyDeathPenalty();
             setBattleResults(penalty);
+
+            // Set battle context for defeat flavor text
+            setBattleContext({
+                duration: battleDuration || 30,
+                isBoss: false,
+                floor: GameState.current.currentFloor
+            });
         }
         GameState.update('currentScreen', 'outcome');
     };
 
     const handleOutcomeContinue = () => {
         setBattleResults(null);
+        setBattleContext(null);
         if (GameState.current.player && GameState.current.player.stats && GameState.current.player.stats.hp > 0) {
             // Show battle outro screen before returning to exploration
             const { x, y } = GameState.current.playerPos;
@@ -523,13 +574,16 @@ export default function App() {
         return <><EventInterimScreen {...interimScreen} /><PersistentDebugger /></>;
     }
     if (gameState.currentScreen === 'outcome') {
-        return <><OutcomeScreen victory={gameState.player && gameState.player.stats && gameState.player.stats.hp > 0} results={battleResults} onContinue={handleOutcomeContinue} /><PersistentDebugger /></>;
+        return <><OutcomeScreen victory={gameState.player && gameState.player.stats && gameState.player.stats.hp > 0} results={battleResults} battleContext={battleContext} onContinue={handleOutcomeContinue} /><PersistentDebugger /></>;
     }
     if (gameState.currentScreen === "battle") {
-        return <><BattleScreen player={gameState.player} enemies={gameState.enemies} combatSystem={combatSystem} combatLog={combatLog} /><PersistentDebugger /></>;
+        return <><BattleScreen player={gameState.player} enemies={gameState.enemies} combatSystem={combatSystem} combatLog={combatLog} /><PersistentDebugger /><PerformanceHUD /></>;
     }
     if (gameState.currentScreen === "shop") {
-        return <><ShopScreen inventorySystem={inventorySystem} onLeave={() => showEventOutro('shop')} /><PersistentDebugger /></>;
+        return <><ShopScreen inventorySystem={inventorySystem} onLeave={() => showEventOutro('shop')} /><PersistentDebugger /><PerformanceHUD /></>;
+    }
+    if (gameState.currentScreen === "analytics") {
+        return <><AnalyticsDashboard /><PersistentDebugger /><PerformanceHUD /></>;
     }
     // Handle save-slots screen state (when returning from death)
     if (gameState.currentScreen === 'save-slots') {
@@ -618,7 +672,7 @@ export default function App() {
     }
 
     return (
-        <div className="w-full max-w-2xl h-full bg-rpg-radial text-rpg-text p-1 flex flex-col overflow-hidden">
+        <div className="w-full max-w-2xl h-[90vh] bg-rpg-radial text-rpg-text p-1 flex flex-col overflow-hidden mx-auto">
             {/* Auto-save indicator */}
             {showSaveIndicator && (
                 <div className="fixed top-4 right-4 z-50 bg-uncommon text-white px-4 py-2 rounded-lg shadow-lg flex items-center gap-2 animate-fade-in">
@@ -628,9 +682,9 @@ export default function App() {
             )}
 
             {/* Compact Top Stats Panel */}
-            <div className="bg-rpg-bg-darker bg-opacity-80 rounded-lg px-2 py-1.5 mb-1 border border-rpg-primary shrink-0 backdrop-blur-sm">
+            <div className="bg-rpg-bg-darker bg-opacity-80 rounded-lg px-2 py-1 mb-0.5 border border-rpg-primary shrink-0 backdrop-blur-sm">
                 {/* First Row - Core Stats */}
-                <div className="grid grid-cols-4 gap-2 text-center text-xs mb-1.5">
+                <div className="grid grid-cols-4 gap-1.5 text-center text-xs mb-1">
                     <div>
                         <div className="text-rpg-text opacity-70 text-xs leading-none">{t('stats.floor')}</div>
                         <div className="text-rpg-primary font-bold text-sm leading-none">{gameState.currentFloor}</div>
@@ -650,23 +704,26 @@ export default function App() {
                 </div>
                 
                 {/* Second Row - XP Progress and Player Stats */}
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1.5">
                     {/* XP Bar */}
                     <div className="flex-1">
-                        <div className="flex justify-between text-xs text-rpg-text opacity-70 leading-none mb-0.5">
+                        <div className="flex justify-between text-[10px] text-rpg-text opacity-70 leading-none mb-0.5">
                             <span>XP: {gameState.experience}/{nextLevelXP}</span>
                             <span>{Math.floor(xpPercent)}%</span>
                         </div>
-                        <div className="h-1.5 bg-rpg-bg-darkest bg-opacity-80 rounded-full overflow-hidden">
-                            <div className="h-1.5 bg-mana-light transition-all duration-300" style={{width: `${Math.min(100, Math.max(0, xpPercent))}%`}}></div>
-                        </div>
+                        <StatBar
+                            current={xpProgressInLevel}
+                            max={xpRequiredForLevel}
+                            color="bg-mana-light"
+                            showNumbers={false}
+                        />
                     </div>
-                    
+
                     {/* Player HP */}
                     {player && (
                         <div className="text-xs text-center">
-                            <div className="text-rpg-text opacity-70 text-xs leading-none">HP</div>
-                            <div className="text-health-mid font-bold text-sm leading-none">
+                            <SmallText className="leading-none mb-0.5">HP</SmallText>
+                            <div className="text-health-mid font-bold text-xs leading-none">
                                 {player.stats.hp}/{player.maxStats.hp}
                             </div>
                         </div>
@@ -675,26 +732,26 @@ export default function App() {
             </div>
 
             {/* Inventory Button */}
-            <div className="shrink-0 mb-1">
-                <button
+            <div className="shrink-0 mb-0.5">
+                <PrimaryButton
                     onClick={() => setShowInventory(true)}
-                    className="w-full px-4 py-2 bg-gradient-to-r from-rpg-secondary to-rpg-primary text-black font-bold rounded-lg hover:from-rpg-primary hover:to-rpg-secondary transition-all flex items-center justify-center gap-2 border border-rpg-primary"
+                    className="w-full bg-gradient-to-r from-rpg-secondary to-rpg-primary hover:from-rpg-primary hover:to-rpg-secondary text-black flex items-center justify-center gap-1.5"
                 >
-                    <span className="text-xl">🎒</span>
+                    <span className="text-base">🎒</span>
                     <span>Inventory</span>
-                </button>
+                </PrimaryButton>
             </div>
 
                 {/* Dungeon Grid - Takes remaining space */}
-                <div className="bg-rpg-bg-darker bg-opacity-60 rounded-lg p-1.5 border border-rpg-secondary flex-1 flex flex-col min-h-0 backdrop-blur-sm">
-                    <div className="grid grid-cols-5 gap-1 w-full max-w-md mx-auto" style={{ aspectRatio: '5/9', maxHeight: '100%' }}>
+                <div className="bg-rpg-bg-darker bg-opacity-60 rounded-lg p-1 border border-rpg-secondary flex-1 flex flex-col justify-center min-h-0 backdrop-blur-sm">
+                    <div className="grid grid-cols-5 gap-0.5 w-full h-full max-h-full">
                         {dungeon.map((row, y) =>
                             row.map((room, x) => {
                                 const isPlayerHere = playerPos && playerPos.x === x && playerPos.y === y;
                                 return (
                                     <div
                                         key={`${x},${y}`}
-                                        className={`aspect-square flex items-center justify-center text-xl rounded transition-colors ${ room.revealed && room.type !== RoomTypes.WALL ? 'cursor-pointer' : 'cursor-default' } ${getRoomBackgroundColor(room, isPlayerHere)}`}
+                                        className={`flex items-center justify-center text-base sm:text-lg rounded transition-colors ${ room.revealed && room.type !== RoomTypes.WALL ? 'cursor-pointer' : 'cursor-default' } ${getRoomBackgroundColor(room, isPlayerHere)}`}
                                         onClick={() => { if ( room.revealed && room.type !== RoomTypes.WALL && playerPos && Math.abs(x - playerPos.x) + Math.abs(y - playerPos.y) === 1 ) { movePlayer(x - playerPos.x, y - playerPos.y); } }}
                                     >
                                         {isPlayerHere ? "🧍" : room.revealed ? getRoomIcon(room) : ""}
@@ -704,7 +761,7 @@ export default function App() {
                         )}
                     </div>
 
-                    <div className="text-center text-xs text-rpg-text opacity-60 mt-1 px-1 leading-tight">
+                    <div className="text-center text-[10px] text-rpg-text opacity-60 mt-0.5 px-1 leading-tight shrink-0">
                         {t('exploration.controls')}
                     </div>
                 </div>
@@ -718,31 +775,35 @@ export default function App() {
 
 function MainMenu({ onCharacterSelect, currentLanguage }) {
     return (
-        <div className="h-full flex flex-col items-center justify-center bg-rpg-radial text-rpg-text px-4">
-            <h1 className="text-5xl font-extrabold text-rpg-primary mb-3 drop-shadow-lg">{t('game.title')}</h1>
-            <p className="text-lg text-rpg-text opacity-80 mb-6">{t('game.subtitle')}</p>
-            
-            {/* Language Toggle Button */}
-            <div className="mb-4">
-                <button 
+        <ScreenContainer className="justify-center items-center">
+            <ScreenContent className="items-center max-w-md w-full">
+                <ScreenTitle className="mb-2">{t('game.title')}</ScreenTitle>
+                <BodyText className="text-center opacity-80 mb-4" large>{t('game.subtitle')}</BodyText>
+
+                {/* Language Toggle Button */}
+                <SecondaryButton
                     onClick={() => {
                         const newLang = currentLanguage === 'en' ? 'ar' : 'en';
                         Localization.setLanguage(newLang);
                     }}
-                    className="px-4 py-2 bg-rpg-secondary hover:bg-rpg-primary text-sm rounded-lg border border-rpg-primary transition-all duration-200"
+                    className="mb-4"
                 >
                     🌍 {currentLanguage === 'en' ? 'العربية' : 'English'}
-                </button>
-            </div>
-            
-            <div className="flex flex-wrap justify-center gap-4 max-w-lg">
-                {Object.values(Characters).map((char) => (
-                    <button key={char.id} onClick={() => onCharacterSelect(char.id)} className="px-6 py-4 bg-rpg-bg-darker bg-opacity-80 hover:bg-rpg-secondary text-lg rounded-lg border border-rpg-primary shadow-md transition-all duration-200 backdrop-blur-sm">
-                        {t(char.nameKey)}{" "}
-                        <span className="text-sm text-rpg-text opacity-70">({t(char.roleKey)})</span>
-                    </button>
-                ))}
-            </div>
-        </div>
+                </SecondaryButton>
+
+                <div className="flex flex-col gap-3 w-full">
+                    {Object.values(Characters).map((char) => (
+                        <PrimaryButton
+                            key={char.id}
+                            onClick={() => onCharacterSelect(char.id)}
+                            className="w-full text-left backdrop-blur-sm py-3"
+                        >
+                            {t(char.nameKey)}{" "}
+                            <SmallText className="inline opacity-70">({t(char.roleKey)})</SmallText>
+                        </PrimaryButton>
+                    ))}
+                </div>
+            </ScreenContent>
+        </ScreenContainer>
     );
 }

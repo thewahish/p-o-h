@@ -1,0 +1,25 @@
+{
+  "last_node_id": 7,
+  "last_link_id": 7,
+  "nodes": [
+    { "id": 1, "type": "CheckpointLoaderSimple", "pos": [0, 0], "widgets_values": ["__CKPT_NAME__"] },
+    { "id": 2, "type": "CLIPTextEncode", "pos": [0, 200], "inputs": { "clip": [1, 0] }, "widgets_values": ["__PROMPT__"] },
+    { "id": 3, "type": "CLIPTextEncode", "pos": [0, 320], "inputs": { "clip": [1, 0] }, "widgets_values": ["__NEG_PROMPT__"] },
+    { "id": 4, "type": "EmptyLatentImage", "pos": [0, 440], "widgets_values": [__WIDTH__, __HEIGHT__, 1] },
+    { "id": 5, "type": "KSampler", "pos": [260, 260],
+      "inputs": { "model": [1, 1], "positive": [2, 0], "negative": [3, 0], "latent_image": [4, 0] },
+      "widgets_values": [__SEED__, "__SAMPLER__", "__SCHEDULER__", __STEPS__, __CFG__, 1.0]
+    },
+    { "id": 6, "type": "VAEDecode", "pos": [520, 260], "inputs": { "samples": [5, 0], "vae": [1, 2] } },
+    { "id": 7, "type": "SaveImage", "pos": [780, 260], "inputs": { "images": [6, 0] }, "widgets_values": ["poh_cli/__STAMP__/"] }
+  ],
+  "links": [
+    [1,1,0,2,0,"CLIP","CLIPTextEncode"],
+    [2,2,0,5,1,"CONDITIONING","KSampler"],
+    [3,3,0,5,2,"CONDITIONING","KSampler"],
+    [4,1,2,6,1,"VAE","VAEDecode"],
+    [5,4,0,5,3,"LATENT","KSampler"],
+    [6,5,0,6,0,"LATENT","VAEDecode"],
+    [7,6,0,7,0,"IMAGE","SaveImage"]
+  ]
+}

@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Logger from '../core/logger';
+import { GameState } from '../core/state';
 
 const sourceColors = {
     'SYSTEM': 'text-common', 'STATE': 'text-epic', 'UI': 'text-mana-light',
@@ -24,13 +25,22 @@ export default function PersistentDebugger() {
 
     if (!isVisible) {
         return (
-            <button
-                onClick={() => setIsVisible(true)}
-                className="fixed top-4 right-4 bg-rpg-bg-darker hover:bg-rpg-secondary text-rpg-text w-8 h-8 rounded-full shadow-lg z-[9999] flex items-center justify-center text-lg"
-                title="Show Debugger"
-            >
-                🐛
-            </button>
+            <>
+                <button
+                    onClick={() => setIsVisible(true)}
+                    className="fixed top-4 right-4 bg-rpg-bg-darker hover:bg-rpg-secondary text-rpg-text w-8 h-8 rounded-full shadow-lg z-[9999] flex items-center justify-center text-lg"
+                    title="Show Debugger"
+                >
+                    🐛
+                </button>
+                <button
+                    onClick={() => GameState.update('currentScreen', 'analytics')}
+                    className="fixed top-4 right-14 bg-rpg-bg-darker hover:bg-rpg-secondary text-rpg-text w-8 h-8 rounded-full shadow-lg z-[9999] flex items-center justify-center text-lg"
+                    title="Analytics"
+                >
+                    📊
+                </button>
+            </>
         );
     }
 

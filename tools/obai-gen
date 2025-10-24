@@ -1,0 +1,129 @@
+#!/bin/zsh
+set -euo pipefail
+
+PORT="${COMFY_PORT:-8188}"
+HOST="127.0.0.1"
+API="http://$HOST:$PORT/prompt"
+COMFY_APP="ComfyUI"
+
+# Project defaults (edit these two lines if your filenames differ)
+: ${CKPT_DEFAULT:="v1-5-pruned-emaonly.safetensors"}
+: ${MOTION_DEFAULT:="mm_sd_v15_v2.safetensors"}
+
+die(){ print -u2 "❌ $*"; exit 1; }
+
+ensure_server() {
+  if nc -z "$HOST" "$PORT" 2>/dev/null; then return 0; fi
+  print "🚀 Starting ComfyUI…"
+  open -a "$COMFY_APP" || die "Cannot open $COMFY_APP"
+  for i in {1..60}; do
+    sleep 1
+    if nc -z "$HOST" "$PORT" 2>/dev/null; then print "✅ ComfyUI API ready on $HOST:$PORT"; return 0; fi
+  done
+  die "ComfyUI API not responding on $HOST:$PORT"
+}
+
+stamp(){ date +"%Y%m%d-%H%M%S"; }
+
+usage(){
+  cat <<USAGE
+obai-gen: CLI for ComfyUI API (project-local)
+
+Usage:
+  ./tools/obai-gen img "prompt" [--neg "..."] [--w 768] [--h 768] [--steps 20] [--cfg 7] [--sampler euler] [--scheduler normal] [--seed 0] [--ckpt name.safetensors]
+  ./tools/obai-gen vid "prompt" [--neg "..."] [--w 512] [--h 512] [--frames 24] [--fps 12] [--steps 12] [--cfg 6] [--seed 0] [--ckpt name.safetensors] [--motion motion.safetensors]
+
+Outputs:
+  images → assets/images/_comfy_output/poh_cli/<stamp>/
+  video  → assets/video/_comfy_output/poh_video/<stamp>/
+USAGE
+}
+
+main(){
+  local cmd="${1:-}"; shift || true
+  [[ -z "$cmd" ]] && { usage; exit 1; }
+
+  ensure_server
+
+  local PROMPT="" NEG="ugly, bad quality, lowres" W=768 H=768 STEPS=20 CFG=7 SAMPLER="euler" SCHEDULER="normal" SEED=0
+  local CKPT="$CKPT_DEFAULT"
+  local FRAMES=24 FPS=12 MOTION="$MOTION_DEFAULT"
+
+  if [[ "$cmd" == "img" || "$cmd" == "vid" ]]; then
+    [[ $# -ge 1 ]] || die "Missing prompt. Example: ./tools/obai-gen $cmd \"warrior hero portrait, pixel art\""
+    PROMPT="$1"; shift
+    while [[ $# -gt 0 ]]; do
+      case "$1" in
+        --neg) NEG="$2"; shift 2;;
+        --w) W="$2"; shift 2;;
+        --h) H="$2"; shift 2;;
+        --steps) STEPS="$2"; shift 2;;
+        --cfg) CFG="$2"; shift 2;;
+        --sampler) SAMPLER="$2"; shift 2;;
+        --scheduler) SCHEDULER="$2"; shift 2;;
+        --seed) SEED="$2"; shift 2;;
+        --ckpt) CKPT="$2"; shift 2;;
+        --frames) FRAMES="$2"; shift 2;;
+        --fps) FPS="$2"; shift 2;;
+        --motion) MOTION="$2"; shift 2;;
+        -h|--help) usage; exit 0;;
+        *) die "Unknown option: $1";;
+      esac
+    done
+
+    local STAMP="$(stamp)"
+    local WF=""
+    if [[ "$cmd" == "img" ]]; then
+      WF="$PWD/comfy/workflows/cli/t2i_basic_sd15.json"
+      [[ -f "$WF" ]] || die "Workflow not found: $WF"
+      jq \
+        --arg ck "$CKPT" --arg p "$PROMPT" --arg n "$NEG" \
+        --arg s "$SAMPLER" --arg sch "$SCHEDULER" \
+        --argjson w "$W" --argjson h "$H" \
+        --argjson steps "$STEPS" --argjson cfg "$CFG" \
+        --argjson seed "$SEED" --arg stamp "$STAMP" \
+        '
+        (.nodes[]|select(.type=="CheckpointLoaderSimple").widgets_values)[0]=$ck
+        | (.nodes[]|select(.type=="CLIPTextEncode").widgets_values) |=
+            (if .[0]=="__PROMPT__" then [$p] else [$n] end)
+        | (.nodes[]|select(.type=="EmptyLatentImage").widgets_values)=[ $w, $h, 1 ]
+        | (.nodes[]|select(.type=="KSampler").widgets_values)=[ $seed, $s, "normal", $steps, $cfg, 1.0 ]
+        | (.nodes[]|select(.type=="SaveImage").widgets_values)=[ "poh_cli/" + $stamp + "/" ]
+        ' "$WF" > /tmp/obai_wf.json
+    else
+      WF="$PWD/comfy/workflows/cli/animatediff_basic.json"
+      [[ -f "$WF" ]] || die "Workflow not found: $WF (install AnimateDiff in ComfyUI Manager)"
+      jq \
+        --arg ck "$CKPT" --arg motion "$MOTION" \
+        --arg p "$PROMPT" --arg n "$NEG" \
+        --arg s "$SAMPLER" --arg sch "$SCHEDULER" \
+        --argjson w "$W" --argjson h "$H" \
+        --argjson frames "$FRAMES" --argjson fps "$FPS" \
+        --argjson steps "$STEPS" --argjson cfg "$CFG" \
+        --argjson seed "$SEED" --arg stamp "$STAMP" \
+        '
+        (.nodes[]|select(.type=="CheckpointLoaderSimple").widgets_values)[0]=$ck
+        | (.nodes[]|select(.type=="AnimateDiffLoader").widgets_values)=[ $motion, $fps ]
+        | (.nodes[]|select(.type=="CLIPTextEncode").widgets_values) |=
+            (if .[0]=="__PROMPT__" then [$p] else [$n] end)
+        | (.nodes[]|select(.type=="EmptyLatentImage").widgets_values)=[ $w, $h, $frames ]
+        | (.nodes[]|select(.type=="KSampler").widgets_values)=[ $seed, $s, "normal", $steps, $cfg, 1.0 ]
+        | (.nodes[]|select(.type=="SaveImage").widgets_values)=[ "poh_video/" + $stamp + "/" ]
+        ' "$WF" > /tmp/obai_wf.json
+    fi
+
+    print "📨 Submitting to ComfyUI…"
+    curl -s -X POST "$API" -H 'Content-Type: application/json' --data-binary @- <<EOF | jq '.|{prompt_id:.prompt_id}'
+{ "prompt": $(cat /tmp/obai_wf.json) }
+EOF
+
+    print ""
+    print "🗂  Outputs will appear under:"
+    print "   images: ./assets/images/_comfy_output/"
+    print "   video : ./assets/video/_comfy_output/"
+    exit 0
+  fi
+
+  usage; exit 1
+}
+main "$@"

@@ -8,11 +8,13 @@ import Logger from '../core/logger.js';
 import SoulForge from './soul-forge.jsx';
 import characterService from '../services/character-service.js';
 import rewardService from '../services/reward-service.js';
+import { SaveExporter } from '../utils/save-exporter.js';
 
 export default function SaveSlotScreen({ characterId, onBack, onGameStart }) {
     const [saveSlots, setSaveSlots] = useState([]);
     const [showConfirmDialog, setShowConfirmDialog] = useState(null);
     const [showSoulForge, setShowSoulForge] = useState(null); // null or { characterId, slotNumber }
+    const [expandedSlot, setExpandedSlot] = useState(1); // Which slot is currently expanded
 
     useEffect(() => {
         // Load save slot information
@@ -141,89 +143,139 @@ export default function SaveSlotScreen({ characterId, onBack, onGameStart }) {
 
     return (
         <>
-        <div className="h-full bg-rpg-radial text-rpg-text p-4 overflow-y-auto">
-            <div className="max-w-md mx-auto">
-                <div className="text-center mb-6">
-                    <div className="flex justify-between items-center mb-4">
+        <div className="h-[90vh] bg-rpg-radial text-rpg-text p-2 flex flex-col">
+            <div className="max-w-md mx-auto w-full flex-1 flex flex-col min-h-0">
+                <div className="text-center mb-2 flex-shrink-0">
+                    <div className="flex justify-between items-center mb-2">
                         <button
                             onClick={onBack}
-                            className="text-rpg-primary hover:text-rpg-secondary text-lg"
+                            className="text-rpg-primary hover:text-rpg-secondary text-sm"
                         >
                             ← {t('saveSlots.back')}
                         </button>
                         <button
                             onClick={onBack}
-                            className="text-rpg-text opacity-70 hover:text-rpg-primary text-sm bg-rpg-secondary hover:bg-rpg-primary px-3 py-1 rounded"
+                            className="text-rpg-text opacity-70 hover:text-rpg-primary text-xs bg-rpg-secondary hover:bg-rpg-primary px-2 py-0.5 rounded"
                         >
                             {t('saveSlots.switchCharacter')}
                         </button>
                     </div>
-                    <h1 className="text-4xl font-bold text-rpg-primary mb-2">
+                    <h1 className="text-2xl font-bold text-rpg-primary mb-1">
                         {t(`characters.${characterId}.name`)}
                     </h1>
-                    <p className="text-rpg-text opacity-70">{t('saveSlots.selectSlot')}</p>
+                    <p className="text-rpg-text opacity-70 text-xs">{t('saveSlots.selectSlot')}</p>
                 </div>
 
-                <div className="space-y-4">
-                    {saveSlots.map((slot) => (
-                        <div key={slot.slotNumber} className="bg-rpg-bg-darker bg-opacity-80 border border-rpg-secondary rounded-lg p-4 backdrop-blur-sm">
-                            <div className="flex justify-between items-start mb-3">
-                                <h3 className="text-xl font-bold text-rpg-primary">
-                                    {t('saveSlots.slot')} {slot.slotNumber}
-                                </h3>
-                                {slot.exists && (
-                                    <button
-                                        onClick={() => handleDeleteSave(slot.slotNumber)}
-                                        className="text-health-mid hover:text-health-full text-sm"
-                                    >
-                                        🗑️ {t('saveSlots.delete')}
-                                    </button>
+                <div className="flex flex-col gap-2 flex-1 min-h-0">
+                    {saveSlots.map((slot) => {
+                        const isExpanded = expandedSlot === slot.slotNumber;
+
+                        return (
+                            <div
+                                key={slot.slotNumber}
+                                className={`flex-1 bg-rpg-bg-darker bg-opacity-80 border-2 rounded-lg backdrop-blur-sm transition-all flex flex-col ${
+                                    isExpanded ? 'border-rpg-primary p-4' : 'border-rpg-secondary p-3 cursor-pointer hover:border-rpg-primary justify-center'
+                                }`}
+                                onClick={() => !isExpanded && setExpandedSlot(slot.slotNumber)}
+                            >
+                                {isExpanded ? (
+                                    // EXPANDED VIEW - Full details with consistent layout
+                                    <>
+                                        <div className="flex justify-between items-start mb-3 flex-shrink-0">
+                                            <h3 className="text-xl font-bold text-rpg-primary">
+                                                {t('saveSlots.slot')} {slot.slotNumber}
+                                            </h3>
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleDeleteSave(slot.slotNumber);
+                                                }}
+                                                className={`text-sm ${slot.exists ? 'text-health-mid hover:text-health-full' : 'invisible'}`}
+                                            >
+                                                🗑️ {t('saveSlots.delete')}
+                                            </button>
+                                        </div>
+
+                                        <div className="mb-4 flex-1 min-h-0 flex flex-col justify-center">
+                                            {slot.exists ? (
+                                                <>
+                                                    <p className="text-rpg-text opacity-80 text-base mb-1">
+                                                        {t('saveSlots.level')}: {slot.level} | {t('saveSlots.floor')}: {slot.floor}
+                                                    </p>
+                                                    <p className="text-rpg-text opacity-80 text-base mb-1">
+                                                        {t('saveSlots.gold')}: {slot.gold}
+                                                    </p>
+                                                    <p className="text-epic text-base mb-1">
+                                                        👻 {GameState.getCharacterSouls(characterId, slot.slotNumber)} {t('souls.heroSouls')}
+                                                    </p>
+                                                    <p className="text-rpg-text opacity-50 text-sm">
+                                                        {formatDate(slot.timestamp)}
+                                                    </p>
+                                                </>
+                                            ) : (
+                                                <p className="text-rpg-text opacity-50 text-lg text-center">{t('saveSlots.empty')}</p>
+                                            )}
+                                        </div>
+
+                                        <div className="flex gap-2 flex-shrink-0">
+                                            {slot.exists ? (
+                                                <>
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            handleLoadGame(slot.slotNumber);
+                                                        }}
+                                                        className="flex-1 bg-uncommon hover:bg-rare text-rpg-text font-bold py-2 px-3 rounded-lg text-sm"
+                                                    >
+                                                        {t('saveSlots.load')}
+                                                    </button>
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            SaveExporter.exportSaveToExcel(characterId, slot.slotNumber);
+                                                        }}
+                                                        className="bg-green-600 hover:bg-green-700 text-rpg-text font-bold py-2 px-3 rounded-lg text-sm"
+                                                        title="Export save to Excel"
+                                                    >
+                                                        📊
+                                                    </button>
+                                                </>
+                                            ) : (
+                                                <button
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        handleNewGame(slot.slotNumber);
+                                                    }}
+                                                    className="flex-1 bg-rpg-primary hover:bg-rpg-secondary text-rpg-text font-bold py-2 px-4 rounded-lg text-sm"
+                                                >
+                                                    {t('saveSlots.newGame')}
+                                                </button>
+                                            )}
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    setShowSoulForge({ characterId, slotNumber: slot.slotNumber });
+                                                }}
+                                                className="flex-1 bg-rpg-secondary hover:bg-rpg-primary text-rpg-text font-bold py-2 px-4 rounded-lg text-sm"
+                                            >
+                                                ⚡ {t('souls.forge')}
+                                            </button>
+                                        </div>
+                                    </>
+                                ) : (
+                                    // COLLAPSED VIEW - Consistent single line
+                                    <div className="flex items-center justify-between h-full">
+                                        <h3 className="text-lg font-bold text-rpg-primary">
+                                            {t('saveSlots.slot')} {slot.slotNumber}
+                                        </h3>
+                                        <p className={`text-sm ${slot.exists ? 'text-rpg-text opacity-80' : 'text-rpg-text opacity-50 italic'}`}>
+                                            {slot.exists ? `Lv.${slot.level} | Floor ${slot.floor}` : t('saveSlots.empty')}
+                                        </p>
+                                    </div>
                                 )}
                             </div>
-
-                            {slot.exists ? (
-                                <div className="mb-4">
-                                    <p className="text-rpg-text opacity-80">
-                                        {t('saveSlots.level')}: {slot.level} | {t('saveSlots.floor')}: {slot.floor}
-                                    </p>
-                                    <p className="text-rpg-text opacity-80">
-                                        {t('saveSlots.gold')}: {slot.gold}
-                                    </p>
-                                    <p className="text-epic">
-                                        👻 {GameState.getCharacterSouls(characterId, slot.slotNumber)} {t('souls.heroSouls')}
-                                    </p>
-                                    <p className="text-rpg-text opacity-50 text-sm">
-                                        {formatDate(slot.timestamp)}
-                                    </p>
-                                </div>
-                            ) : (
-                                <p className="text-rpg-text opacity-50 mb-4">{t('saveSlots.empty')}</p>
-                            )}
-
-                            <div className="flex gap-2">
-                                {slot.exists && (
-                                    <button
-                                        onClick={() => handleLoadGame(slot.slotNumber)}
-                                        className="flex-1 bg-uncommon hover:bg-rare text-rpg-text font-bold py-2 px-4 rounded-lg"
-                                    >
-                                        {t('saveSlots.load')}
-                                    </button>
-                                )}
-                                <button
-                                    onClick={() => handleNewGame(slot.slotNumber)}
-                                    className="flex-1 bg-rpg-primary hover:bg-rpg-secondary text-rpg-text font-bold py-2 px-4 rounded-lg"
-                                >
-                                    {t('saveSlots.newGame')}
-                                </button>
-                                <button
-                                    onClick={() => setShowSoulForge({ characterId, slotNumber: slot.slotNumber })}
-                                    className="bg-rpg-secondary hover:bg-rpg-primary text-rpg-text font-bold py-2 px-4 rounded-lg flex items-center gap-1"
-                                >
-                                    ⚡ {t('souls.forge')}
-                                </button>
-                            </div>
-                        </div>
-                    ))}
+                        );
+                    })}
                 </div>
             </div>
         </div>
