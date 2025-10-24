@@ -1,355 +1,201 @@
-# CLAUDE.md
+# Path of Heroes - RPG Dungeon Crawler
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+<!-- Inherits from MASTER_CLAUDE.md and game-development.md -->
 
-## Project Overview
+## 🎯 Project Overview
+**Type**: Game Development
+**Status**: Active Development
+**Domain Module**: `modules/domains/game-development.md`
 
-Path of Heroes is a mobile-first React roguelike dungeon crawler built with Vite and TailwindCSS. It features turn-based combat, procedural dungeon generation, and a persistent debug system.
+Mobile-first React roguelike dungeon crawler built with Vite and TailwindCSS. Features turn-based combat, procedural dungeon generation, character progression, and comprehensive localization system.
 
-## Development Commands
+## 📋 Project-Specific Overrides
 
-```bash
-npm run dev      # Start development server
-npm run build    # Build for production
-npm run preview  # Preview production build
-npm run deploy   # Deploy to GitHub Pages
+### Agent Pipeline Customization
+```
+Recommended Pipeline: 0 → 2 → 4 → 6 → 7 → 8 → 11
+Complexity Level: Complex
+Quality Gates: Game Balance, Performance (60fps), Save System Integrity, Localization
 ```
 
-## Architecture
+### Game Development Enhancements
+- **Turn-Based Combat**: Complex damage formulas and status effects
+- **Procedural Generation**: 5x9 maze dungeons with strategic room placement
+- **Character Progression**: Individual save systems with balanced XP curves
+- **Bilingual Support**: Complete Arabic/English localization with RTL support
+- **Mobile Optimization**: Portrait orientation, touch-friendly interface
 
-### State Management
-- **Global State**: Single singleton object in `src/core/state.js` with subscription model
+## 🔧 Technical Configuration
+
+### Technology Stack
+- **Framework**: React 18 with Vite 7
+- **Styling**: TailwindCSS 3.4.17
+- **Build Tools**: Vite, PostCSS, Autoprefixer
+- **Deployment**: GitHub Pages
+- **Testing**: Manual playtesting, balance simulation scripts
+
+### Development Commands
+```bash
+# Development server
+npm run dev
+
+# Build for production
+npm run build
+
+# Preview production build
+npm run preview
+
+# Deploy to GitHub Pages
+npm run deploy
+```
+
+### Repository Information
+- **GitHub URL**: [To be created in sync phase]
+- **Deployment URL**: [GitHub Pages URL when created]
+- **Documentation**: README.md + comprehensive CLAUDE.md
+
+## 🎯 Project-Specific Quality Gates
+
+### Must-Have Checks
+- [ ] Frame rate maintains 60fps on mobile devices
+- [ ] Save/load system works across all 3 character save slots
+- [ ] Game balance validated through automated simulation
+- [ ] Arabic/English localization complete and functional
+- [ ] Touch interface responsive on 320px+ screens
+- [ ] Combat formulas produce expected win rates (60% player advantage)
+- [ ] Dungeon generation creates solvable mazes consistently
+
+### Performance Targets
+- **Frame Rate**: Stable 60fps
+- **Save Operations**: < 1 second
+- **Scene Transitions**: < 3 seconds
+- **Memory Usage**: < 100MB
+- **Bundle Size**: Optimized for mobile loading
+
+## 📂 File Structure Notes
+
+### Important Files
+- **src/core/state.js**: Global game state management with subscription model
+- **src/systems/**: Core game systems (combat, dungeon, inventory, etc.)
+- **src/constants/**: Game configuration, characters, enemies, localization
+- **public/locales/**: Arabic and English translation files (user-editable)
+- **src/components/**: React UI components for all game screens
+
+### Special Considerations
+- **State Management**: Single singleton object with subscription model for React integration
 - **Save System**: Character-specific saves with 3 slots per character in localStorage
-- **State Updates**: All state changes go through `GameState.update()` or dedicated methods
-- **Reactivity**: Components subscribe to state changes via `GameState.subscribe()`
+- **Localization**: External JSON files allow non-developer translation updates
+- **Balance Testing**: Automated simulation scripts for combat and progression validation
 
-### Core Systems
-- **Combat**: `src/systems/combat.js` - Turn-based combat with damage formula: `(ATK² / (ATK + DEF))`
-- **Dungeon**: `src/systems/dungeon.js` - Procedural 5x9 maze generation with character-specific boss scaling
-- **Inventory**: `src/systems/inventory.js` - Item and equipment management (planned)
-- **Save System**: Character-specific progression paths with individual save slots (`src/components/save-slot-screen.jsx`)
+## 🔒 Project-Specific Safety Protocols
 
-### Screen Navigation
-Screens are controlled by `GameState.current.currentScreen`:
-- `'main-menu'` - Character selection with Soul Forge access
-- `'save-slots'` - Save slot management (New Game/Load/Delete with confirmations)
-- `'exploration'` - Dungeon grid navigation
-- `'battle'` - Turn-based combat UI
-- `'shop'` - Item purchasing
-- `'outcome'` - Post-battle results
+### Critical Rules
+- **Game Balance**: Never adjust balance without running simulation tests
+- **Save Integrity**: All save operations must be tested across character transitions
+- **Performance**: Combat animations must not drop below 55fps on mobile
+- **Localization**: Both languages must be functionally complete before release
 
-### File Structure Conventions
-- All React components use kebab-case naming (e.g., `battle-screen.jsx`)
-- Constants organized in `src/constants/` directory
-- Core game logic in `src/systems/`
-- UI components in `src/components/`
+### Never Do
+- ❌ Modify character stats without updating balance simulation
+- ❌ Change save format without migration system
+- ❌ Add features that break mobile portrait orientation
+- ❌ Use English-only text anywhere in the interface
 
-## Key Game Systems
+### Always Do
+- ✅ Run balance simulation after any combat system changes
+- ✅ Test save/load functionality after state management updates
+- ✅ Verify both Arabic and English interfaces after UI changes
+- ✅ Performance test on actual mobile devices
+
+## 🎮 Game-Specific Guidelines
+
+### Balance Philosophy
+- **Player Advantage**: Target 60% win rate against same-level enemies
+- **Progression Curve**: 100 base XP + 120 increment per level to prevent rapid early leveling
+- **Resource Management**: Balanced costs encourage strategic ability usage
+- **Difficulty Scaling**: 20% base + 5% exponential per floor
 
 ### Combat System
-- Turn order determined by Speed (SPD) stat
-- Multi-enemy encounters with focus targeting
-- Status effects (poison, defend stance)
-- God mode and instant win debug features
+- **Damage Formula**: `(ATK² / (ATK + DEF))` for balanced scaling
+- **Turn Order**: Speed (SPD) stat determines initiative
+- **Status Effects**: Poison, defend stance, buffs system
+- **Multi-Enemy**: 30% base chance + 10% per floor (max 60%)
 
-### Character System
-- Three playable characters with unique resources (Vigor, Mana, Energy)
-- **Character-Specific Progression**: Each character has unique progression paths and boss scaling
-- **Balanced Progression**: XP curve adjusted (100 base + 120 increment) to prevent rapid leveling after level 3
-- **Balanced Stats**: Lower starting stats for more strategic gameplay
-- **Resource Management**: Reduced resource pools require careful ability usage
-- **Individual Save System**: 3 save slots per character with separate progression
-- **Boss Scaling**: All characters face the same boss difficulty (1.0x) for fair balance
-- Character growth rates balanced for long-term progression
+### Localization Requirements
+- **Complete Coverage**: All UI text, character names, skills, and system messages
+- **RTL Support**: Proper Arabic text direction and layout
+- **Cultural Sensitivity**: Appropriate character names and themes for both cultures
+- **External Editing**: JSON files allow translators to work without code access
 
-### Dungeon System
-- **Grid Size**: 5x9 compact maze layout (optimized for large, visible squares)
-- **No Fog of War**: ALL rooms are visible from the start - no hidden paths or fog of war mechanics
-- **Strategic Visibility**: Full dungeon path revealed from start for strategic planning of optimal routes
-- **Clean Path Display**: Unvisited paths appear plain/empty until explored, events remain surprises
-- **Maze Generation**: Recursive backtracking algorithm creates unique layouts each floor
-- **Wall System**: Hard walls (⬛) block movement, creating strategic path choices
-- **Room Placement**: Strategic positioning prevents direct access to boss/shrine rooms
-- **Room Types**: Wall 🧱, Path (empty), Battle ⚔️, Elite 💀, Shop 🏪, Shrine ⛩️, Treasure 💎, Boss 👹, Stairs 🔄
-- **Navigation**: WASD/Arrow keys + click adjacent rooms to move
-- **Progressive Discovery**: Room types revealed only when entered
-- **Replayability**: Each floor generates a completely new maze layout
+## 📊 Success Metrics
 
-### Floor Progression System
-- **Stairs Mechanic**: Defeat boss to spawn stairs (🔄) to next floor
-- **Floor Transitions**: Automatic dungeon reset and generation for new floor
-- **Balanced Rewards**: Much lower gold/reward scaling for challenging economy
-- **Partial Healing**: 25% HP restoration when advancing floors
+### Primary Goals
+1. **Engaging Gameplay**: Average session > 10 minutes
+2. **Balanced Progression**: Playtesting validates difficulty curve
+3. **Cultural Accessibility**: Both language communities can fully enjoy the game
 
-### Dynamic Difficulty Scaling
-- **Enemy Stats**: Base 20% + 5% exponential scaling per floor (significantly increased from previous versions)
-- **Multi-Enemy Encounters**: 30% base chance + 10% per floor (max 60%)
-- **Triple Encounters**: Available from floor 5+ (20% chance)
-- **Elite Scaling**: 50% base + 10% per floor bonus, may have minions (floor 3+)
-- **Boss Scaling**: 80% base + 15% per floor bonus, with character-specific modifiers
-- **Character-Specific Boss Naming**: Bosses get unique titles based on character progression path (e.g., "Floor 2 defensive_tank Nemesis")
-- **Reward Scaling**: Treasures give 20% more gold per floor, shrine bonuses increase (all significantly reduced from previous versions)
+### Measurement Methods
+- **Retention**: Day 7 retention tracking through local analytics
+- **Balance Validation**: Automated simulation confirms 60% win rates
+- **Performance**: Frame rate monitoring during extended play sessions
+- **Localization**: User feedback from both language communities
 
-### Floor Progression
-- Enemy scaling: Enhanced compound scaling (base + exponential)
-- Elite enemies: Floor-scaling bonuses with "Elite" prefix and possible minions
-- Boss encounters: Enhanced scaling with unique "Floor X Lord" titles
-- Boss placement: Always positioned furthest from starting location  
-- Death penalty: 90% gold loss, Hero Souls retained
+## 🔄 Maintenance Notes
 
-## Combat Balance & Systems (V38.2)
+### Regular Updates Needed
+- **Balance Tuning**: Monthly review of progression metrics and player feedback
+- **Localization Updates**: Add new content in both languages simultaneously
+- **Performance Optimization**: Monitor and optimize for new mobile devices
 
-### Combat Rebalance Overview
-Complete overhaul addressing resource costs, survivability, and strategic depth:
-- **Increased HP pools**: 60-100% improvement across all characters
-- **Enhanced resource pools**: 25-40% more mana/vigor/energy
-- **Reduced ability costs**: 20-33% reduction for frequent usage
-- **Resource regeneration**: 8+ points per turn for sustainability
-- **Starting potions**: Emergency healing and resource restoration
-- **Hades-style buffs**: Strategic choices at battle start
+### Known Issues
+- **Memory Growth**: Extended play sessions may show memory increase
+- **Arabic Font Loading**: Initial load may show brief font swap
+- **Save Migration**: No migration system for save format changes
 
-### Potion System (`src/systems/potions.js`)
-Consumable items available during combat for tactical recovery:
+## 📞 Stakeholder Information
 
-#### Starting Potions
-- **3x Health Potions** (50 HP each) - Total emergency HP: 150
-- **2x Resource Potions** (40 resource each) - Total emergency resource: 80
+### Primary Contacts
+- **Game Designer**: Claude Code - Balance, mechanics, progression
+- **Localization**: Community contributors for Arabic/English
+- **Technical**: React/Vite development stack
 
-#### Potion Types
-- **Health Potion** (❤️‍🩹): Restores 50 HP instantly
-- **Resource Potion** (🧪): Restores 40 resource points instantly  
-- **Greater Health Potion** (💖): Restores 80 HP instantly
-- **Elixir of Vitality** (🌟): Fully restores HP and resource
+### Approval Process
+1. **Balance Testing**: Automated simulation validates changes
+2. **Localization Review**: Both languages functionally tested
+3. **Performance Validation**: Mobile testing confirms smooth operation
 
-#### Usage
-- Potions usable during player turn in combat
-- Consume turn but don't end turn (can still move/act)
-- Quantities displayed on battle UI
-- Managed via `PotionSystem.usePotion(type)`
+---
 
-### Hades-Style Buff System (`src/systems/buffs.js`)
-Strategic buff selection at battle start with stackable effects:
+## 🔗 Inheritance Chain
 
-#### Buff Categories
-
-**Offensive Buffs:**
-- **Berserker Rage** (🔥): +25% attack damage this battle
-- **Precision Strike** (🎯): +15% critical hit chance
-- **Swift Reflexes** (⚡): +30% speed this battle
-
-**Defensive Buffs:**
-- **Iron Skin** (🛡️): +40% defense this battle
-- **Vampiric Aura** (🩸): Heal 20% of damage dealt as HP
-- **Mana Surge** (💫): +50% resource regeneration this battle
-
-**Utility Buffs:**
-- **Battle Focus** (🎭): Abilities cost 25% less resource
-- **Lucky Strikes** (🍀): 20% chance to not consume resource
-- **Second Wind** (🌪️): Heal 15 HP at start of each turn
-
-#### Buff Selection
-- 3 random buffs offered at battle start (from pool of 9+)
-- Player chooses 1 buff to apply for entire battle
-- Buffs are stackable across multiple battles
-- Effects processed at appropriate timing (`turn_start`, `damage_dealt`, etc.)
-
-### Resource Regeneration System
-Characters now regenerate resources each turn for sustainable combat:
-- **Base Regeneration**: 8 points per turn
-- **Level Scaling**: +0.5 additional per character level
-- **Buff Modifiers**: Mana Surge increases regen by 50%
-- **Example**: Level 5 character regens 10.5 per turn
-
-### Balanced Character Stats
-Enhanced starting stats for better survivability and gameplay:
-
-#### Warrior (Omar)
-- **HP**: 100 (balanced survivability)
-- **Vigor**: 50 (for Shield Bash usage)
-- **Shield Bash Cost**: 12 (reduced cost)
-
-#### Sorceress (Salma) 
-- **HP**: 80 (balanced survivability) 
-- **Mana**: 70 (for multiple Fireball casts)
-- **Fireball Cost**: 20 (reduced cost)
-
-#### Rogue (Shadi)
-- **HP**: 90 (balanced survivability)
-- **Energy**: 60 (for Venom Strike usage) 
-- **Venom Strike Cost**: 15 (reduced cost)
-
-### Battle UI Enhancements
-Redesigned battle interface for new systems:
-- **Compact action buttons**: 4-column grid for main combat actions
-- **Potion row**: Dedicated buttons showing quantities (HP, MP, G.HP, Elixir)
-- **Buff indicators**: Active buffs shown with icons and effects
-- **Resource tracking**: Enhanced resource bars with regeneration display
-
-## Debug Features
-
-### Developer Hotkeys (Global)
-- `0` - Toggle God Mode (invincibility + 9999 damage)
-- `1` - Restore HP to full
-- `2` - Restore resource (Mana/Vigor/Energy) to full
-- `3` - Add 100 gold
-- `4` - Gain one level
-- `5` - Instantly win current battle
-
-### Persistent Debugger
-- Always-visible debug panel (`src/components/persistent-debugger.jsx`)
-- Integrated logging system (`src/core/logger.js`)
-- Log categories: SYSTEM, COMBAT, STATE, UI, INPUT, ERROR
-
-## Character-Specific Save System
-
-### Save System Implementation
-- **3 Save Slots per Character**: Each character (Taha, Mais, Ibrahim) has independent save data
-- **Character Selection Flow**: Main Menu → Character Selection → Save Slot Management → Game
-- **Save Data Structure**: Includes characterId, level, floor, gold, experience, and character-specific progression
-- **Confirmation Dialogs**: New Game overwrites, Load Game, and Delete operations all require confirmation
-- **Automatic Saving**: Game state is automatically saved during progression (manual save functionality available)
-
-### Character Progression Paths
-Each character has unique progression characteristics defined in `src/constants/characters.js`:
-
-#### Omar (Warrior)
-- **Progression Path**: `defensive_tank`
-- **Boss Scaling**: 1.0x (same difficulty as all characters)
-- **Preferred Enemy Types**: `brute`, `physical`
-- **Unique Rewards**: `heavy_armor`, `shields`
-
-#### Salma (Sorceress)  
-- **Progression Path**: `elemental_mage`
-- **Boss Scaling**: 1.0x (same difficulty as all characters)
-- **Preferred Enemy Types**: `magical`, `undead`
-- **Unique Rewards**: `staves`, `mana_crystals`
-
-#### Shadi (Rogue)
-- **Progression Path**: `assassin_berserker`
-- **Boss Scaling**: 1.0x (same difficulty as all characters)
-- **Preferred Enemy Types**: `fast`, `elite`
-- **Unique Rewards**: `daggers`, `poisons`
-
-### Save System Usage
-- Save slots display: Level, Floor, Gold, and Last Played timestamp
-- Empty slots show "Empty Slot" with option to start New Game
-- Existing saves show Load/Delete options with confirmation
-- Character-specific save keys: `pathOfHeroes_save_${characterId}_${slotNumber}`
-
-## Important Implementation Notes
-
-### Documentation Maintenance (CRITICAL RULE)
-- **ALWAYS update README.md** to match all CLAUDE.md changes after implementing new features
-- README.md serves as user-facing documentation and must stay synchronized
-- Check both files for consistency before completing any major feature implementation
-- Version numbers and changelogs must be updated in both files simultaneously
-
-### State Management Patterns
-- Never mutate `GameState.current` directly - use provided methods
-- Always call `GameState._notify()` after state changes
-- Components should subscribe to state in `useEffect` with cleanup
-- Use character-specific save methods: `GameState.saveGame(characterId, slotNumber)`
-- Load character data with: `GameState.loadGame(characterId, slotNumber)`
-
-### Combat Implementation
-- Combat is turn-based with automatic enemy AI after 800ms delay
-- All damage calculations go through `CombatSystem.calculateDamage()`
-- Status effects are processed at start of each unit's turn
-
-### Dungeon Implementation
-- Maze generation uses recursive backtracking for guaranteed solvable paths
-- All movement respects wall boundaries - no free navigation
-- Room revelation system shows adjacent accessible rooms only
-- Strategic room distribution: boss furthest from start, special rooms scattered
-- Player movement restricted to path tiles only (walls block access)
-
-### UI Patterns  
-- Mobile-first design with strict portrait orientation
-- TailwindCSS utility classes for styling
-- 5x9 compact grid with large, clearly visible squares
-- Full-screen layout maximizing square size and usability
-- Large text (3xl) and increased spacing for better visibility
-- Click/tap navigation for adjacent accessible rooms only
-- Combat UI shows turn indicators and action buttons
-
-### Visual Indicators
-- **Clean Paths**: Unvisited path rooms appear plain/empty (clean and uncluttered)
-- **Discovered Rooms**: Actual room type icons after visiting (⚔️, 💀, 🏪, etc.)
-- **Completed Rooms**: Color-coded backgrounds (green for battles, blue for stairs, etc.)
-- **Wall Blocks**: Stone-colored 🧱 icons, clearly blocking and non-interactive
-- **Player Position**: Amber pulsing background with character icon (🧍)
-- **Strategic Planning**: Full maze layout visible for route planning to boss/shops
-
-## Testing & Debugging
-
-Use the developer hotkeys for rapid testing of game states. The persistent debugger shows real-time game state and logs all system operations.
-
-The game enforces portrait orientation and is optimized for mobile devices with touch controls alongside keyboard support.
-
-## Comprehensive Localization System
-
-### Master Translation Files (Editable by User)
-All game text is stored in external JSON files for easy editing:
-- `public/locales/en.json` - English translations
-- `public/locales/ar.json` - Arabic translations
-
-**No code changes needed to update translations!** See `LOCALIZATION.md` for complete editing guide.
-
-### Implementation Pattern
-All components use the centralized localization system:
-
-```javascript
-import { t } from '../core/localization.js';
-
-function MyComponent() {
-    return <div>{t('game.title')}</div>;
-}
+```
+MASTER_CLAUDE.md (Universal orchestrator)
+    ↓
+modules/domains/game-development.md (Game-specific patterns)
+    ↓
+p-o-h/CLAUDE.md (Project-specific overrides)
 ```
 
-### Language Selection
-- Automatic language selection screen on first launch
-- Language toggle available on main menu (🌍 button)
-- Persistent language preference in localStorage
-- Automatic RTL support for Arabic
+### From Master System
+- 12-Agent Framework with complex game development pipeline
+- TodoWrite workflow for multi-step feature development
+- Quality gates ensuring performance and stability
+- Git management for version control and deployment
 
-### Adding New Translations
-1. Add new keys to both `en.json` and `ar.json` files
-2. Use descriptive nested keys: `characters.warrior.name`, `combat.victory`
-3. Support template strings: `{placeholder}` for dynamic values
-4. Use `t('key', {placeholder: value})` for dynamic text
+### From Game Development Module
+- Game loop architecture with 60fps targeting
+- Save system patterns with version compatibility
+- Balance testing frameworks and automation
+- Performance monitoring and optimization strategies
 
-### Current Integration Status
-- ✅ Complete bilingual system with external JSON files
-- ✅ Language selection screen at startup
-- ✅ All UI elements fully localized
-- ✅ Character names, enemy names, skills localized
-- ✅ Hero Souls system fully localized
-- ✅ Main menu with language toggle
-- ✅ Save slot system fully localized with confirmation dialogs
-- ✅ RTL support for Arabic interface
+### Project Overrides
+- Turn-based combat with specific damage formulas
+- Character-specific save system with 3 slots per character
+- Bilingual localization with external JSON management
+- Mobile-first design with portrait orientation requirement
+- Procedural dungeon generation with 5x9 grid constraints
 
-## Dark RPG Theme Colors
+---
 
-### Color Palette
-- **Background**: `radial-gradient(ellipse at center, #1a0f0a 0%, #0d0604 40%, #000000 100%)`
-- **Primary**: `#d4a656` (Golden amber)
-- **Secondary**: `#5c4423` (Dark brown)
-- **Text**: `#f8e4c0` (Light cream)
-
-### Resource Bars
-- **Health**: `linear-gradient(90deg, #8b0000, #ff4500, #ff6347)` (Dark red to orange-red)
-- **Mana**: `linear-gradient(90deg, #191970, #4169e1, #87ceeb)` (Midnight blue to sky blue)
-
-### Item Rarity Colors
-- **Common**: `#95a5a6` (Gray)
-- **Uncommon**: `#27ae60` (Green)
-- **Rare**: `#3498db` (Blue)
-- **Epic**: `#9b59b6` (Purple)
-- **Mythic**: `#e67e22` (Orange)
-- **Legendary**: `#f1c40f` (Gold)
-
-### Implementation Notes
-- Dark theme creates immersive dungeon atmosphere
-- High contrast ensures mobile readability
-- Gradient backgrounds add depth and visual interest
-- Color-coded rarities provide immediate item value recognition
+*Last Updated: October 2024*
+*Version: 38.2 (Combat Rebalance)*
